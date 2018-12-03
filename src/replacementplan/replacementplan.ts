@@ -47,12 +47,12 @@ const extractData = async (data: any) => {
                             parsed = true;
                             d.push({
                                 unit: unit,
-                                subject: original[0].split(' ')[0].toUpperCase(),
+                                subject: original[0].split(' ')[0].toUpperCase().replace(/[0-9]/g, ''),
                                 course: original[0].split(' ')[1].toUpperCase(),
                                 room: original[1].toUpperCase(),
                                 teacher: '',
                                 change: {
-                                    subject: changed[1].split(' ')[1].toUpperCase(),
+                                    subject: changed[1].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
                                     teacher: changed[0].split(' ')[0],
                                     room: changed[1].split(' ')[2].toUpperCase(),
                                     info: changed[0].split(' ')[1]
@@ -63,7 +63,7 @@ const extractData = async (data: any) => {
                             parsed = true;
                             d.push({
                                 unit: unit,
-                                subject: original[0].split(' ')[1].toUpperCase(),
+                                subject: original[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
                                 course: original[0].split(' ')[2].toUpperCase(),
                                 room: original[1].toUpperCase(),
                                 teacher: '',
@@ -79,7 +79,7 @@ const extractData = async (data: any) => {
                             parsed = true;
                             d.push({
                                 unit: unit,
-                                subject: original[0].split(' ')[0].toUpperCase(),
+                                subject: original[0].split(' ')[0].toUpperCase().replace(/[0-9]/g, ''),
                                 course: '',
                                 room: original[0].split(' ')[1].toUpperCase(),
                                 teacher: '',
@@ -97,7 +97,7 @@ const extractData = async (data: any) => {
                             for (let k = 0; k < original.length - 1; k++) {
                                 d.push({
                                     unit: unit,
-                                    subject: original[k].split(' ')[2].toUpperCase(),
+                                    subject: original[k].split(' ')[2].toUpperCase().replace(/[0-9]/g, ''),
                                     course: original[k].split(' ')[3].toUpperCase(),
                                     room: '',
                                     teacher: original[k].split(' ')[1].toUpperCase(),
@@ -114,7 +114,7 @@ const extractData = async (data: any) => {
                             parsed = true;
                             d.push({
                                 unit: unit,
-                                subject: original[0].split(' ')[1].toUpperCase(),
+                                subject: original[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
                                 course: original[0].split(' ')[2].toUpperCase(),
                                 room: original[1],
                                 teacher: '',
@@ -130,7 +130,7 @@ const extractData = async (data: any) => {
                             parsed = true;
                             d.push({
                                 unit: unit,
-                                subject: original[0].split(' ')[1].toUpperCase(),
+                                subject: original[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
                                 course: original[0].split(' ')[2].toUpperCase(),
                                 room: original[1],
                                 teacher: '',
@@ -146,7 +146,7 @@ const extractData = async (data: any) => {
                             parsed = true;
                             d.push({
                                 unit: unit,
-                                subject: original[0].split(' ')[1].toUpperCase(),
+                                subject: original[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
                                 course: original[0].split(' ')[2].toUpperCase(),
                                 room: original[1],
                                 teacher: '',
