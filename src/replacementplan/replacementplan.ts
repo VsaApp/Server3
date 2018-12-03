@@ -158,6 +158,22 @@ const extractData = async (data: any) => {
                                 }
                             });
                         }
+                        if (changed[0].includes('Aufs.aus')) {
+                            parsed = true;
+                            d.push({
+                                unit: unit,
+                                subject: original[0].split(' ')[1].toUpperCase(),
+                                course: original[0].split(' ')[2].toUpperCase(),
+                                room: original[1],
+                                teacher: '',
+                                change: {
+                                    subject: '',
+                                    teacher: changed[0].split(' ')[0],
+                                    room: changed[0].split('R.')[1],
+                                    info: 'Aufsicht aus'
+                                }
+                            });
+                        }
                         if (!parsed) {
                             let text = '';
                             let file = path.resolve(process.cwd(), 'out', 'replacementplan', 'unparsed.txt');
