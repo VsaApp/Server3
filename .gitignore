@@ -62,4 +62,5 @@ typings/
 
 out
 config.json
+firebase.json
 unparsed.txt

@@ -1,4 +1,6 @@
 {
     "username": "USERNAME",
-    "password": "PASSWORD"
+    "password": "PASSWORD",
+    "appAuthKey": "ONESIGNAL_AUTH_KEY",
+    "appId": "ONESIGNAL_APP_ID"
 }

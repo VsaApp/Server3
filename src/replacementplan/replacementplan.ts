@@ -4,6 +4,17 @@ import config from '../config';
 import got from 'got';
 import { parse } from 'node-html-parser';
 
+const isNew = (data: any, today: boolean) => {
+    let file = path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow') + '.txt');
+    let old = '';
+    if (fs.existsSync(file)) {
+        old = fs.readFileSync(file, 'utf-8').toString();
+    }
+    let n = data.querySelectorAll('div')[1].childNodes[0].rawText;
+    fs.writeFileSync(file, n);
+    return old !== n;
+};
+
 const fetchData = async (today: boolean) => {
     return (await got('https://www.viktoriaschule-aachen.de/sundvplan/vps/' + (today ? 'left' : 'right') + '.html', { auth: config.username + ':' + config.password })).body;
 };
@@ -209,31 +220,71 @@ const extractData = async (data: any) => {
     });
 };
 
+const send = async (segment: string, data: any) => {
+    const dataString = {
+        app_id: config.appId,
+        included_segments: [segment],
+        content_available: true,
+        data: data
+    };
+    let url = 'https://onesignal.com/api/v1/notifications';
+    const response = await got.post(
+        url,
+        {
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': 'Basic ' + config.appAuthKey
+            },
+            body: JSON.stringify(dataString)
+        });
+    if (response.statusCode === 200) {
+        return await response.body;
+    } else {
+        throw response.body;
+    }
+};
+
 (async () => {
     fetchData(true).then(raw => {
         console.log('Fetched replacement plan for today');
         parseData(raw).then(data => {
             console.log('Parsed replacement plan for today');
-            extractData(data).then(replacementplan => {
-                console.log('Extracted replacement plan for today');
-                replacementplan.forEach(data => {
-                    fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'today', data.grade + '.json'), JSON.stringify(data, null, 2));
+            if (isNew(data, true)) {
+                extractData(data).then(replacementplan => {
+                    console.log('Extracted replacement plan for today');
+                    replacementplan.forEach(async (data) => {
+                        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'today', data.grade + '.json'), JSON.stringify(data, null, 2));
+                        send(data.grade, { type: 'replacementplan', day: 'today' }).then(() => {
+                            console.log('Send replacement plan for today to ' + data.grade);
+                        }).catch((e: any) => {
+                            console.log('Sending replacement plan for today to ' + data.grade + ' failed');
+                            console.error(e);
+                        });
+                    });
+                    console.log('Saved replacement plan for today');
                 });
-                console.log('Saved replacement plan for today');
-            });
+            }
         });
     });
     fetchData(false).then(raw => {
         console.log('Fetched replacement plan for tomorrow');
         parseData(raw).then(data => {
             console.log('Parsed replacement plan for tomorrow');
-            extractData(data).then(replacementplan => {
-                console.log('Extracted replacement plan for tomorrow');
-                replacementplan.forEach(data => {
-                    fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'tomorrow', data.grade + '.json'), JSON.stringify(data, null, 2));
+            if (isNew(data, false)) {
+                extractData(data).then(replacementplan => {
+                    console.log('Extracted replacement plan for tomorrow');
+                    replacementplan.forEach(async (data) => {
+                        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'tomorrow', data.grade + '.json'), JSON.stringify(data, null, 2));
+                        send(data.grade, { type: 'replacementplan', day: 'tomorrow' }).then(() => {
+                            console.log('Send replacement plan for tomorrow to ' + data.grade);
+                        }).catch((e: any) => {
+                            console.log('Sending replacement plan for tomorrow to ' + data.grade + ' failed');
+                            console.error(e);
+                        });
+                    });
+                    console.log('Saved replacement plan for tomorrow');
                 });
-                console.log('Saved replacement plan for tomorrow');
-            });
+            }
         });
     });
 
