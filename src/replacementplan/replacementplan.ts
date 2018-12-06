@@ -56,25 +56,58 @@ const extractData = async (data: any) => {
                         let parsed = false;
                         if (changed[0].includes('m.Aufg.')) {
                             parsed = true;
-                            d.push({
-                                unit: unit,
-                                subject: original[0].split(' ')[0].toUpperCase().replace(/[0-9]/g, ''),
-                                course: original[0].split(' ')[1].toUpperCase(),
-                                room: original[1].toUpperCase(),
-                                teacher: '',
-                                change: {
-                                    subject: changed[1].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
-                                    teacher: changed[0].split(' ')[0],
-                                    room: changed[1].split(' ')[2].toUpperCase(),
-                                    info: changed[0].split(' ')[1]
+                            if ((original[0].match(/ /g) || []).length > 1) {
+                                if (original[0].includes('abc')) {
+                                    d.push({
+                                        unit: unit,
+                                        subject: original[0].split(' ')[1].toUpperCase(),
+                                        course: original[0].split(' ')[2].toUpperCase(),
+                                        room: original[1].toUpperCase(),
+                                        teacher: '',
+                                        change: {
+                                            subject: changed[1].split(' ')[1].toUpperCase(),
+                                            teacher: changed[0].split(' ')[0],
+                                            room: changed[1].split(' ')[2].toUpperCase(),
+                                            info: changed[0].split(' ')[1]
+                                        }
+                                    });
                                 }
-                            });
+                                else {
+                                    d.push({
+                                        unit: unit,
+                                        subject: original[0].split(' ')[1].toUpperCase(),
+                                        course: original[0].split(' ')[2].toUpperCase(),
+                                        room: original[1].toUpperCase(),
+                                        teacher: '',
+                                        change: {
+                                            subject: changed[1].split(' ')[1].toUpperCase(),
+                                            teacher: changed[0].split(' ')[0],
+                                            room: changed[1].split(' ')[2].toUpperCase(),
+                                            info: changed[0].split(' ')[1]
+                                        }
+                                    });
+                                }
+                            } else {
+                                d.push({
+                                    unit: unit,
+                                    subject: original[0].split(' ')[0].toUpperCase(),
+                                    course: '',
+                                    room: original[0].split(' ')[1].toUpperCase(),
+                                    teacher: '',
+                                    change: {
+                                        subject: changed[1].split(' ')[1].toUpperCase(),
+                                        teacher: changed[0].split(' ')[0],
+                                        room: changed[1].split(' ')[2].toUpperCase(),
+                                        info: changed[0].split(' ')[1]
+                                    }
+                                });
+                            }
                         }
                         if (changed[0].includes('Studienzeit')) {
                             parsed = true;
                             d.push({
                                 unit: unit,
-                                subject: original[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
+                                subject: original[0].split(' ')[1].toUpperCase(),
                                 course: original[0].split(' ')[2].toUpperCase(),
                                 room: original[1].toUpperCase(),
                                 teacher: '',
@@ -88,19 +121,35 @@ const extractData = async (data: any) => {
                         }
                         if (changed[0].includes('abgehängt')) {
                             parsed = true;
-                            d.push({
-                                unit: unit,
-                                subject: original[0].split(' ')[0].toUpperCase().replace(/[0-9]/g, ''),
-                                course: '',
-                                room: original[0].split(' ')[1].toUpperCase(),
-                                teacher: '',
-                                change: {
-                                    subject: '',
+                            if ((original[0].match(/ /g) || []).length > 1) {
+                                d.push({
+                                    unit: unit,
+                                    subject: original[0].split(' ')[1].toUpperCase(),
+                                    course: original[0].split(' ')[2].toUpperCase(),
+                                    room: original[1].toUpperCase(),
                                     teacher: '',
-                                    room: '',
-                                    info: 'Freistunde'
-                                }
-                            });
+                                    change: {
+                                        subject: '',
+                                        teacher: '',
+                                        room: '',
+                                        info: 'Freistunde'
+                                    }
+                                });
+                            } else {
+                                d.push({
+                                    unit: unit,
+                                    subject: original[0].split(' ')[0].toUpperCase(),
+                                    course: '',
+                                    room: original[0].split(' ')[1].toUpperCase(),
+                                    teacher: '',
+                                    change: {
+                                        subject: '',
+                                        teacher: '',
+                                        room: '',
+                                        info: 'Freistunde'
+                                    }
+                                });
+                            }
                         }
                         if (original[0].includes('Klausur')) {
                             parsed = true;
@@ -108,7 +157,7 @@ const extractData = async (data: any) => {
                             for (let k = 0; k < original.length - 1; k++) {
                                 d.push({
                                     unit: unit,
-                                    subject: original[k].split(' ')[2].toUpperCase().replace(/[0-9]/g, ''),
+                                    subject: original[k].split(' ')[2].toUpperCase(),
                                     course: original[k].split(' ')[3].toUpperCase(),
                                     room: '',
                                     teacher: original[k].split(' ')[1].toUpperCase(),
@@ -125,7 +174,7 @@ const extractData = async (data: any) => {
                             parsed = true;
                             d.push({
                                 unit: unit,
-                                subject: original[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
+                                subject: original[0].split(' ')[1].toUpperCase(),
                                 course: original[0].split(' ')[2].toUpperCase(),
                                 room: original[1],
                                 teacher: '',
@@ -141,7 +190,7 @@ const extractData = async (data: any) => {
                             parsed = true;
                             d.push({
                                 unit: unit,
-                                subject: original[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
+                                subject: original[0].split(' ')[1].toUpperCase(),
                                 course: original[0].split(' ')[2].toUpperCase(),
                                 room: original[1],
                                 teacher: '',
@@ -157,7 +206,7 @@ const extractData = async (data: any) => {
                             parsed = true;
                             d.push({
                                 unit: unit,
-                                subject: original[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
+                                subject: original[0].split(' ')[1].toUpperCase(),
                                 course: original[0].split(' ')[2].toUpperCase(),
                                 room: original[1],
                                 teacher: '',
@@ -206,6 +255,10 @@ const extractData = async (data: any) => {
                 }
             }
         });
+        for (let l = 0; l < d.length; l++) {
+            d[l].subject = d[l].subject.replace('NWB', 'NW').replace(/[0-9]/g, '');
+            d[l].change.subject = d[l].change.subject.replace('NWB', 'NW').replace(/[0-9]/g, '');
+        }
         const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).replace('-Klassen-Vertretungsplan für ', '').replace('Januar', 'January').replace('Februar', 'February').replace('März', 'March').replace('Mai', 'May').replace('Juni', 'June').replace('Juli', 'July').replace('Oktober', 'October').replace('Dezember', 'December');
         const date = new Date(dateStr);
         date.setHours(date.getHours() + 1);
@@ -249,6 +302,27 @@ const send = async (segment: string, data: any) => {
     }
 };
 
+const updateUnitPlan = (data: any) => {
+    const file = path.resolve(process.cwd(), 'out', 'unitplan', data.grade + '.json');
+    let unitplan = JSON.parse(fs.readFileSync(file, 'utf-8'));
+    data.data.forEach((change: any) => {
+        const day = unitplan.data.filter((day: any) => {
+            return data.for.weekday === day.weekday;
+        })[0];
+        const lesson = day.lessons[change.unit.toString()];
+        if (lesson.length === 1) {
+            lesson.course = change.course;
+        }
+        const matchingSubjects = lesson.filter((subject: any) => {
+            return subject.subject === change.subject && change.change.info !== 'Klausur';
+        });
+        if (matchingSubjects.length === 1) {
+            lesson[lesson.indexOf(matchingSubjects[0])].course = change.course;
+        }
+    });
+    fs.writeFileSync(file, JSON.stringify(unitplan, null, 2));
+};
+
 (async () => {
     fetchData(true).then(raw => {
         console.log('Fetched replacement plan for today');
@@ -258,6 +332,7 @@ const send = async (segment: string, data: any) => {
                 extractData(data).then(replacementplan => {
                     console.log('Extracted replacement plan for today');
                     replacementplan.forEach(async (data) => {
+                        updateUnitPlan(data);
                         fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'today', data.grade + '.json'), JSON.stringify(data, null, 2));
                         send(data.grade, { type: 'replacementplan', day: 'today' }).then(() => {
                             console.log('Send replacement plan for today to ' + data.grade);

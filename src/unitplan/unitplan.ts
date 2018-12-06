@@ -28,10 +28,10 @@ const extractData = async (data: any) => {
                         d[day].lessons[unit] = [];
                     }
                     if (a.length === 1) {
-                        d[day].lessons[unit].push({ block: '', participant: a[0].split(' ')[0], subject: a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''), room: a[0].split(' ')[2].toUpperCase() });
+                        d[day].lessons[unit].push({ block: '', participant: a[0].split(' ')[0], subject: a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''), room: a[0].split(' ')[2].toUpperCase(), course: '' });
                     } else {
                         for (let i = 1; i < a.length; i++) {
-                            d[day].lessons[unit].push({ block: a[0].split(' ')[1], participant: a[i].split(' ')[1], subject: a[i].split(' ')[0].toUpperCase().replace(/[0-9]/g, ''), room: a[i].split(' ')[2].toUpperCase() });
+                            d[day].lessons[unit].push({ block: a[0].split(' ')[1], participant: a[i].split(' ')[1], subject: a[i].split(' ')[0].toUpperCase().replace(/[0-9]/g, ''), room: a[i].split(' ')[2].toUpperCase(), course: '' });
                         }
                     }
                 }
@@ -39,7 +39,7 @@ const extractData = async (data: any) => {
         });
         d = d.map((a: any) => {
             if (Object.keys(a.lessons).length >= 6) {
-                a.lessons['5'] = { block: '', participant: '', subject: 'Mittagspause', room: '' };
+                a.lessons['5'] = { block: '', participant: '', subject: 'Mittagspause', room: '', course: '' };
             }
             return a;
         });
