@@ -314,10 +314,28 @@ const updateUnitPlan = (data: any) => {
             lesson.course = change.course;
         }
         const matchingSubjects = lesson.filter((subject: any) => {
-            return subject.subject === change.subject && change.change.info !== 'Klausur';
+            return (subject.subject === change.subject || subject.room === change.room || subject.teacher === change.room) && change.change.info !== 'Klausur';
         });
         if (matchingSubjects.length === 1) {
             lesson[lesson.indexOf(matchingSubjects[0])].course = change.course;
+        }
+        const multiMatchingSubjects: any = [];
+        unitplan.data.forEach((day: any) => {
+            Object.keys(day.lessons).forEach((unit: string) => {
+                const lesson = day.lessons[unit];
+                if (lesson.length > 0) {
+                    lesson.forEach((subject: any) => {
+                        if (subject.subject === change.subject && subject.teacher === subject.teacher) {
+                            multiMatchingSubjects.push(subject);
+                        }
+                    });
+                }
+            });
+        });
+        if (multiMatchingSubjects.length <= 3) {
+            for (let m = 0; m < multiMatchingSubjects.length; m++) {
+                multiMatchingSubjects[m].course = change.course;
+            }
         }
     });
     fs.writeFileSync(file, JSON.stringify(unitplan, null, 2));
