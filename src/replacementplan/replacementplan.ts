@@ -206,10 +206,15 @@ const extractData = async (data: any) => {
                 }
             }
         });
+        const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).replace('-Klassen-Vertretungsplan für ', '').replace('Januar', 'January').replace('Februar', 'February').replace('März', 'March').replace('Mai', 'May').replace('Juni', 'June').replace('Juli', 'July').replace('Oktober', 'October').replace('Dezember', 'December');
+        const date = new Date(dateStr);
+        date.setHours(date.getHours() + 1);
+        const weekday = dateStr.split(', ')[0];
         return {
             grade: grade,
             for: {
-                date: data.querySelectorAll('div')[0].childNodes[0].rawText.split('für')[1].trim().split(',')[1].trim()
+                date: date.getUTCDate() + '.' + (date.getUTCMonth() + 1) + '.' + date.getUTCFullYear(),
+                weekday: weekday
             },
             updated: {
                 date: data.querySelectorAll('div')[1].childNodes[0].rawText.split('um')[0].trim().split(' den ')[1].trim(),
