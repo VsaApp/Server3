@@ -354,6 +354,7 @@ const updateUnitPlan = (data: any) => {
                 extractData(data).then(replacementplan => {
                     console.log('Extracted replacement plan for tomorrow');
                     replacementplan.forEach(async (data) => {
+                        updateUnitPlan(data);
                         fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'tomorrow', data.grade + '.json'), JSON.stringify(data, null, 2));
                         send(data.grade, { type: 'replacementplan', day: 'tomorrow' }).then(() => {
                             console.log('Send replacement plan for tomorrow to ' + data.grade);
