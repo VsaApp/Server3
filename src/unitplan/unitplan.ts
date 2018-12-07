@@ -39,8 +39,13 @@ const extractData = async (data: any) => {
         });
         d = d.map((a: any) => {
             if (Object.keys(a.lessons).length >= 6) {
-                a.lessons['5'] = { block: '', participant: '', subject: 'Mittagspause', room: '', course: '' };
+                a.lessons['5'] = [{ block: '', participant: '', subject: 'Mittagspause', room: '', course: '' }];
             }
+            Object.keys(a.lessons).forEach((lesson: any) => {
+                if (a.lessons[lesson].length > 1) {
+                    a.lessons[lesson].push({ block: a.lessons[lesson][0].block, participant: '', subject: 'Freistunde', room: '', course: '' });
+                }
+            });
             return a;
         });
         return {
