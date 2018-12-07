@@ -7,6 +7,17 @@ import { parse } from 'node-html-parser';
 const grades = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c', '9a', '9b', '9c', 'EF', 'Q1', 'Q2'];
 const weekdays = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
 
+const isNew = (data: any) => {
+    let file = path.resolve(process.cwd(), 'out', 'unitplan', 'date.txt');
+    let old = '';
+    if (fs.existsSync(file)) {
+        old = fs.readFileSync(file, 'utf-8').toString();
+    }
+    let n = data.querySelectorAll('div')[0].childNodes[0].rawText;
+    fs.writeFileSync(file, n);
+    return old !== n;
+};
+
 const fetchData = async () => {
     return (await got('https://www.viktoriaschule-aachen.de/sundvplan/sps/left.html', { auth: config.username + ':' + config.password })).body;
 };
@@ -61,13 +72,15 @@ const extractData = async (data: any) => {
         console.log('Fetched unit plan');
         parseData(raw).then(data => {
             console.log('Parsed unit plan');
-            extractData(data).then(unitplan => {
-                console.log('Extracted unit plan');
-                unitplan.forEach(data => {
-                    fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.grade + '.json'), JSON.stringify(data, null, 2));
+            if (isNew(data)) {
+                extractData(data).then(unitplan => {
+                    console.log('Extracted unit plan');
+                    unitplan.forEach(data => {
+                        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.grade + '.json'), JSON.stringify(data, null, 2));
+                    });
+                    console.log('Saved unit plan');
                 });
-                console.log('Saved unit plan');
-            });
+            }
         });
     });
 })();
