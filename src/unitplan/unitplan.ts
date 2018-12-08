@@ -102,8 +102,13 @@ const createTeacherUnitplan = async (data: any) => {
                             if (d[weekdays.indexOf(b.weekday)].lessons[unit] === undefined) {
                                 d[weekdays.indexOf(b.weekday)].lessons[unit] = [];
                             }
-                            subject.participant = a.participant;
-                            d[weekdays.indexOf(b.weekday)].lessons[unit].push(subject);
+                            d[weekdays.indexOf(b.weekday)].lessons[unit].push({
+                                block: subject.block,
+                                participant: a.participant,
+                                subject: subject.subject,
+                                room: subject.room,
+                                course: subject.course
+                            });
                         }
                     });
                 });
