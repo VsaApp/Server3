@@ -312,7 +312,7 @@ const createTeacherReplacementplan = async (data: any) => {
 };
 
 const send = async (segment: string, data: any) => {
-    /*const dataString = {
+    const dataString = {
         app_id: config.appId,
         included_segments: [segment],
         content_available: true,
@@ -332,8 +332,7 @@ const send = async (segment: string, data: any) => {
         return await response.body;
     } else {
         throw response.body;
-    }*/
-    return await true;
+    }
 };
 
 const updateUnitPlan = (data: any) => {
