@@ -65,7 +65,7 @@ const extractData = async (data: any) => {
                 a.lessons['5'] = [{block: '', participant: '', subject: 'Mittagspause', room: '', course: ''}];
             }
             Object.keys(a.lessons).forEach((lesson: any) => {
-                if (a.lessons[lesson].length > 1) {
+                if (a.lessons[lesson].length > 1 || a.lessons[lesson][0].block !== '') {
                     a.lessons[lesson].push({
                         block: a.lessons[lesson][0].block,
                         participant: '',
