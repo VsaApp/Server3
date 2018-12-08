@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import config from '../config';
 import got from 'got';
-import { parse } from 'node-html-parser';
+import {parse} from 'node-html-parser';
 
 const grades = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c', '9a', '9b', '9c', 'EF', 'Q1', 'Q2'];
 const weekdays = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
@@ -19,7 +19,7 @@ const isNew = (data: any) => {
 };
 
 const fetchData = async () => {
-    return (await got('https://www.viktoriaschule-aachen.de/sundvplan/sps/left.html', { auth: config.username + ':' + config.password })).body;
+    return (await got('https://www.viktoriaschule-aachen.de/sundvplan/sps/left.html', {auth: config.username + ':' + config.password})).body;
 };
 
 const parseData = async (raw: string) => {
@@ -29,7 +29,7 @@ const parseData = async (raw: string) => {
 const extractData = async (data: any) => {
     return await grades.map(grade => {
         let d: any = weekdays.map((weekday: string) => {
-            return { weekday: weekday, lessons: {} };
+            return {weekday: weekday, lessons: {}};
         });
         data.querySelectorAll('table')[grades.indexOf(grade)].childNodes.slice(1).forEach((row: any, unit: number) => {
             row.childNodes.slice(1).forEach((field: any, day: number) => {
@@ -39,10 +39,22 @@ const extractData = async (data: any) => {
                         d[day].lessons[unit] = [];
                     }
                     if (a.length === 1) {
-                        d[day].lessons[unit].push({ block: '', participant: a[0].split(' ')[0], subject: a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''), room: a[0].split(' ')[2].toUpperCase(), course: '' });
+                        d[day].lessons[unit].push({
+                            block: '',
+                            participant: a[0].split(' ')[0],
+                            subject: a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
+                            room: a[0].split(' ')[2].toUpperCase(),
+                            course: ''
+                        });
                     } else {
                         for (let i = 1; i < a.length; i++) {
-                            d[day].lessons[unit].push({ block: a[0].split(' ')[1], participant: a[i].split(' ')[1], subject: a[i].split(' ')[0].toUpperCase().replace(/[0-9]/g, ''), room: a[i].split(' ')[2].toUpperCase(), course: '' });
+                            d[day].lessons[unit].push({
+                                block: a[0].split(' ')[1],
+                                participant: a[i].split(' ')[1],
+                                subject: a[i].split(' ')[0].toUpperCase().replace(/[0-9]/g, ''),
+                                room: a[i].split(' ')[2].toUpperCase(),
+                                course: ''
+                            });
                         }
                     }
                 }
@@ -50,21 +62,83 @@ const extractData = async (data: any) => {
         });
         d = d.map((a: any) => {
             if (Object.keys(a.lessons).length >= 6) {
-                a.lessons['5'] = [{ block: '', participant: '', subject: 'Mittagspause', room: '', course: '' }];
+                a.lessons['5'] = [{block: '', participant: '', subject: 'Mittagspause', room: '', course: ''}];
             }
             Object.keys(a.lessons).forEach((lesson: any) => {
                 if (a.lessons[lesson].length > 1) {
-                    a.lessons[lesson].push({ block: a.lessons[lesson][0].block, participant: '', subject: 'Freistunde', room: '', course: '' });
+                    a.lessons[lesson].push({
+                        block: a.lessons[lesson][0].block,
+                        participant: '',
+                        subject: 'Freistunde',
+                        room: '',
+                        course: ''
+                    });
                 }
             });
             return a;
         });
         return {
-            grade: grade,
+            participant: grade,
             date: data.querySelector('div').childNodes[0].rawText.split(' den ')[1].trim(),
             data: d
         };
     });
+};
+
+const createTeacherUnitplan = async (data: any) => {
+    let teachers = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'teachers', 'teachers.json')).toString());
+    teachers = teachers.map((teacher: any) => teacher.shortName);
+    teachers = teachers.map((teacher: string) => {
+        const weekdays = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
+        let d: any = weekdays.map((weekday: string) => {
+            return {weekday, lessons: {}};
+        });
+        data.forEach((a: any) => {
+            a.data.forEach((b: any) => {
+                Object.keys(b.lessons).forEach((unit: string) => {
+                    const lesson = b.lessons[unit];
+                    lesson.forEach((subject: any) => {
+                        if (subject.participant === teacher) {
+                            if (d[weekdays.indexOf(b.weekday)].lessons[unit] === undefined) {
+                                d[weekdays.indexOf(b.weekday)].lessons[unit] = [];
+                            }
+                            subject.participant = a.participant;
+                            d[weekdays.indexOf(b.weekday)].lessons[unit].push(subject);
+                        }
+                    });
+                });
+            });
+        });
+        d.forEach((e: any) => {
+            const units = ['9', '8', '7', '6', '5', '4', '3', '2', '1', '0'];
+            let notEmpty = false;
+            units.forEach((unit: string) => {
+                if (notEmpty) {
+                    if (e.lessons[unit] === undefined) {
+                        e.lessons[unit] = [];
+                    }
+                    if (e.lessons[unit].length === 0) {
+                        e.lessons[unit].push({
+                            block: '',
+                            participant: '',
+                            subject: (unit === '5' ? 'Mittagspause' : 'Freistunde'),
+                            room: '',
+                            course: ''
+                        });
+                    }
+                }
+                if (e.lessons[unit] !== undefined) {
+                    notEmpty = true;
+                }
+            });
+        });
+        return {
+            participant: teacher,
+            date: data[0].date,
+            data: d
+        };
+    });
+    return await teachers;
 };
 
 (async () => {
@@ -73,12 +147,14 @@ const extractData = async (data: any) => {
         parseData(raw).then(data => {
             console.log('Parsed unit plan');
             if (isNew(data)) {
-                extractData(data).then(unitplan => {
-                    console.log('Extracted unit plan');
-                    unitplan.forEach(data => {
-                        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.grade + '.json'), JSON.stringify(data, null, 2));
+                extractData(data).then(unitplan1 => {
+                    createTeacherUnitplan(unitplan1).then(unitplan2 => {
+                        console.log('Extracted unit plan');
+                        unitplan1.concat(unitplan2).forEach(data => {
+                            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json'), JSON.stringify(data, null, 2));
+                        });
+                        console.log('Saved unit plan');
                     });
-                    console.log('Saved unit plan');
                 });
             }
         });
