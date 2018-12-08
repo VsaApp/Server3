@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import config from '../config';
 import got from 'got';
-import { parse } from 'node-html-parser';
+import {parse} from 'node-html-parser';
 
 const isNew = (data: any, today: boolean) => {
     let file = path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow') + '.txt');
@@ -16,7 +16,7 @@ const isNew = (data: any, today: boolean) => {
 };
 
 const fetchData = async (today: boolean) => {
-    return (await got('https://www.viktoriaschule-aachen.de/sundvplan/vps/' + (today ? 'left' : 'right') + '.html', { auth: config.username + ':' + config.password })).body;
+    return (await got('https://www.viktoriaschule-aachen.de/sundvplan/vps/' + (today ? 'left' : 'right') + '.html', {auth: config.username + ':' + config.password})).body;
 };
 
 const parseData = async (raw: string) => {
@@ -63,7 +63,7 @@ const extractData = async (data: any) => {
                                         subject: original[0].split(' ')[1].toUpperCase(),
                                         course: original[0].split(' ')[2].toUpperCase(),
                                         room: original[1].toUpperCase(),
-                                        teacher: '',
+                                        participant: '',
                                         change: {
                                             subject: changed[1].split(' ')[1].toUpperCase(),
                                             teacher: changed[0].split(' ')[0],
@@ -71,14 +71,13 @@ const extractData = async (data: any) => {
                                             info: changed[0].split(' ')[1]
                                         }
                                     });
-                                }
-                                else {
+                                } else {
                                     d.push({
                                         unit: unit,
                                         subject: original[0].split(' ')[1].toUpperCase(),
                                         course: original[0].split(' ')[2].toUpperCase(),
                                         room: original[1].toUpperCase(),
-                                        teacher: '',
+                                        participant: '',
                                         change: {
                                             subject: changed[1].split(' ')[1].toUpperCase(),
                                             teacher: changed[0].split(' ')[0],
@@ -93,7 +92,7 @@ const extractData = async (data: any) => {
                                     subject: original[0].split(' ')[0].toUpperCase(),
                                     course: '',
                                     room: original[0].split(' ')[1].toUpperCase(),
-                                    teacher: '',
+                                    participant: '',
                                     change: {
                                         subject: changed[1].split(' ')[1].toUpperCase(),
                                         teacher: changed[0].split(' ')[0],
@@ -110,7 +109,7 @@ const extractData = async (data: any) => {
                                 subject: original[0].split(' ')[1].toUpperCase(),
                                 course: original[0].split(' ')[2].toUpperCase(),
                                 room: original[1].toUpperCase(),
-                                teacher: '',
+                                participant: '',
                                 change: {
                                     subject: '',
                                     teacher: '',
@@ -127,7 +126,7 @@ const extractData = async (data: any) => {
                                     subject: original[0].split(' ')[1].toUpperCase(),
                                     course: original[0].split(' ')[2].toUpperCase(),
                                     room: original[1].toUpperCase(),
-                                    teacher: '',
+                                    participant: '',
                                     change: {
                                         subject: '',
                                         teacher: '',
@@ -141,7 +140,7 @@ const extractData = async (data: any) => {
                                     subject: original[0].split(' ')[0].toUpperCase(),
                                     course: '',
                                     room: original[0].split(' ')[1].toUpperCase(),
-                                    teacher: '',
+                                    participant: '',
                                     change: {
                                         subject: '',
                                         teacher: '',
@@ -160,7 +159,7 @@ const extractData = async (data: any) => {
                                     subject: original[k].split(' ')[2].toUpperCase(),
                                     course: original[k].split(' ')[3].toUpperCase(),
                                     room: '',
-                                    teacher: original[k].split(' ')[1].toUpperCase(),
+                                    participant: original[k].split(' ')[1].toUpperCase(),
                                     change: {
                                         subject: '',
                                         teacher: original[original.length - 1].split(': Aufsicht in ')[0],
@@ -177,7 +176,7 @@ const extractData = async (data: any) => {
                                 subject: original[0].split(' ')[1].toUpperCase(),
                                 course: original[0].split(' ')[2].toUpperCase(),
                                 room: original[1],
-                                teacher: '',
+                                participant: '',
                                 change: {
                                     subject: '',
                                     teacher: '',
@@ -193,7 +192,7 @@ const extractData = async (data: any) => {
                                 subject: original[0].split(' ')[1].toUpperCase(),
                                 course: original[0].split(' ')[2].toUpperCase(),
                                 room: original[1],
-                                teacher: '',
+                                participant: '',
                                 change: {
                                     subject: '',
                                     teacher: '',
@@ -209,7 +208,7 @@ const extractData = async (data: any) => {
                                 subject: original[0].split(' ')[1].toUpperCase(),
                                 course: original[0].split(' ')[2].toUpperCase(),
                                 room: original[1],
-                                teacher: '',
+                                participant: '',
                                 change: {
                                     subject: '',
                                     teacher: '',
@@ -225,7 +224,7 @@ const extractData = async (data: any) => {
                                 subject: original[0].split(' ')[1].toUpperCase(),
                                 course: original[0].split(' ')[2].toUpperCase(),
                                 room: original[1],
-                                teacher: '',
+                                participant: '',
                                 change: {
                                     subject: '',
                                     teacher: changed[0].split(' ')[0],
@@ -264,7 +263,7 @@ const extractData = async (data: any) => {
         date.setHours(date.getHours() + 1);
         const weekday = dateStr.split(', ')[0];
         return {
-            grade: grade,
+            participant: grade,
             for: {
                 date: date.getUTCDate() + '.' + (date.getUTCMonth() + 1) + '.' + date.getUTCFullYear(),
                 weekday: weekday
@@ -278,8 +277,42 @@ const extractData = async (data: any) => {
     });
 };
 
+const createTeacherReplacementplan = async (data: any) => {
+    let teachers = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'teachers', 'teachers.json')).toString());
+    teachers = teachers.map((teacher: any) => teacher.shortName);
+    teachers = teachers.map((teacher: string) => {
+        let d: any = {
+            participant: teacher,
+            for: data[0].for,
+            updated: data[0].updated,
+            data: []
+        };
+        data.forEach((a: any) => {
+            a.data.forEach((change: any) => {
+                if (change.teacher === teacher || change.change.teacher === teacher) {
+                    d.data.push({
+                        'unit': change.unit,
+                        'subject': change.subject,
+                        'course': change.course,
+                        'room': change.room,
+                        'participant': a.participant,
+                        'change': {
+                            'subject': change.change.subject,
+                            'teacher': change.change.teacher,
+                            'room': change.change.room,
+                            'info': change.change.info
+                        }
+                    });
+                }
+            });
+        });
+        return d;
+    });
+    return await teachers;
+};
+
 const send = async (segment: string, data: any) => {
-    const dataString = {
+    /*const dataString = {
         app_id: config.appId,
         included_segments: [segment],
         content_available: true,
@@ -299,11 +332,12 @@ const send = async (segment: string, data: any) => {
         return await response.body;
     } else {
         throw response.body;
-    }
+    }*/
+    return await true;
 };
 
 const updateUnitPlan = (data: any) => {
-    const file = path.resolve(process.cwd(), 'out', 'unitplan', data.grade + '.json');
+    const file = path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json');
     let unitplan = JSON.parse(fs.readFileSync(file, 'utf-8'));
     data.data.forEach((change: any) => {
         const day = unitplan.data.filter((day: any) => {
@@ -347,19 +381,23 @@ const updateUnitPlan = (data: any) => {
         parseData(raw).then(data => {
             console.log('Parsed replacement plan for today');
             if (isNew(data, true)) {
-                extractData(data).then(replacementplan => {
-                    console.log('Extracted replacement plan for today');
-                    replacementplan.forEach(async (data) => {
-                        updateUnitPlan(data);
-                        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'today', data.grade + '.json'), JSON.stringify(data, null, 2));
-                        send(data.grade, { type: 'replacementplan', day: 'today' }).then(() => {
-                            console.log('Send replacement plan for today to ' + data.grade);
-                        }).catch((e: any) => {
-                            console.log('Sending replacement plan for today to ' + data.grade + ' failed');
-                            console.error(e);
+                extractData(data).then(replacementplan1 => {
+                    createTeacherReplacementplan(replacementplan1).then(replacementplan2 => {
+                        console.log('Extracted replacement plan for today');
+                        replacementplan1.concat(replacementplan2).forEach(async (data) => {
+                            if (data.participant.length < 3) {
+                                updateUnitPlan(data);
+                            }
+                            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'today', data.participant + '.json'), JSON.stringify(data, null, 2));
+                            send(data.participant, {type: 'replacementplan', day: 'today'}).then(() => {
+                                console.log('Send replacement plan for today to ' + data.participant);
+                            }).catch((e: any) => {
+                                console.log('Sending replacement plan for today to ' + data.participant + ' failed');
+                                console.error(e);
+                            });
                         });
+                        console.log('Saved replacement plan for today');
                     });
-                    console.log('Saved replacement plan for today');
                 });
             }
         });
@@ -369,19 +407,23 @@ const updateUnitPlan = (data: any) => {
         parseData(raw).then(data => {
             console.log('Parsed replacement plan for tomorrow');
             if (isNew(data, false)) {
-                extractData(data).then(replacementplan => {
-                    console.log('Extracted replacement plan for tomorrow');
-                    replacementplan.forEach(async (data) => {
-                        updateUnitPlan(data);
-                        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'tomorrow', data.grade + '.json'), JSON.stringify(data, null, 2));
-                        send(data.grade, { type: 'replacementplan', day: 'tomorrow' }).then(() => {
-                            console.log('Send replacement plan for tomorrow to ' + data.grade);
-                        }).catch((e: any) => {
-                            console.log('Sending replacement plan for tomorrow to ' + data.grade + ' failed');
-                            console.error(e);
+                extractData(data).then(replacementplan1 => {
+                    createTeacherReplacementplan(replacementplan1).then(replacementplan2 => {
+                        console.log('Extracted replacement plan for tomorrow');
+                        replacementplan1.concat(replacementplan2).forEach(async (data) => {
+                            if (data.participant.length < 3) {
+                                updateUnitPlan(data);
+                            }
+                            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'tomorrow', data.participant + '.json'), JSON.stringify(data, null, 2));
+                            send(data.participant, {type: 'replacementplan', day: 'tomorrow'}).then(() => {
+                                console.log('Send replacement plan for tomorrow to ' + data.participant);
+                            }).catch((e: any) => {
+                                console.log('Sending replacement plan for tomorrow to ' + data.participant + ' failed');
+                                console.error(e);
+                            });
                         });
+                        console.log('Saved replacement plan for tomorrow');
                     });
-                    console.log('Saved replacement plan for tomorrow');
                 });
             }
         });
