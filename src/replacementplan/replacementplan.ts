@@ -388,7 +388,7 @@ const updateUnitPlan = (data: any) => {
                                 updateUnitPlan(data);
                             }
                             fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'today', data.participant + '.json'), JSON.stringify(data, null, 2));
-                            send(data.participant, {type: 'replacementplan', day: 'today'}).then(() => {
+                            send(data.participant, {type: 'replacementplan', day: 'today', weekday: data.for.weekday}).then(() => {
                                 console.log('Send replacement plan for today to ' + data.participant);
                             }).catch((e: any) => {
                                 console.log('Sending replacement plan for today to ' + data.participant + ' failed');
@@ -414,7 +414,7 @@ const updateUnitPlan = (data: any) => {
                                 updateUnitPlan(data);
                             }
                             fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'tomorrow', data.participant + '.json'), JSON.stringify(data, null, 2));
-                            send(data.participant, {type: 'replacementplan', day: 'tomorrow'}).then(() => {
+                            send(data.participant, {type: 'replacementplan', day: 'tomorrow', weekday: data.for.weekday}).then(() => {
                                 console.log('Send replacement plan for tomorrow to ' + data.participant);
                             }).catch((e: any) => {
                                 console.log('Sending replacement plan for tomorrow to ' + data.participant + ' failed');
