@@ -311,13 +311,21 @@ const createTeacherReplacementplan = async (data: any) => {
     return await teachers;
 };
 
-const send = async (segment: string, data: any) => {
+const send = async (key: string, value: number, weekday: number, text: string) => {
     const dataString = {
-        app_id: config.appId,
-        included_segments: [segment],
-        content_available: true,
-        data: data
-    };
+            app_id: config.appId,
+            filters: [{field: 'tag', key, relation: (value !== -1 ? '=' : 'exists'), value: value.toString()}],
+            android_group: weekday.toString(),
+            contents: {
+                de: text,
+                en: text
+            },
+            headings: {
+                de: intToWeekday(weekday),
+                en: intToWeekday(weekday)
+            }
+        }
+    ;
     let url = 'https://onesignal.com/api/v1/notifications';
     const response = await got.post(
         url,
@@ -374,58 +382,92 @@ const updateUnitPlan = (data: any) => {
     fs.writeFileSync(file, JSON.stringify(unitplan, null, 2));
 };
 
-(async () => {
-    fetchData(true).then(raw => {
-        console.log('Fetched replacement plan for today');
+const weekdayToInt = (weekday: string): number => {
+    return ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'].indexOf(weekday);
+};
+const intToWeekday = (weekday: number): string => {
+    return ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'][weekday];
+};
+
+const getSubjectPlaceOfChange = (change: any, participant: string, weekday: number) => {
+    if (change.change.info === 'Klausur') {
+        return -1;
+    }
+    const file = path.resolve(process.cwd(), 'out', 'unitplan', participant + '.json');
+    let unitplan = JSON.parse(fs.readFileSync(file, 'utf-8'));
+    let subjects = JSON.parse(JSON.stringify(unitplan.data[weekday].lessons[change.unit.toString()]));
+    subjects = subjects.filter((subject: any) => {
+        return (subjects.filter((s: any) => s.subject === subject.subject).length === 1
+            && subject.subject === change.subject
+            && change.subject !== '')
+            || (subject.room === change.room && change.room !== '')
+            || (subject.participant === change.participant && change.participant !== '');
+    });
+    if (subjects.length !== 1) {
+        return -1;
+    }
+    return unitplan.data[weekday].lessons[change.unit.toString()]
+        .map((subject: any) => subject.participant + subject.subject + subject.room + subject.course)
+        .indexOf(subjects[0].participant + subjects[0].subject + subjects[0].room + subjects[0].course);
+};
+
+const getBlockOfLesson = (weekday: number, unit: number, participant: string): string => {
+    const file = path.resolve(process.cwd(), 'out', 'unitplan', participant + '.json');
+    let unitplan = JSON.parse(fs.readFileSync(file, 'utf-8'));
+    return unitplan.data[weekday].lessons[unit.toString()][0].block;
+};
+const doWork = (today: boolean) => {
+    const day = (today ? 'today' : 'tomorrow');
+    fetchData(today).then(raw => {
+        console.log('Fetched replacement plan for ' + day);
         parseData(raw).then(data => {
-            console.log('Parsed replacement plan for today');
+            console.log('Parsed replacement plan for ' + day);
             if (isNew(data, true)) {
                 extractData(data).then(replacementplan1 => {
                     createTeacherReplacementplan(replacementplan1).then(replacementplan2 => {
-                        console.log('Extracted replacement plan for today');
+                        console.log('Extracted replacement plan for ' + day);
                         replacementplan1.concat(replacementplan2).forEach(async (data) => {
                             if (data.participant.length < 3) {
                                 updateUnitPlan(data);
                             }
-                            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'today', data.participant + '.json'), JSON.stringify(data, null, 2));
-                            send(data.participant, {type: 'replacementplan', day: 'today', weekday: data.for.weekday}).then(() => {
-                                console.log('Send replacement plan for today to ' + data.participant);
-                            }).catch((e: any) => {
-                                console.log('Sending replacement plan for today to ' + data.participant + ' failed');
-                                console.error(e);
-                            });
+                            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', day, data.participant + '.json'), JSON.stringify(data, null, 2));
                         });
-                        console.log('Saved replacement plan for today');
-                    });
-                });
-            }
-        });
-    });
-    fetchData(false).then(raw => {
-        console.log('Fetched replacement plan for tomorrow');
-        parseData(raw).then(data => {
-            console.log('Parsed replacement plan for tomorrow');
-            if (isNew(data, false)) {
-                extractData(data).then(replacementplan1 => {
-                    createTeacherReplacementplan(replacementplan1).then(replacementplan2 => {
-                        console.log('Extracted replacement plan for tomorrow');
+                        console.log('Saved replacement plan for ' + day);
                         replacementplan1.concat(replacementplan2).forEach(async (data) => {
                             if (data.participant.length < 3) {
-                                updateUnitPlan(data);
+                                data.data.forEach((change: any) => {
+                                    const place = getSubjectPlaceOfChange(change, data.participant, weekdayToInt(data.for.weekday));
+                                    const block = getBlockOfLesson(weekdayToInt(data.for.weekday), change.unit, data.participant);
+                                    const key = data.participant + '-' + (block !== '' ? block : weekdayToInt(data.for.weekday) + '-' + change.unit);
+                                    const text =
+                                        (change.unit + 1) + '. ' + change.subject
+                                        + (change.course !== '' ? ' ' + change.course : '')
+                                        + (change.participant !== '' ? ' ' + change.participant : '')
+                                        + (change.room !== '' ? ' ' + change.room : '') + ':'
+                                        + (change.change.subject !== '' ? ' ' + change.change.subject : '')
+                                        + (change.change.info !== '' ? ' ' + change.change.info : '')
+                                        + (change.change.teacher !== '' ? ' ' + change.change.teacher : '')
+                                        + (change.change.room !== '' ? ' ' + change.change.room : '');
+                                    send(key, place, weekdayToInt(data.for.weekday), text).then((a: any) => {
+                                        if (JSON.parse(a).errors !== undefined) {
+                                            if (JSON.parse(a).errors[0] === 'All included players are not subscribed') {
+                                                return;
+                                            }
+                                        }
+                                        console.log(a);
+                                    }).catch((e: any) => {
+                                        console.log(e);
+                                    });
+                                });
                             }
-                            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'tomorrow', data.participant + '.json'), JSON.stringify(data, null, 2));
-                            send(data.participant, {type: 'replacementplan', day: 'tomorrow', weekday: data.for.weekday}).then(() => {
-                                console.log('Send replacement plan for tomorrow to ' + data.participant);
-                            }).catch((e: any) => {
-                                console.log('Sending replacement plan for tomorrow to ' + data.participant + ' failed');
-                                console.error(e);
-                            });
                         });
-                        console.log('Saved replacement plan for tomorrow');
                     });
                 });
             }
         });
     });
 
-})();
+};
+
+doWork(true);
+doWork(false);
