@@ -311,11 +311,17 @@ const createTeacherReplacementplan = async (data: any) => {
     return await teachers;
 };
 
-const send = async (key: string, value: number, weekday: number, text: string) => {
+const send = async (key: string, value: number, weekday: number, text: string, unit: number) => {
     const dataString = {
             app_id: config.appId,
             filters: [{field: 'tag', key, relation: (value !== -1 ? '=' : 'exists'), value: value.toString()}],
-            android_group: weekday.toString(),
+        android_group: weekday.toString() + '-' + unit.toString(),
+        android_group_message: {
+            de: intToWeekday(weekday) + ' ' + (unit + 1).toString() + '. Stunde: $[notif_count] Änderungen',
+            en: intToWeekday(weekday) + ' ' + (unit + 1).toString() + '. Stunde: $[notif_count] Änderungen',
+        },
+        android_led_color: 'ff5bc638',
+        android_accent_color: 'ff5bc638',
             contents: {
                 de: text,
                 en: text
@@ -422,7 +428,7 @@ const doWork = (today: boolean) => {
         console.log('Fetched replacement plan for ' + day);
         parseData(raw).then(data => {
             console.log('Parsed replacement plan for ' + day);
-            if (isNew(data, true)) {
+            if (isNew(data, today)) {
                 extractData(data).then(replacementplan1 => {
                     createTeacherReplacementplan(replacementplan1).then(replacementplan2 => {
                         console.log('Extracted replacement plan for ' + day);
@@ -440,7 +446,7 @@ const doWork = (today: boolean) => {
                                     const block = getBlockOfLesson(weekdayToInt(data.for.weekday), change.unit, data.participant);
                                     const key = data.participant + '-' + (block !== '' ? block : weekdayToInt(data.for.weekday) + '-' + change.unit);
                                     const text =
-                                        (change.unit + 1) + '. ' + change.subject
+                                        (change.unit + 1) + '. Stunde ' + change.subject
                                         + (change.course !== '' ? ' ' + change.course : '')
                                         + (change.participant !== '' ? ' ' + change.participant : '')
                                         + (change.room !== '' ? ' ' + change.room : '') + ':'
@@ -448,7 +454,7 @@ const doWork = (today: boolean) => {
                                         + (change.change.info !== '' ? ' ' + change.change.info : '')
                                         + (change.change.teacher !== '' ? ' ' + change.change.teacher : '')
                                         + (change.change.room !== '' ? ' ' + change.change.room : '');
-                                    send(key, place, weekdayToInt(data.for.weekday), text).then((a: any) => {
+                                    send(key, place, weekdayToInt(data.for.weekday), text, change.unit).then((a: any) => {
                                         if (JSON.parse(a).errors !== undefined) {
                                             if (JSON.parse(a).errors[0] === 'All included players are not subscribed') {
                                                 return;
