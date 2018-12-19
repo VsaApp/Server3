@@ -2,5 +2,7 @@
     "username": "USERNAME",
     "password": "PASSWORD",
     "appAuthKey": "ONESIGNAL_AUTH_KEY",
-    "appId": "ONESIGNAL_APP_ID"
+    "appId": "ONESIGNAL_APP_ID",
+    "cafetoriaId": "YOUR_SERVICE_ID",
+    "cafetoriaPin": "YOUR_SERVICE_PIN"
 }
