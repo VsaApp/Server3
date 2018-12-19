@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import config from '../config';
 import got from 'got';
-import {parse} from 'node-html-parser';
+import { parse } from 'node-html-parser';
 
 const isNew = (data: any, today: boolean) => {
     let file = path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow') + '.txt');
@@ -16,7 +16,7 @@ const isNew = (data: any, today: boolean) => {
 };
 
 const fetchData = async (today: boolean) => {
-    return (await got('https://www.viktoriaschule-aachen.de/sundvplan/vps/' + (today ? 'left' : 'right') + '.html', {auth: config.username + ':' + config.password})).body;
+    return (await got('https://www.viktoriaschule-aachen.de/sundvplan/vps/' + (today ? 'left' : 'right') + '.html', { auth: config.username + ':' + config.password })).body;
 };
 
 const parseData = async (raw: string) => {
@@ -118,7 +118,7 @@ const extractData = async (data: any) => {
                                 }
                             });
                         }
-                        if (changed[0].includes('abgehängt')) {
+                        if (changed[0].includes('abgehängt') || changed[0].includes('U-frei')) {
                             parsed = true;
                             if ((original[0].match(/ /g) || []).length > 1) {
                                 d.push({
@@ -313,8 +313,8 @@ const createTeacherReplacementplan = async (data: any) => {
 
 const send = async (key: string, value: number, weekday: number, text: string, unit: number) => {
     const dataString = {
-            app_id: config.appId,
-            filters: [{field: 'tag', key, relation: (value !== -1 ? '=' : 'exists'), value: value.toString()}],
+        app_id: config.appId,
+        filters: [{ field: 'tag', key, relation: (value !== -1 ? '=' : 'exists'), value: value.toString() }],
         android_group: weekday.toString() + '-' + unit.toString(),
         android_group_message: {
             de: intToWeekday(weekday) + ' ' + (unit + 1).toString() + '. Stunde: $[notif_count] Änderungen',
@@ -322,16 +322,16 @@ const send = async (key: string, value: number, weekday: number, text: string, u
         },
         android_led_color: 'ff5bc638',
         android_accent_color: 'ff5bc638',
-            contents: {
-                de: text,
-                en: text
-            },
-            headings: {
-                de: intToWeekday(weekday),
-                en: intToWeekday(weekday)
-            }
+        contents: {
+            de: text,
+            en: text
+        },
+        headings: {
+            de: intToWeekday(weekday),
+            en: intToWeekday(weekday)
         }
-    ;
+    }
+        ;
     let url = 'https://onesignal.com/api/v1/notifications';
     const response = await got.post(
         url,
@@ -454,7 +454,7 @@ const doWork = (today: boolean) => {
                                         + (change.change.info !== '' ? ' ' + change.change.info : '')
                                         + (change.change.teacher !== '' ? ' ' + change.change.teacher : '')
                                         + (change.change.room !== '' ? ' ' + change.change.room : '');
-                                    send(key, place, weekdayToInt(data.for.weekday), text, change.unit).then((a: any) => {
+                                    /*send(key, place, weekdayToInt(data.for.weekday), text, change.unit).then((a: any) => {
                                         if (JSON.parse(a).errors !== undefined) {
                                             if (JSON.parse(a).errors[0] === 'All included players are not subscribed') {
                                                 return;
@@ -463,7 +463,7 @@ const doWork = (today: boolean) => {
                                         console.log(a);
                                     }).catch((e: any) => {
                                         console.log(e);
-                                    });
+                                    });*/
                                 });
                             }
                         });
