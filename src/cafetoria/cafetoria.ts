@@ -69,19 +69,19 @@ export const extractData = async (data: any) => {
     return {
         saldo,
         error: null, days: dates.map((date: any) => {
-            let menus: any = [];
+            let menues: any = [];
             for (let i = 0; i < 4; i++) {
-                menus.push({
+                menues.push({
                     name: entities.decodeHTML(names[dates.indexOf(date) * 4 + i].childNodes.length == 1 ? names[dates.indexOf(date) * 4 + i].childNodes[0].rawText : ''),
                     time: '',
                     price: prices[dates.indexOf(date) * 4 + i].childNodes.length == 1 ? parseFloat(prices[dates.indexOf(date) * 4 + i].childNodes[0].rawText.replace('&euro;', '').trim().replace(',', '.')) : 0
                 });
             }
-            menus = menus.filter((a: any) => a.name !== '');
+            menues = menues.filter((a: any) => a.name !== '');
             return {
                 date: date.date,
                 weekday: date.weekday,
-                menus
+                menues
             };
         })
     };
@@ -94,8 +94,8 @@ export const fetchDataForUser = async (id: string, pin: string) => {
         return new Promise((resolve, reject) => {
             fetchData(id, pin).then((raw: any) => {
                 parseData(raw).then((data: any) => {
-                    extractData(data).then((menus: any) => {
-                        resolve(menus);
+                    extractData(data).then((menues: any) => {
+                        resolve(menues);
                     });
                 });
             }).catch(reject);
@@ -106,14 +106,14 @@ export const fetchDataForUser = async (id: string, pin: string) => {
 if (module.parent === null) {
     (async () => {
         fetchData(config.cafetoriaId, config.cafetoriaPin).then((raw: any) => {
-            console.log('Fetched menus');
+            console.log('Fetched menues');
             parseData(raw).then((data: any) => {
-                console.log('Parsed menus');
+                console.log('Parsed menues');
                 if (isNew(data)) {
-                    extractData(data).then((menus: any) => {
-                        console.log('Extracted menus');
-                        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'cafetoria', 'list.json'), JSON.stringify(menus, null, 2));
-                        console.log('Saved menus');
+                    extractData(data).then((menues: any) => {
+                        console.log('Extracted menues');
+                        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'cafetoria', 'list.json'), JSON.stringify(menues, null, 2));
+                        console.log('Saved menues');
                     });
                 }
             });
