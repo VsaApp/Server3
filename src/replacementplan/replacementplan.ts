@@ -454,7 +454,7 @@ const doWork = (today: boolean) => {
                                         + (change.change.info !== '' ? ' ' + change.change.info : '')
                                         + (change.change.teacher !== '' ? ' ' + change.change.teacher : '')
                                         + (change.change.room !== '' ? ' ' + change.change.room : '');
-                                    /*send(key, place, weekdayToInt(data.for.weekday), text, change.unit).then((a: any) => {
+                                    send(key, place, weekdayToInt(data.for.weekday), text, change.unit).then((a: any) => {
                                         if (JSON.parse(a).errors !== undefined) {
                                             if (JSON.parse(a).errors[0] === 'All included players are not subscribed') {
                                                 return;
@@ -463,7 +463,7 @@ const doWork = (today: boolean) => {
                                         console.log(a);
                                     }).catch((e: any) => {
                                         console.log(e);
-                                    });*/
+                                    });
                                 });
                             }
                         });
