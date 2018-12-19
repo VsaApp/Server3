@@ -67,7 +67,8 @@ export const extractData = async (data: any) => {
     const names = data.querySelectorAll('.angebot_text');
     const prices = data.querySelectorAll('.angebot_preis');
     return {
-        saldo: saldo, error: null, days: dates.map((date: any) => {
+        saldo,
+        error: null, days: dates.map((date: any) => {
             let menus: any = [];
             for (let i = 0; i < 4; i++) {
                 menus.push({
@@ -111,7 +112,7 @@ if (module.parent === null) {
                 if (isNew(data)) {
                     extractData(data).then((menus: any) => {
                         console.log('Extracted menus');
-                        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'cafetoria', 'list.json'), JSON.stringify(menus.days, null, 2));
+                        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'cafetoria', 'list.json'), JSON.stringify(menus, null, 2));
                         console.log('Saved menus');
                     });
                 }
