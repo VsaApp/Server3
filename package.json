@@ -16,6 +16,7 @@
     "form-data": "^2.3.3",
     "got": "^9.3.2",
     "node-html-parser": "^1.1.11",
+    "pdf-table-extractor": "^1.0.3",
     "pdf2json": "^1.1.7",
     "request": "^2.88.0",
     "tough-cookie": "^2.5.0"
