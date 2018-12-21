@@ -98,7 +98,7 @@ const extractData = async (data: any) => {
 };
 
 (async () => {
-    const file = path.resolve(process.cwd(), 'out', 'work groups', 'list.pdf');
+    const file = path.resolve(process.cwd(), 'out', 'workgroups', 'list.pdf');
     fetchData(file).then(() => {
         console.log('Fetched work groups');
         parseData(file).then(async data => {
