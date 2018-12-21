@@ -54,6 +54,9 @@ const extractData = async (data: any) => {
                         if (participants.includes('-')) {
                             participants = participants.replace('-', ' - ');
                         }
+                        if (participants.includes('/')) {
+                            participants = participants.replace('/', ' - ');
+                        }
                         let time = column[2]
                             .toLowerCase()
                             .replace('uhr', '')
@@ -76,12 +79,14 @@ const extractData = async (data: any) => {
                         }
                         let place = column[3]
                             .toLowerCase()
-                            .replace('gr ha', 'GRH')
                             .replace('gr. halle', 'GRH')
+                            .replace('gr halle', 'GRH')
+                            .replace('gr ha', 'GRH')
                             .replace('r ', '')
                             .replace('aula', 'AUL')
-                            .replace('kl ha', 'KLH')
                             .replace('kl. halle', 'KLH')
+                            .replace('kl halle', 'KLH')
+                            .replace('kl ha', 'KLH')
                             .trim();
                         list[j].data.push({
                             name,
