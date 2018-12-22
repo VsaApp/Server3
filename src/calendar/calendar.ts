@@ -328,7 +328,7 @@ const extractData = async (data: any) => {
                     end = {};
                 }
                 out.data.push({
-                    name,
+                    name: name + 'ferien',
                     info: '',
                     start: {
                         date: start[1].replace('.', '') + '.' + monthToInt(start[2]) + '.' + start[3],
