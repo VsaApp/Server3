@@ -72,7 +72,7 @@ export const extractData = async (data: any) => {
             let menues: any = [];
             for (let i = 0; i < 4; i++) {
                 menues.push({
-                    name: entities.decodeHTML(names[dates.indexOf(date) * 4 + i].childNodes.length == 1 ? names[dates.indexOf(date) * 4 + i].childNodes[0].rawText : ''),
+                    name: entities.decodeHTML(names[dates.indexOf(date) * 4 + i].childNodes.length >= 1 ? names[dates.indexOf(date) * 4 + i].childNodes.map((a: any) => a.rawText).join(' ').replace('  ', ' ') : ''),
                     time: '',
                     price: prices[dates.indexOf(date) * 4 + i].childNodes.length == 1 ? parseFloat(prices[dates.indexOf(date) * 4 + i].childNodes[0].rawText.replace('&euro;', '').trim().replace(',', '.')) : 0
                 });
