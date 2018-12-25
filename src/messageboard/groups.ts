@@ -44,7 +44,8 @@ groupsRouter.get('/info/:username', (req, res) => {
             username: group.username,
             info: group.info,
             status: group.status,
-            follower: group.follower
+            follower: group.follower,
+            post_count: group.posts.length
         };
     })[0];
     if (group === undefined) {
