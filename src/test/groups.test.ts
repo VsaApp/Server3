@@ -70,8 +70,7 @@ describe('Groups', () => {
                         username: username1,
                         info: info1,
                         status,
-                        follower,
-                        posts
+                        follower
                     });
             });
         });
@@ -118,7 +117,7 @@ describe('Groups', () => {
         test('Updated correctly', () => {
             return request(app).get('/messageboard/groups/info/' + username2).then((response: any) => {
                 expect(response.body)
-                    .toEqual({ username: username2, info: info2, status, follower, posts });
+                    .toEqual({ username: username2, info: info2, status, follower });
             });
         });
         test('Correct', () => {
@@ -137,8 +136,7 @@ describe('Groups', () => {
                         username: username1,
                         info: info1,
                         status,
-                        follower,
-                        posts
+                        follower
                     });
             });
         });
