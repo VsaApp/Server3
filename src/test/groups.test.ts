@@ -82,7 +82,8 @@ describe('Groups', () => {
                         username: username1,
                         info: info1,
                         status,
-                        follower
+                        follower,
+                        post_count: 0
                     }]);
             });
         });

@@ -57,12 +57,13 @@ groupsRouter.get('/info/:username', (req, res) => {
 
 groupsRouter.get('/list', (req, res) => {
     const groups = db.get('groups') || [];
-    res.json(groups.map((group: { username: string, info: string, status: string, follower: number }) => {
+    res.json(groups.map((group: { username: string, info: string, status: string, follower: number, posts: [] }) => {
         return {
             username: group.username,
             info: group.info,
             status: group.status,
-            follower: group.follower
+            follower: group.follower,
+            post_count: group.posts.length
         };
     }));
 });
