@@ -36,21 +36,6 @@ postsRouter.post('/add/:username/:password', (req, res) => {
     res.json({ error: null, id, time });
 });
 
-postsRouter.get('/list/:username', (req, res) => {
-    const groups = db.get('groups') || [];
-    const group = groups.filter((group: { username: string }) => {
-        return group.username === req.params.username;
-    })[0];
-    if (group === undefined) {
-        res.json({ error: 'Invalid username' });
-        return;
-    }
-    group.posts = group.posts.sort((a: { title: string, text: string, id: string, time: string }, b: { title: string, text: string, id: string, time: string }) => {
-        return (a.time < b.time) ? 1 : ((a.time > b.time) ? -1 : 0);
-    });
-    res.json(group.posts);
-});
-
 postsRouter.get('/list/:username/:start/:end', (req, res) => {
     const groups = db.get('groups') || [];
     const group = groups.filter((group: { username: string }) => {

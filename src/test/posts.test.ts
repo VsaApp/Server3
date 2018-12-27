@@ -42,7 +42,7 @@ describe('Posts', () => {
         });
         test('Correctly added', () => {
             expect.assertions(1);
-            return request(app).get('/messageboard/posts/list/' + username).then((response: any) => {
+            return request(app).get('/messageboard/posts/list/' + username + '/0/1').then((response: any) => {
                 expect(response.body)
                     .toEqual(posts);
             });
@@ -77,7 +77,7 @@ describe('Posts', () => {
         });
         test('Return all posts', async (done) => {
             expect.assertions(1);
-            const response = await request(app).get('/messageboard/posts/list/' + username);
+            const response = await request(app).get('/messageboard/posts/list/' + username + '/0/3');
             expect(response.body).toEqual(posts);
             done();
         });

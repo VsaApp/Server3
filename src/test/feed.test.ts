@@ -50,18 +50,13 @@ request(app).post('/messageboard/posts/add/' + username1 + '/' + password1).send
 });
 describe('Feed', () => {
     describe('Get', () => {
-        test('Missing count', () => {
-            return request(app).post('/messageboard/feed').send({ groups: [username1] }).then((response: any) => {
-                expect(response.body.error).toBe('Missing count');
-            });
-        });
         test('Missing groups', () => {
-            return request(app).post('/messageboard/feed').send({ count: 1 }).then((response: any) => {
+            return request(app).post('/messageboard/feed/0/0').then((response: any) => {
                 expect(response.body.error).toBe('Missing groups');
             });
         });
         test('Correct', () => {
-            return request(app).post('/messageboard/feed').send({ count: 2, groups: [username1, username2] }).then((response: any) => {
+            return request(app).post('/messageboard/feed/0/1').send({ groups: [username1, username2] }).then((response: any) => {
                 expect(response.body[0].time).toBe(post4.time);
                 expect(response.body[1].time).toBe(post3.time);
                 expect(response.body.length).toBe(2);

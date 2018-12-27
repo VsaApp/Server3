@@ -3,11 +3,7 @@ import express from 'express';
 import db from './db';
 
 const feedRouter = express.Router();
-feedRouter.post('/', (req, res) => {
-    if (req.body.count === undefined) {
-        res.json({ error: 'Missing count' });
-        return;
-    }
+feedRouter.post('/:start/:end', (req, res) => {
     if (req.body.groups === undefined) {
         res.json({ error: 'Missing groups' });
         return;
@@ -36,7 +32,8 @@ feedRouter.post('/', (req, res) => {
     feed = feed.sort((a: { title: string, text: string, id: string, time: string }, b: { title: string, text: string, id: string, time: string }) => {
         return (a.time < b.time) ? 1 : ((a.time > b.time) ? -1 : 0);
     });
-    feed = feed.slice(0, parseInt(req.body.count));
+
+    feed = feed.slice(parseInt(req.params.start), parseInt(req.params.end) + 1);
     res.json(feed);
 });
 
