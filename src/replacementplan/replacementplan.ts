@@ -444,7 +444,7 @@ const doWork = (today: boolean) => {
                                 data.data.forEach((change: any) => {
                                     const place = getSubjectPlaceOfChange(change, data.participant, weekdayToInt(data.for.weekday));
                                     const block = getBlockOfLesson(weekdayToInt(data.for.weekday), change.unit, data.participant);
-                                    const key = data.participant + '-' + (block !== '' ? block : weekdayToInt(data.for.weekday) + '-' + change.unit);
+                                    const key = 'unitPlan-' + data.participant + '-' + (block !== '' ? block : weekdayToInt(data.for.weekday) + '-' + change.unit);
                                     const text =
                                         (change.unit + 1) + '. Stunde ' + change.subject
                                         + (change.course !== '' ? ' ' + change.course : '')
