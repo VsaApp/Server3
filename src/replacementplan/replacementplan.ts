@@ -329,6 +329,9 @@ const send = async (key: string, value: number, weekday: number, text: string, u
         headings: {
             de: intToWeekday(weekday),
             en: intToWeekday(weekday)
+        },
+        data: {
+            type: 'replacementplan'
         }
     }
         ;
