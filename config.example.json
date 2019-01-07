@@ -4,5 +4,8 @@
     "appAuthKey": "ONESIGNAL_AUTH_KEY",
     "appId": "ONESIGNAL_APP_ID",
     "cafetoriaId": "YOUR_SERVICE_ID",
-    "cafetoriaPin": "YOUR_SERVICE_PIN"
+    "cafetoriaPin": "YOUR_SERVICE_PIN",
+    "emailUser": "TEST@EXAMPLE.de",
+    "emailKey": "EMAIL_KEY",
+    "apiEndpoint": "https://api.vsa.2bad2c0.de/"
 }

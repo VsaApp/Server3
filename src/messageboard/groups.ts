@@ -1,7 +1,11 @@
 import express from 'express';
 import db from './db';
+import got from 'got';
+import config from '../config';
+import crypto from 'crypto';
 
 const groupsRouter = express.Router();
+const nodemailer = require('nodemailer');
 
 groupsRouter.post('/add', (req, res) => {
     if (req.body.username === undefined) {
@@ -23,17 +27,168 @@ groupsRouter.post('/add', (req, res) => {
         res.json({ error: 'User already exists' });
         return;
     }
+    const allIds = groups.map((group: {statusId: number}) => statusId);
+    let statusId = crypto.randomBytes(8).toString('hex');
+    while (allIds.includes(statusId)) statusId = crypto.randomBytes(8).toString('hex');
+
     groups.push({
         username: req.body.username,
         password: req.body.password,
         info: req.body.info,
         status: 'waiting',
+        statusId: statusId,
         follower: -1,
         posts: []
     });
     db.set('groups', groups);
     res.json({ error: null });
+
+    // Send request mail to vsa@2bad2c0.de
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+        host: 'smtp.2bad2c0.de',
+        port: 587,
+        secure: false,
+        auth: {
+            user: config.emailUser,
+            pass: config.emailKey
+        }
+    });
+
+    // setup email data with unicode symbols
+    let mailOptions = {
+        from: `"VsaApp" <${config.emailUser}>`, // sender address
+        to: config.emailUser, // list of receivers
+        subject: 'Gruppe "' + req.body.username + '" wurde erstellt', // Subject line
+        text: `Es wurde eine neue Gruppe erstellt! \n\n ${req.body.username}\n${req.body.info}`, // plain text body
+        html: `<p>Es wurde eine neue Gruppe erstellt:</p><p><b>${req.body.username}</b><br>${req.body.info}</p>` +
+                `<p><a href="${config.apiEndpoint}/messageboard/groups/activate/${statusId}" target="_blank">Akzeptieren</a><br><a href="${config.apiEndpoint}/messageboard/groups/block/${statusId}" target="_blank">Blockieren</a></p>`
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, (error: any, info: any) => {});
 });
+
+groupsRouter.get('/activate/:id', async (req, res) => {
+    const groups = db.get('groups') || [];
+    const group = groups.filter((group: { statusId: number }) => {
+        return group.statusId.toString() === req.params.id;
+    })[0];
+    if (group === undefined) {
+        res.json({ error: 'Invalid id' });
+        return;
+    }
+    if (group.status == 'activated') res.json({ error: null });
+    group.status = 'activated';
+    db.set('groups', groups);
+    res.json({ error: null });
+
+    const dataString = {
+        app_id: config.appId,
+        filters: [{ field: 'tag', key: 'messageboard-' + group.username.replace(/ /g, '-'), relation: '=', value: true }],
+        android_group: 'messageboard-' + group.username,
+        android_group_message: {
+            de: '$[notif_count] Gruppenbestätigungen',
+            en: '$[notif_count] Gruppenbestätigungen',
+        },
+        android_led_color: 'ff5bc638',
+        android_accent_color: 'ff5bc638',
+        contents: {
+            de: 'Die Gruppe "' + group.username + '" wurde aktiviert!',
+            en: 'Die Gruppe "' + group.username + '" wurde aktiviert!',
+        },
+        headings: {
+            de: 'Schwarzes Brett',
+            en: 'Schwarzes Brett'
+        },
+        data: {
+            type: 'messageboard-confirm',
+            group: req.params.username
+        }
+    };
+
+    let url = 'https://onesignal.com/api/v1/notifications';
+    const response = await got.post(
+        url,
+        {
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': 'Basic ' + config.appAuthKey
+            },
+            body: JSON.stringify(dataString)
+        });
+    if (response.statusCode === 200) {
+        if (JSON.parse(response.body).errors !== undefined) {
+            if (JSON.parse(response.body).errors[0] === 'All included players are not subscribed') {
+                return;
+            }
+        }
+        console.log(response.body);
+    } else {
+        console.log(response.body);
+    }
+});
+
+groupsRouter.get('/block/:id', async (req, res) => {
+    const groups = db.get('groups') || [];
+    const group = groups.filter((group: { statusId: number }) => {
+        return group.statusId.toString() === req.params.id;
+    })[0];
+    if (group === undefined) {
+        res.json({ error: 'Invalid id' });
+        return;
+    }
+    if (group.status == 'blocked') res.json({ error: null });
+    group.status = 'blocked';
+    db.set('groups', groups);
+    res.json({ error: null });
+
+    const dataString = {
+        app_id: config.appId,
+        filters: [{ field: 'tag', key: 'messageboard-' + group.username.replace(/ /g, '-'), relation: '=', value: true }],
+        android_group: 'messageboard-' + group.username,
+        android_group_message: {
+            de: '$[notif_count] Gruppenbestätigungen',
+            en: '$[notif_count] Gruppenbestätigungen',
+        },
+        android_led_color: 'ff5bc638',
+        android_accent_color: 'ff5bc638',
+        contents: {
+            de: 'Die Gruppe "' + group.username + '" wurde blockiert!',
+            en: 'Die Gruppe "' + group.username + '" wurde blockiert!',
+        },
+        headings: {
+            de: 'Schwarzes Brett',
+            en: 'Schwarzes Brett'
+        },
+        data: {
+            type: 'messageboard-confirm',
+            group: req.params.username
+        }
+    };
+
+    let url = 'https://onesignal.com/api/v1/notifications';
+    const response = await got.post(
+        url,
+        {
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': 'Basic ' + config.appAuthKey
+            },
+            body: JSON.stringify(dataString)
+        });
+    if (response.statusCode === 200) {
+        if (JSON.parse(response.body).errors !== undefined) {
+            if (JSON.parse(response.body).errors[0] === 'All included players are not subscribed') {
+                return;
+            }
+        }
+        console.log(response.body);
+    } else {
+        console.log(response.body);
+    }
+});
+
 
 groupsRouter.get('/info/:username', (req, res) => {
     const groups = db.get('groups') || [];
