@@ -56,6 +56,15 @@ describe('Groups', () => {
             });
         });
     });
+    describe('Activate/Block', () => {
+        test('Invalid id', () => {
+            return request(app).get('/messageboard/groups/activate/' + '-1').then((response: any) => {
+                expect(response.body.error)
+                    .toBe('Invalid id');
+            });
+        });
+        // It isn't possible to test b locking and activating groups, beacause you can't know the correct id! (That's good, because it should be save)
+    });
     describe('Info', () => {
         test('Invalid username', () => {
             return request(app).get('/messageboard/groups/info/' + username2).then((response: any) => {
