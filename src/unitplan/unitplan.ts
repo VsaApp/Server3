@@ -78,27 +78,32 @@ const extractData = async (data: any) => {
             return a;
         });
         d = d.map((a: any) => { 
-          if (grade === 'EF') {
-            Object.keys(a.lessons).forEach((unit: string) => {
-              let b = a.lessons[unit];
-              const containsMultiple = b.filter((subject: any) => {
-                  return /^(a|b|c|d)$/gmi.test(subject.room);
-                }).length > 0;
-              b = b.filter((subject: any) => { 
-                if (config.isFirstQ) {
-                  return !/^(a|b|c|d)$/gmi.test(subject.room) || subject.subject === 'Freistunde';
-                } else {
-									if (containsMultiple) {
-                  	return /^(a|b|c|d)$/gmi.test(subject.room) || subject.subject === 'Freistunde';
-									} else {
-										return true;	
-									}
-                }
-              });
-              a.lessons[unit] = b;
-            });
-          }
-          return a;
+            if (grade === 'EF') {
+                Object.keys(a.lessons).forEach((unit: string) => {
+                    let b = a.lessons[unit];
+                    const containsMultiple = b.filter((subject: any) => {
+                        return /^(a|b|c|d)$/gmi.test(subject.room);
+                    }).length > 0;
+                    b = b.map((subject: any) => { 
+                        if (config.isFirstQ) {
+                            if (/^(a|b|c|d)$/gmi.test(subject.room)) {
+                                subject.room = '';
+                                subject.participant = '';
+                            }
+                        } else {
+									          if (containsMultiple) {
+                                if (!/^(a|b|c|d)$/gmi.test(subject.room)) {
+                                    subject.room = '';
+                                    subject.participant = '';
+                                }
+									          }
+                        }
+                        return subject;
+                    });
+                    a.lessons[unit] = b;
+                });
+            }
+            return a;
         });
         return {
             participant: grade,
