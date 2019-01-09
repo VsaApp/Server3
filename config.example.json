@@ -7,5 +7,6 @@
     "cafetoriaPin": "YOUR_SERVICE_PIN",
     "emailUser": "TEST@EXAMPLE.de",
     "emailKey": "EMAIL_KEY",
-    "apiEndpoint": "https://api.vsa.2bad2c0.de/"
+    "apiEndpoint": "https://api.vsa.2bad2c0.de/",
+    "isFirstQ": true
 }

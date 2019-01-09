@@ -77,6 +77,29 @@ const extractData = async (data: any) => {
             });
             return a;
         });
+        d = d.map((a: any) => { 
+          if (grade === 'EF') {
+            Object.keys(a.lessons).forEach((unit: string) => {
+              let b = a.lessons[unit];
+              const containsMultiple = b.filter((subject: any) => {
+                  return /^(a|b|c|d)$/gmi.test(subject.room);
+                }).length > 0;
+              b = b.filter((subject: any) => { 
+                if (config.isFirstQ) {
+                  return !/^(a|b|c|d)$/gmi.test(subject.room) || subject.subject === 'Freistunde';
+                } else {
+									if (containsMultiple) {
+                  	return /^(a|b|c|d)$/gmi.test(subject.room) || subject.subject === 'Freistunde';
+									} else {
+										return true;	
+									}
+                }
+              });
+              a.lessons[unit] = b;
+            });
+          }
+          return a;
+        });
         return {
             participant: grade,
             date: data.querySelector('div').childNodes[0].rawText.split(' den ')[1].trim(),
