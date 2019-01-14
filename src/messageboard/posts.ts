@@ -26,7 +26,12 @@ postsRouter.post('/add/:username/:password', async (req, res) => {
         res.json({ error: 'Invalid credentials' });
         return;
     }
-    const id = crypto.randomBytes(8).toString('hex');
+    let allIdLists = groups.map((group: {posts: []}) => group.posts.map((post: {id: string}) => post.id));
+    let allIds: string[] = [];
+    allIdLists.forEach((ids: []) => allIds.concat(ids));
+    let id = crypto.randomBytes(8).toString('hex');
+    while (allIds.indexOf(id) > -1) id = crypto.randomBytes(8).toString('hex');
+
     const time = new Date().toISOString();
     group.posts.push({
         title: req.body.title,
@@ -80,6 +85,54 @@ postsRouter.post('/add/:username/:password', async (req, res) => {
     } else {
         console.log(response.body);
     }
+});
+
+postsRouter.post('/update/:id/:password', (req, res) => {
+    if (req.body.title === undefined) {
+        res.json({ error: 'Missing title' });
+        return;
+    }
+    if (req.body.text === undefined) {
+        res.json({ error: 'Missing text' });
+        return;
+    }
+    const groups = db.get('groups') || [];
+
+    const group = groups.filter((group: {posts: {id: string}[]}) => group.posts.filter((post: {id: string}) => post.id === req.params.id).length > 0)[0];
+    if (group === undefined) {
+        res.json({ error: 'Invalid id' });
+        return;
+    }
+    if (group !== undefined && group.password !== req.params.password) {
+        res.json({ error: 'Invalid credentials' });
+        return;
+    }
+    const post = group.posts.filter((post: {id: string}) => post.id === req.params.id)[0];
+
+    post.title = req.body.title;
+    post.text = req.body.text;
+    db.set('groups', groups);
+    res.json({ error: null });
+});
+
+postsRouter.get('/delete/:id/:password', (req, res) => {
+    const groups = db.get('groups') || [];
+
+    const group = groups.filter((group: {posts: {id: string}[]}) => group.posts.filter((post: {id: string}) => post.id === req.params.id).length > 0)[0];
+    if (group === undefined) {
+        res.json({ error: 'Invalid id' });
+        return;
+    }
+    if (group !== undefined && group.password !== req.params.password) {
+        res.json({ error: 'Invalid credentials' });
+        return;
+    }
+
+    const post = group.posts.filter((post: {id: string}) => post.id === req.params.id)[0];
+
+    group.posts.splice(group.posts.indexOf(post), 1);
+    db.set('groups', groups);
+    res.json({ error: null });
 });
 
 postsRouter.get('/list/:username/:start/:end', (req, res) => {
