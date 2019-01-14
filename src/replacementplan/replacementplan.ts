@@ -4,15 +4,20 @@ import config from '../config';
 import got from 'got';
 import { parse } from 'node-html-parser';
 
+const isDev = process.argv.length === 3;
+
 const isNew = (data: any, today: boolean) => {
-    let file = path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow') + '.txt');
+    const file = path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow') + '.txt');
     let old = '';
     if (fs.existsSync(file)) {
         old = fs.readFileSync(file, 'utf-8').toString();
     }
-    let n = data.querySelectorAll('div')[1].childNodes[0].rawText;
-    fs.writeFileSync(file, n);
-    return old !== n;
+    return old !== data.querySelectorAll('div')[1].childNodes[0].rawText;
+};
+
+const saveDate = (data: any, today: boolean) => {
+    const file = path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow') + '.txt');
+    fs.writeFileSync(file, data.querySelectorAll('div')[1].childNodes[0].rawText);
 };
 
 const fetchData = async (today: boolean) => {
@@ -333,9 +338,11 @@ const send = async (key: string, value: number, weekday: number, text: string, u
         data: {
             type: 'replacementplan'
         }
-    }
-        ;
+    };
     let url = 'https://onesignal.com/api/v1/notifications';
+    if (isDev) { 
+        dataString.filters.push({field: 'tag', key: 'dev', relation: '=', value: 'true'});
+    }
     const response = await got.post(
         url,
         {
@@ -425,57 +432,54 @@ const getBlockOfLesson = (weekday: number, unit: number, participant: string): s
     let unitplan = JSON.parse(fs.readFileSync(file, 'utf-8'));
     return unitplan.data[weekday].lessons[unit.toString()][0].block;
 };
-const doWork = (today: boolean) => {
+
+const doWork = async (today: boolean) => {
     const day = (today ? 'today' : 'tomorrow');
-    fetchData(today).then(raw => {
-        console.log('Fetched replacement plan for ' + day);
-        parseData(raw).then(data => {
-            console.log('Parsed replacement plan for ' + day);
-            if (isNew(data, today)) {
-                extractData(data).then(replacementplan1 => {
-                    createTeacherReplacementplan(replacementplan1).then(replacementplan2 => {
-                        console.log('Extracted replacement plan for ' + day);
-                        replacementplan1.concat(replacementplan2).forEach(async (data) => {
-                            if (data.participant.length < 3) {
-                                updateUnitPlan(data);
+    const raw = await fetchData(today);
+    console.log('Fetched replacement plan for ' + day);
+    const data = await parseData(raw);
+    console.log('Parsed replacement plan for ' + day);
+    if (isNew(data, today)) {
+        const replacementplan1 = await extractData(data);
+        const replacementplan2 = await createTeacherReplacementplan(replacementplan1);
+        console.log('Extracted replacement plan for ' + day);
+        replacementplan1.concat(replacementplan2).forEach(async (data) => {
+            if (data.participant.length < 3) {
+                updateUnitPlan(data);
+            }
+            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', day, data.participant + '.json'), JSON.stringify(data, null, 2));
+        });
+        saveDate(data, today);
+        console.log('Saved replacement plan for ' + day);
+        replacementplan1.concat(replacementplan2).forEach(async (data) => {
+            if (data.participant.length < 3) {
+                data.data.forEach((change: any) => {
+                    const place = getSubjectPlaceOfChange(change, data.participant, weekdayToInt(data.for.weekday));
+                    const block = getBlockOfLesson(weekdayToInt(data.for.weekday), change.unit, data.participant);
+                    const key = 'unitPlan-' + data.participant + '-' + (block !== '' ? block : weekdayToInt(data.for.weekday) + '-' + change.unit);
+                    const text =
+                        (change.unit + 1) + '. Stunde ' + change.subject
+                        + (change.course !== '' ? ' ' + change.course : '')
+                        + (change.participant !== '' ? ' ' + change.participant : '')
+                        + (change.room !== '' ? ' ' + change.room : '') + ':'
+                        + (change.change.subject !== '' ? ' ' + change.change.subject : '')
+                        + (change.change.info !== '' ? ' ' + change.change.info : '')
+                        + (change.change.teacher !== '' ? ' ' + change.change.teacher : '')
+                        + (change.change.room !== '' ? ' ' + change.change.room : '');
+                    send(key, place, weekdayToInt(data.for.weekday), text, change.unit).then((a: any) => {
+                        if (JSON.parse(a).errors !== undefined) {
+                            if (JSON.parse(a).errors[0] === 'All included players are not subscribed') {
+                                return;
                             }
-                            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', day, data.participant + '.json'), JSON.stringify(data, null, 2));
-                        });
-                        console.log('Saved replacement plan for ' + day);
-                        replacementplan1.concat(replacementplan2).forEach(async (data) => {
-                            if (data.participant.length < 3) {
-                                data.data.forEach((change: any) => {
-                                    const place = getSubjectPlaceOfChange(change, data.participant, weekdayToInt(data.for.weekday));
-                                    const block = getBlockOfLesson(weekdayToInt(data.for.weekday), change.unit, data.participant);
-                                    const key = 'unitPlan-' + data.participant + '-' + (block !== '' ? block : weekdayToInt(data.for.weekday) + '-' + change.unit);
-                                    const text =
-                                        (change.unit + 1) + '. Stunde ' + change.subject
-                                        + (change.course !== '' ? ' ' + change.course : '')
-                                        + (change.participant !== '' ? ' ' + change.participant : '')
-                                        + (change.room !== '' ? ' ' + change.room : '') + ':'
-                                        + (change.change.subject !== '' ? ' ' + change.change.subject : '')
-                                        + (change.change.info !== '' ? ' ' + change.change.info : '')
-                                        + (change.change.teacher !== '' ? ' ' + change.change.teacher : '')
-                                        + (change.change.room !== '' ? ' ' + change.change.room : '');
-                                    send(key, place, weekdayToInt(data.for.weekday), text, change.unit).then((a: any) => {
-                                        if (JSON.parse(a).errors !== undefined) {
-                                            if (JSON.parse(a).errors[0] === 'All included players are not subscribed') {
-                                                return;
-                                            }
-                                        }
-                                        console.log(a);
-                                    }).catch((e: any) => {
-                                        console.log(e);
-                                    });
-                                });
-                            }
-                        });
+                        }
+                        console.log(a);
+                    }).catch((e: any) => {
+                        console.log(e);
                     });
                 });
             }
         });
-    });
-
+    }
 };
 
 doWork(true);
