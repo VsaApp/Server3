@@ -66,3 +66,5 @@ firebase.json
 unparsed.txt
 .idea
 messageboard.json
+
+/history/

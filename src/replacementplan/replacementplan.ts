@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import config from '../config';
 import got from 'got';
+import { saveNewReplacementplan } from '../history/history';
 import { parse } from 'node-html-parser';
 
 const isDev = process.argv.length === 3;
@@ -449,6 +450,7 @@ const doWork = async (today: boolean) => {
             }
             fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', day, data.participant + '.json'), JSON.stringify(data, null, 2));
         });
+        saveNewReplacementplan(raw, replacementplan1);
         saveDate(data, today);
         console.log('Saved replacement plan for ' + day);
         replacementplan1.concat(replacementplan2).forEach(async (data) => {

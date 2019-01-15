@@ -3,6 +3,7 @@ import path from 'path';
 import config from '../config';
 import got from 'got';
 import {parse} from 'node-html-parser';
+import { saveNewUnitplan } from '../history/history';
 
 const grades = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c', '9a', '9b', '9c', 'EF', 'Q1', 'Q2'];
 const weekdays = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
@@ -186,6 +187,7 @@ const createTeacherUnitplan = async (data: any) => {
                         unitplan1.concat(unitplan2).forEach(data => {
                             fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json'), JSON.stringify(data, null, 2));
                         });
+                        saveNewUnitplan(raw, unitplan1.concat(unitplan2));
                         console.log('Saved unit plan');
                     });
                 });
