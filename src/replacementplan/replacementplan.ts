@@ -6,6 +6,7 @@ import {saveNewReplacementplan} from '../history/history';
 import {parse} from 'node-html-parser';
 
 const isDev = process.argv.length === 3;
+const isTest = process.argv.length === 4;
 
 const isNew = (data: any, today: boolean) => {
     const file = path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow') + '.txt');
@@ -277,7 +278,7 @@ const extractData = async (data: any) => {
             }
         });
         for (let l = 0; l < d.length; l++) {
-            d[l].subject = d[l].subject.replace('NWB', 'NW').replace(/[0-9]/g, '');
+            d[l].subject = d[l].subject.replace('NWB', 'NW').replace('DFÖ', 'DF').replace(/[0-9]/g, '');
             d[l].change.subject = d[l].change.subject.replace('NWB', 'NW').replace(/[0-9]/g, '');
         }
         const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).replace('-Klassen-Vertretungsplan für ', '').replace('Januar', 'January').replace('Februar', 'February').replace('März', 'March').replace('Mai', 'May').replace('Juni', 'June').replace('Juli', 'July').replace('Oktober', 'October').replace('Dezember', 'December');
@@ -333,49 +334,6 @@ const createTeacherReplacementplan = async (data: any) => {
     return await teachers;
 };
 
-const send = async (key: string, value: number, weekday: number, text: string, unit: number) => {
-    const dataString = {
-        app_id: config.appId,
-        filters: [{field: 'tag', key, relation: (value !== -1 ? '=' : 'exists'), value: value.toString()}],
-        android_group: weekday.toString() + '-' + unit.toString(),
-        android_group_message: {
-            de: intToWeekday(weekday) + ' ' + (unit + 1).toString() + '. Stunde: $[notif_count] Änderungen',
-            en: intToWeekday(weekday) + ' ' + (unit + 1).toString() + '. Stunde: $[notif_count] Änderungen',
-        },
-        android_led_color: 'ff5bc638',
-        android_accent_color: 'ff5bc638',
-        contents: {
-            de: text,
-            en: text
-        },
-        headings: {
-            de: intToWeekday(weekday),
-            en: intToWeekday(weekday)
-        },
-        data: {
-            type: 'replacementplan'
-        }
-    };
-    let url = 'https://onesignal.com/api/v1/notifications';
-    if (isDev) {
-        dataString.filters.push({field: 'tag', key: 'dev', relation: '=', value: 'true'});
-    }
-    const response = await got.post(
-        url,
-        {
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-                'Authorization': 'Basic ' + config.appAuthKey
-            },
-            body: JSON.stringify(dataString)
-        });
-    if (response.statusCode === 200) {
-        return await response.body;
-    } else {
-        throw response.body;
-    }
-};
-
 const updateUnitPlan = (data: any) => {
     const file = path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json');
     let unitplan = JSON.parse(fs.readFileSync(file, 'utf-8'));
@@ -422,33 +380,90 @@ const intToWeekday = (weekday: number): string => {
     return ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'][weekday];
 };
 
-const getSubjectPlaceOfChange = (change: any, participant: string, weekday: number) => {
-    if (change.change.info === 'Klausur') {
-        return -1;
+const getDevices = async () => {
+    let url = 'https://onesignal.com/api/v1/players?app_id=' + config.appId;
+    const response = await got.get(
+        url,
+        {
+            headers: {
+                'Authorization': 'Basic ' + config.appAuthKey
+            }
+        });
+    if (response.statusCode === 200) {
+        return await response.body;
+    } else {
+        throw response.body;
     }
-    const file = path.resolve(process.cwd(), 'out', 'unitplan', participant + '.json');
-    let unitplan = JSON.parse(fs.readFileSync(file, 'utf-8'));
-    let subjects = JSON.parse(JSON.stringify(unitplan.data[weekday].lessons[change.unit.toString()]));
-    subjects = subjects.filter((subject: any) => {
-        return (subjects.filter((s: any) => s.subject === subject.subject).length === 1
-            && subject.subject === change.subject
-            && change.subject !== '')
-            || (subject.room === change.room && change.room !== '')
-            || (subject.participant === change.participant && change.participant !== '');
-    });
-    if (subjects.length !== 1) {
-        return -1;
-    }
-    return unitplan.data[weekday].lessons[change.unit.toString()]
-        .map((subject: any) => subject.participant + subject.subject + subject.room + subject.course)
-        .indexOf(subjects[0].participant + subjects[0].subject + subjects[0].room + subjects[0].course);
 };
 
-const getBlockOfLesson = (weekday: number, unit: number, participant: string): string => {
-    const file = path.resolve(process.cwd(), 'out', 'unitplan', participant + '.json');
-    let unitplan = JSON.parse(fs.readFileSync(file, 'utf-8'));
-    return unitplan.data[weekday].lessons[unit.toString()][0].block;
-};
+const getInjectedUnitplan = (today: boolean, grade: string) => {
+        const unitplan = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'unitplan', grade + '.json')).toString());
+        const replacementplan = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow'), grade + '.json')).toString());
+        const weekday = weekdayToInt(replacementplan.for.weekday);
+        replacementplan.data.forEach((change: any) => {
+                const subjects = unitplan.data[weekday].lessons[change.unit.toString()];
+                change.sure = false;
+                change.exam = change.change.info.toLowerCase().includes('klausur');
+                if (change.exam) {
+                    change.sure = !change.change.info.toLowerCase().includes('nachschreiber');
+                    if (!change.sure) {
+                        console.log(change);
+                    }
+                    subjects.forEach((subject: any) => {
+                        if (subject.changes === undefined) {
+                            subject.changes = [];
+                        }
+                        subject.changes.push(change);
+                    });
+                } else {
+                    let duplicates;
+                    duplicates = subjects.filter((subject: any) => subject.subject === change.subject);
+                    if (duplicates.length === 1) {
+                        change.sure = true;
+                        duplicates.forEach((subject: any) => {
+                            if (subject.changes === undefined) {
+                                subject.changes = [];
+                            }
+                            subject.changes.push(change);
+                        });
+                    } else {
+                        if (subjects.filter((subject: any) => subject.room === change.room).length === 1) {
+                            change.sure = true;
+                            const subject = subjects.filter((subject: any) => subject.room === change.room);
+                            if (subject.changes === undefined) {
+                                subject.changes = [];
+                            }
+                            subject.changes.push(change);
+                        }
+                        if (!change.sure) {
+                            if (duplicates.length === 0) {
+                                subjects.forEach((subject: any) => {
+                                    if (subject.changes === undefined) {
+                                        subject.changes = [];
+                                    }
+                                    subject.changes.push(change);
+                                });
+                            } else {
+                                subjects
+                                    .filter((subject: any) => subject.subject === change.subject)
+                                    .forEach((subject: any) => {
+                                        if (subject.changes === undefined) {
+                                            subject.changes = [];
+                                        }
+                                        subject.changes.push(change);
+                                    });
+                            }
+                        }
+                    }
+                }
+                if (!change.sure) {
+                    console.log(change, subjects);
+                }
+            }
+        );
+        return unitplan;
+    }
+;
 
 const doWork = async (today: boolean) => {
     const day = (today ? 'today' : 'tomorrow');
@@ -468,37 +483,132 @@ const doWork = async (today: boolean) => {
         });
         saveNewReplacementplan(raw, replacementplan1);
         saveDate(data, today);
-        console.log('Saved replacement plan for ' + day);
-        replacementplan1.concat(replacementplan2).forEach(async (data) => {
-            if (data.participant.length < 3) {
-                data.data.forEach((change: any) => {
-                    const place = getSubjectPlaceOfChange(change, data.participant, weekdayToInt(data.for.weekday));
-                    const block = getBlockOfLesson(weekdayToInt(data.for.weekday), change.unit, data.participant);
-                    const key = 'unitPlan-' + data.participant + '-' + (block !== '' ? block : weekdayToInt(data.for.weekday) + '-' + change.unit);
-                    const text =
-                        (change.unit + 1) + '. Stunde ' + change.subject
-                        + (change.course !== '' ? ' ' + change.course : '')
-                        + (change.participant !== '' ? ' ' + change.participant : '')
-                        + (change.room !== '' ? ' ' + change.room : '') + ':'
-                        + (change.change.subject !== '' ? ' ' + change.change.subject : '')
-                        + (change.change.info !== '' ? ' ' + change.change.info : '')
-                        + (change.change.teacher !== '' ? ' ' + change.change.teacher : '')
-                        + (change.change.room !== '' ? ' ' + change.change.room : '');
-                    send(key, place, weekdayToInt(data.for.weekday), text, change.unit).then((a: any) => {
-                        if (JSON.parse(a).errors !== undefined) {
-                            if (JSON.parse(a).errors[0] === 'All included players are not subscribed') {
-                                return;
+        console.log('Saved replacement plan for ' + day + ' for ' + day);
+        try {
+            let devices = JSON.parse(await getDevices());
+            devices = devices.players.filter((device: any) => {
+                return device.tags.grade !== undefined;
+            }).map((device: any) => {
+                const id = device.id;
+                const grade = device.tags.grade;
+                const isDev = device.tags.dev !== undefined;
+                const exams: any = {};
+                Object.keys(device.tags).filter(key => key.startsWith('exams')).forEach(key => {
+                    exams[key.split('-')[2]] = device.tags[key] === 'true';
+                });
+                const unitplan: any = {};
+                Object.keys(device.tags).filter(key => key.startsWith('unitPlan')).forEach(key => {
+                    unitplan[key.split(grade + '-')[1]] = parseInt(device.tags[key]);
+                });
+                return {
+                    id,
+                    grade,
+                    isDev,
+                    exams,
+                    unitplan
+                }
+            });
+            if (isDev) {
+                devices = devices.filter((device: any) => device.isDev);
+            }
+            console.log('Sending notifications to ' + devices.length + ' devices');
+            devices.forEach(async (device: any) => {
+                const unitplan = getInjectedUnitplan(today, device.grade);
+                const weekday = weekdayToInt(replacementplan1[0].for.weekday);
+                const day = unitplan.data[weekday];
+                let text = '';
+                Object.keys(day.lessons).forEach((unit: string) => {
+                    let subjects = day.lessons[unit];
+                    subjects.forEach((subject: any) => {
+                        let identifier = (subject.block !== '' ? subject.block : weekday + '-' + unit);
+                        if (Object.keys(device.unitplan).indexOf(identifier) > 0) {
+                            if (device.unitplan[identifier] === subjects.indexOf(subject)) {
+                                if (subject.changes !== undefined) {
+                                    subject.changes.forEach((change: any) => {
+                                        text +=
+                                            (!change.sure ? '(' : '')
+                                            + (change.unit + 1) + '. Stunde ' + subject.subject
+                                            + (subject.participant !== '' ? ' ' + subject.participant : '') + ':'
+                                            + (change.change.subject !== '' ? ' ' + change.change.subject : '')
+                                            + (change.change.info !== '' ? ' ' + change.change.info : '')
+                                            + (change.change.teacher !== '' ? ' ' + change.change.teacher : '')
+                                            + (change.change.room !== '' ? ' ' + change.change.room : '')
+                                            + (!change.sure ? ')' : '') + '\n';
+                                    });
+                                }
                             }
                         }
-                        console.log(a);
-                    }).catch((e: any) => {
-                        console.log(e);
                     });
                 });
-            }
-        });
+                text = text.slice(0, -1);
+                if (text.length === 0) {
+                    text = 'Es gibt keine Änderungen';
+                }
+                const dataString = {
+                        app_id: config.appId,
+                        include_player_ids: [device.id],
+                        android_group: weekday.toString(),
+                        android_group_message: {
+                            de: intToWeekday(weekday) + ': $[notif_count] Änderungen',
+                            en: intToWeekday(weekday) + ': $[notif_count] Änderungen',
+                        },
+                        android_led_color: 'ff5bc638',
+                        android_accent_color: 'ff5bc638',
+                        contents: {
+                            de: text,
+                            en: text
+                        },
+                        headings: {
+                            de: intToWeekday(weekday),
+                            en: intToWeekday(weekday)
+                        },
+                        data: {
+                            type: 'replacementplan'
+                        }
+                    }
+                ;
+                let url = 'https://onesignal.com/api/v1/notifications';
+                try {
+                    const response = await got.post(
+                        url,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json; charset=utf-8',
+                                'Authorization': 'Basic ' + config.appAuthKey
+                            },
+                            body: JSON.stringify(dataString)
+                        });
+                    if (JSON.parse(response.body).errors !== undefined) {
+                        if (JSON.parse(response.body).errors[0] === 'All included players are not subscribed') {
+                            return;
+                        }
+                    }
+                    console.log(response.body);
+                } catch (response) {
+                    console.log(response);
+                }
+            });
+        } catch (e) {
+            console.log(e);
+        }
     }
 };
 
-doWork(true);
-doWork(false);
+if (isTest) {
+    const grades = [];
+    for (let i = 0; i < 5; i++) {
+        for (let j = 0; j < 3; j++) {
+            grades.push((5 + i) + (j === 0 ? 'a' : (j === 1 ? 'b' : 'c')));
+        }
+    }
+    grades.push('EF');
+    grades.push('Q1');
+    grades.push('Q2');
+    grades.forEach((grade: string) => {
+        getInjectedUnitplan(true, grade);
+        getInjectedUnitplan(false, grade);
+    });
+} else {
+    doWork(true);
+    doWork(false);
+}

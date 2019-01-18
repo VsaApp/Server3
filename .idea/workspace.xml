@@ -31,6 +31,18 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/messageboard/groups.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1875">
+              <caret line="129" selection-start-line="119" selection-end-line="129" />
+              <folding>
+                <element signature="e#0#30#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -47,10 +59,11 @@
       <find>data.grade</find>
       <find>da</find>
       <find>&quot;</find>
-      <find>console.log</find>
       <find>today</find>
       <find>course&quot;: &quot;</find>
       <find>true</find>
+      <find>weekdayTo</find>
+      <find>console.log</find>
     </findStrings>
     <replaceStrings>
       <replace>'</replace>
@@ -100,7 +113,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="editor.config.ad.shown" value="true" />
-    <property name="last_opened_file_path" value="/snap/bin" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Server3.1" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_package_manager_path" value="/snap/bin" />
@@ -188,7 +201,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="TypeScript" order="9" weight="0.32977098" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.3129771" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.3053435" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -338,12 +351,29 @@
     <entry file="file://$PROJECT_DIR$/out/unitplan/5a.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/duplicateSubjects.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="29" column="32" selection-start-line="29" selection-start-column="32" selection-end-line="29" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="118">
           <caret line="163" selection-start-line="163" selection-end-line="163" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/messageboard/groups.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1875">
+          <caret line="129" selection-start-line="119" selection-end-line="129" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>
