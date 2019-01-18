@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts" line="405" />
+    <bookmark url="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts" line="406" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4d3783b-a945-48d2-856f-8c33d2b55b9c" name="Default Changelist" comment="" />
+    <list default="true" id="c4d3783b-a945-48d2-856f-8c33d2b55b9c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/replacementplan/replacementplan.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/replacementplan/replacementplan.ts" afterDir="false" />
+    </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -19,8 +22,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="323" column="41" lean-forward="true" selection-start-line="323" selection-start-column="41" selection-end-line="323" selection-end-column="41" />
+            <state relative-caret-position="118">
+              <caret line="163" selection-start-line="163" selection-end-line="163" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -80,29 +83,18 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="Server3" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Server3" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Server3" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Server3" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Server3" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Server3" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="replacementplan" type="462c0819:PsiDirectoryNode" />
+              <item name="Server3.1" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Server3.1" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -143,6 +135,7 @@
       <workItem from="1545139685675" duration="5684000" />
       <workItem from="1545150055571" duration="1142000" />
       <workItem from="1545156160889" duration="2505000" />
+      <workItem from="1547849292951" duration="320000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed participants in unit plan">
       <created>1544305079874</created>
@@ -176,11 +169,12 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="30484000" />
+    <option name="totallyTimeSpent" value="30858000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1" y="25" width="1282" height="776" extended-state="6" />
     <layout>
+      <window_info id="npm" side_tool="true" />
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4977778" visible="true" weight="0.24502784" />
       <window_info id="Structure" order="1" sideWeight="0.50222224" side_tool="true" weight="0.24502784" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -346,8 +340,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="323" column="41" lean-forward="true" selection-start-line="323" selection-start-column="41" selection-end-line="323" selection-end-column="41" />
+        <state relative-caret-position="118">
+          <caret line="163" selection-start-line="163" selection-end-line="163" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>

@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import config from '../config';
 import got from 'got';
-import { saveNewReplacementplan } from '../history/history';
-import { parse } from 'node-html-parser';
+import {saveNewReplacementplan} from '../history/history';
+import {parse} from 'node-html-parser';
 
 const isDev = process.argv.length === 3;
 
@@ -22,7 +22,7 @@ const saveDate = (data: any, today: boolean) => {
 };
 
 const fetchData = async (today: boolean) => {
-    return (await got('https://www.viktoriaschule-aachen.de/sundvplan/vps/' + (today ? 'left' : 'right') + '.html', { auth: config.username + ':' + config.password })).body;
+    return (await got('https://www.viktoriaschule-aachen.de/sundvplan/vps/' + (today ? 'left' : 'right') + '.html', {auth: config.username + ':' + config.password})).body;
 };
 
 const parseData = async (raw: string) => {
@@ -159,20 +159,36 @@ const extractData = async (data: any) => {
                         if (original[0].includes('Klausur')) {
                             parsed = true;
                             original.shift();
-                            for (let k = 0; k < original.length - 1; k++) {
+                            if (original[0] === 'Nachschreiber') {
                                 d.push({
                                     unit: unit,
-                                    subject: original[k].split(' ')[2].toUpperCase(),
-                                    course: original[k].split(' ')[3].toUpperCase(),
+                                    subject: '',
+                                    course: '',
                                     room: '',
-                                    participant: original[k].split(' ')[1].toUpperCase(),
+                                    participant: '',
                                     change: {
                                         subject: '',
-                                        teacher: original[original.length - 1].split(': Aufsicht in ')[0],
-                                        room: original[original.length - 1].split(': Aufsicht in ')[1],
-                                        info: 'Klausur'
+                                        teacher: original[1].split(': Aufsicht in ')[0],
+                                        room: original[1].split(': Aufsicht in ')[1],
+                                        info: 'Klausurnachschreiber'
                                     }
                                 });
+                            } else {
+                                for (let k = 0; k < original.length - 1; k++) {
+                                    d.push({
+                                        unit: unit,
+                                        subject: original[k].split(' ')[2].toUpperCase(),
+                                        course: original[k].split(' ')[3].toUpperCase(),
+                                        room: '',
+                                        participant: original[k].split(' ')[1].toUpperCase(),
+                                        change: {
+                                            subject: '',
+                                            teacher: original[original.length - 1].split(': Aufsicht in ')[0],
+                                            room: original[original.length - 1].split(': Aufsicht in ')[1],
+                                            info: 'Klausur'
+                                        }
+                                    });
+                                }
                             }
                         }
                         if (changed[0] === '' && changed[1] === '' && (original[1].match(/ /g) || []).length === 0) {
@@ -320,7 +336,7 @@ const createTeacherReplacementplan = async (data: any) => {
 const send = async (key: string, value: number, weekday: number, text: string, unit: number) => {
     const dataString = {
         app_id: config.appId,
-        filters: [{ field: 'tag', key, relation: (value !== -1 ? '=' : 'exists'), value: value.toString() }],
+        filters: [{field: 'tag', key, relation: (value !== -1 ? '=' : 'exists'), value: value.toString()}],
         android_group: weekday.toString() + '-' + unit.toString(),
         android_group_message: {
             de: intToWeekday(weekday) + ' ' + (unit + 1).toString() + '. Stunde: $[notif_count] Änderungen',
@@ -341,7 +357,7 @@ const send = async (key: string, value: number, weekday: number, text: string, u
         }
     };
     let url = 'https://onesignal.com/api/v1/notifications';
-    if (isDev) { 
+    if (isDev) {
         dataString.filters.push({field: 'tag', key: 'dev', relation: '=', value: 'true'});
     }
     const response = await got.post(
