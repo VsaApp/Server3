@@ -3,6 +3,7 @@ import db from './db';
 import got from 'got';
 import config from '../config';
 import crypto from 'crypto';
+import {getDevices} from '../replacementplan/replacementplan';
 
 const groupsRouter = express.Router();
 const nodemailer = require('nodemailer');
@@ -288,5 +289,25 @@ groupsRouter.get('/delete/:username/:password', (req, res) => {
     db.set('groups', groups);
     res.json({ error: null });
 });
+
+const updateFollowers = async () => {
+    let devices: any = JSON.parse(await getDevices());
+    devices = devices.players.map((device: any) => {
+        return Object.keys(device.tags)
+            .filter(key => key.startsWith('messageboard'))
+            .reduce((obj: any, key) => {
+                obj[key] = device.tags[key];
+                return obj;
+        }, {});
+    });
+    db.set('groups', (db.get('groups') || []).map((group: any) => {
+        group.follower = devices.filter((device: any) => device['messageboard-' + group.username.replace(/ /g, '-')] !== undefined).length;
+        return group;
+    }));
+    console.log(db.get('groups'));
+};
+
+updateFollowers();
+setInterval(updateFollowers, 60000);
 
 export default groupsRouter;

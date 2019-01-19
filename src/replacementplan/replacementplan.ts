@@ -380,7 +380,7 @@ const intToWeekday = (weekday: number): string => {
     return ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'][weekday];
 };
 
-const getDevices = async () => {
+export const getDevices = async () => {
     let url = 'https://onesignal.com/api/v1/players?app_id=' + config.appId;
     const response = await got.get(
         url,
