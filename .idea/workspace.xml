@@ -4,10 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts" line="406" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4d3783b-a945-48d2-856f-8c33d2b55b9c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/replacementplan/replacementplan.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/replacementplan/replacementplan.ts" afterDir="false" />
-    </list>
+    <list default="true" id="c4d3783b-a945-48d2-856f-8c33d2b55b9c" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -22,8 +19,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="118">
-              <caret line="163" selection-start-line="163" selection-end-line="163" />
+            <state relative-caret-position="405">
+              <caret line="405" column="59" selection-start-line="405" selection-start-column="59" selection-end-line="405" selection-end-column="59" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -96,18 +93,35 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="Server3.1" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Server3.1" type="462c0819:PsiDirectoryNode" />
+              <item name="Server3" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Server3" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Server3" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Server3" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Server3" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Server3" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="messageboard" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Server3" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Server3" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="replacementplan" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -182,15 +196,15 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="30858000" />
+    <option name="totallyTimeSpent" value="30859000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1" y="25" width="1282" height="776" extended-state="6" />
     <layout>
-      <window_info id="npm" side_tool="true" />
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4977778" visible="true" weight="0.24502784" />
       <window_info id="Structure" order="1" sideWeight="0.50222224" side_tool="true" weight="0.24502784" />
       <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info id="npm" order="3" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -360,8 +374,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="118">
-          <caret line="163" selection-start-line="163" selection-end-line="163" />
+        <state relative-caret-position="405">
+          <caret line="405" column="59" selection-start-line="405" selection-start-column="59" selection-end-line="405" selection-end-column="59" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>
