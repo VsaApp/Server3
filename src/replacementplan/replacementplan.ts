@@ -397,73 +397,71 @@ export const getDevices = async () => {
 };
 
 const getInjectedUnitplan = (today: boolean, grade: string) => {
-        const unitplan = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'unitplan', grade + '.json')).toString());
-        const replacementplan = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow'), grade + '.json')).toString());
-        const weekday = weekdayToInt(replacementplan.for.weekday);
-        replacementplan.data.forEach((change: any) => {
-                const subjects = unitplan.data[weekday].lessons[change.unit.toString()];
-                change.sure = false;
-                change.exam = change.change.info.toLowerCase().includes('klausur');
-                if (change.exam) {
-                    change.sure = !change.change.info.toLowerCase().includes('nachschreiber');
-                    if (!change.sure) {
-                        console.log(change);
+    const unitplan = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'unitplan', grade + '.json')).toString());
+    const replacementplan = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow'), grade + '.json')).toString());
+    const weekday = weekdayToInt(replacementplan.for.weekday);
+    replacementplan.data.forEach((change: any) => {
+            const subjects = unitplan.data[weekday].lessons[change.unit.toString()];
+            change.sure = false;
+            change.exam = change.change.info.toLowerCase().includes('klausur');
+            if (change.exam) {
+                change.sure = !change.change.info.toLowerCase().includes('nachschreiber');
+                subjects.forEach((subject: any) => {
+                    if (subject.changes === undefined) {
+                        subject.changes = [];
                     }
-                    subjects.forEach((subject: any) => {
+                    subject.changes.push(change);
+                });
+            } else {
+                let duplicates;
+                duplicates = subjects.filter((subject: any) => subject.subject === change.subject);
+                if (duplicates.length === 1) {
+                    change.sure = true;
+                    duplicates.forEach((subject: any) => {
                         if (subject.changes === undefined) {
                             subject.changes = [];
                         }
                         subject.changes.push(change);
                     });
                 } else {
-                    let duplicates;
-                    duplicates = subjects.filter((subject: any) => subject.subject === change.subject);
-                    if (duplicates.length === 1) {
+                    if (subjects.filter((subject: any) => subject.room === change.room).length === 1) {
                         change.sure = true;
-                        duplicates.forEach((subject: any) => {
-                            if (subject.changes === undefined) {
-                                subject.changes = [];
-                            }
-                            subject.changes.push(change);
-                        });
-                    } else {
-                        if (subjects.filter((subject: any) => subject.room === change.room).length === 1) {
-                            change.sure = true;
-                            const subject = subjects.filter((subject: any) => subject.room === change.room);
-                            if (subject.changes === undefined) {
-                                subject.changes = [];
-                            }
-                            subject.changes.push(change);
+                        const subject = subjects.filter((subject: any) => subject.room === change.room);
+                        if (subject.changes === undefined) {
+                            subject.changes = [];
                         }
-                        if (!change.sure) {
-                            if (duplicates.length === 0) {
-                                subjects.forEach((subject: any) => {
+                        subject.changes.push(change);
+                    }
+                    if (!change.sure) {
+                        if (duplicates.length === 0) {
+                            subjects.forEach((subject: any) => {
+                                if (subject.changes === undefined) {
+                                    subject.changes = [];
+                                }
+                                subject.changes.push(change);
+                            });
+                        } else {
+                            subjects
+                                .filter((subject: any) => subject.subject === change.subject)
+                                .forEach((subject: any) => {
                                     if (subject.changes === undefined) {
                                         subject.changes = [];
                                     }
                                     subject.changes.push(change);
                                 });
-                            } else {
-                                subjects
-                                    .filter((subject: any) => subject.subject === change.subject)
-                                    .forEach((subject: any) => {
-                                        if (subject.changes === undefined) {
-                                            subject.changes = [];
-                                        }
-                                        subject.changes.push(change);
-                                    });
-                            }
                         }
                     }
                 }
-                if (!change.sure) {
-                    console.log(change, subjects);
-                }
             }
-        );
-        return unitplan;
-    }
-;
+            if (!change.sure && change.change.info !== 'Klausurnachschreiber') {
+                console.log(change, subjects);
+            }
+        }
+    );
+    return unitplan;
+};
+
+const unitplans: any = {};
 
 const doWork = async (today: boolean) => {
     const day = (today ? 'today' : 'tomorrow');
@@ -513,7 +511,7 @@ const doWork = async (today: boolean) => {
             }
             console.log('Sending notifications to ' + devices.length + ' devices');
             devices.forEach(async (device: any) => {
-                const unitplan = getInjectedUnitplan(today, device.grade);
+                const unitplan = unitplans[device.grade + '-' + (today ? 'today' : 'tomorrow')];
                 const weekday = weekdayToInt(replacementplan1[0].for.weekday);
                 const day = unitplan.data[weekday];
                 let text = '';
@@ -594,21 +592,21 @@ const doWork = async (today: boolean) => {
     }
 };
 
-if (isTest) {
-    const grades = [];
-    for (let i = 0; i < 5; i++) {
-        for (let j = 0; j < 3; j++) {
-            grades.push((5 + i) + (j === 0 ? 'a' : (j === 1 ? 'b' : 'c')));
-        }
+const grades = [];
+for (let i = 0; i < 5; i++) {
+    for (let j = 0; j < 3; j++) {
+        grades.push((5 + i) + (j === 0 ? 'a' : (j === 1 ? 'b' : 'c')));
     }
-    grades.push('EF');
-    grades.push('Q1');
-    grades.push('Q2');
-    grades.forEach((grade: string) => {
-        getInjectedUnitplan(true, grade);
-        getInjectedUnitplan(false, grade);
-    });
-} else {
+}
+grades.push('EF');
+grades.push('Q1');
+grades.push('Q2');
+grades.forEach((grade: string) => {
+    unitplans[grade + '-today'] = getInjectedUnitplan(true, grade);
+    unitplans[grade + '-tomorrow'] = getInjectedUnitplan(false, grade);
+});
+
+if (!isTest) {
     doWork(true);
     doWork(false);
 }
