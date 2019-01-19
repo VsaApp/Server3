@@ -471,7 +471,8 @@ const doWork = async (today: boolean) => {
     console.log('Fetched replacement plan for ' + day);
     const data = await parseData(raw);
     console.log('Parsed replacement plan for ' + day);
-    if (isNew(data, today)) {
+    if (isNew(data, today) || isDev) {
+        saveNewReplacementplan(raw, []);
         const replacementplan1 = await extractData(data);
         const replacementplan2 = await createTeacherReplacementplan(replacementplan1);
         console.log('Extracted replacement plan for ' + day);
@@ -481,7 +482,7 @@ const doWork = async (today: boolean) => {
             }
             fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', day, data.participant + '.json'), JSON.stringify(data, null, 2));
         });
-        saveNewReplacementplan(raw, replacementplan1);
+        saveNewReplacementplan('', replacementplan1.concat(replacementplan2));
         saveDate(data, today);
         console.log('Saved replacement plan for ' + day + ' for ' + day);
         try {
