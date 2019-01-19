@@ -3,6 +3,7 @@ import express from 'express';
 import got from 'got';
 import db from './db';
 import config from '../config';
+import {updateApp} from '../update_app';
 
 const postsRouter = express.Router();
 postsRouter.post('/add/:username/:password', async (req, res) => {
@@ -85,6 +86,8 @@ postsRouter.post('/add/:username/:password', async (req, res) => {
     } else {
         console.log(response.body);
     }
+
+    updateApp('ALL', {'type': 'messageboard-post', 'action': 'add', 'group': req.params.username});
 });
 
 postsRouter.post('/update/:id/:password', (req, res) => {
@@ -113,6 +116,8 @@ postsRouter.post('/update/:id/:password', (req, res) => {
     post.text = req.body.text;
     db.set('groups', groups);
     res.json({ error: null });
+
+    updateApp('ALL', {'type': 'messageboard-post', 'action': 'update', 'group': group.username});
 });
 
 postsRouter.get('/delete/:id/:password', (req, res) => {
@@ -133,6 +138,8 @@ postsRouter.get('/delete/:id/:password', (req, res) => {
     group.posts.splice(group.posts.indexOf(post), 1);
     db.set('groups', groups);
     res.json({ error: null });
+
+    updateApp('ALL', {'type': 'messageboard-post', 'action': 'delete', 'group': req.params.username});
 });
 
 postsRouter.get('/list/:username/:start/:end', (req, res) => {
