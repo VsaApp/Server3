@@ -4,6 +4,7 @@ import got from 'got';
 import config from '../config';
 import crypto from 'crypto';
 import {getDevices} from '../replacementplan/replacementplan';
+import {updateApp} from '../update_app';
 
 const groupsRouter = express.Router();
 const nodemailer = require('nodemailer');
@@ -68,6 +69,7 @@ groupsRouter.post('/add', (req, res) => {
 
     // send mail with defined transport object
     transporter.sendMail(mailOptions, (error: any, info: any) => {});
+
 });
 
 groupsRouter.get('/activate/:id', async (req, res) => {
@@ -128,6 +130,8 @@ groupsRouter.get('/activate/:id', async (req, res) => {
     } else {
         console.log(response.body);
     }
+
+    updateApp('ALL', {'type': 'messageboard-group', 'action': 'activate', 'group': group.username});
 });
 
 groupsRouter.get('/block/:id', async (req, res) => {
@@ -188,6 +192,8 @@ groupsRouter.get('/block/:id', async (req, res) => {
     } else {
         console.log(response.body);
     }
+
+    updateApp('ALL', {'type': 'messageboard-group', 'action': 'block', 'group': group.username});
 });
 
 
@@ -254,6 +260,8 @@ groupsRouter.post('/update/:username/:password', (req, res) => {
     group.info = req.body.info;
     db.set('groups', groups);
     res.json({ error: null });
+
+    updateApp('ALL', {'type': 'messageboard-group', 'action': 'update', 'group': group.username});
 });
 
 groupsRouter.get('/login/:username/:password', (req, res) => {
@@ -288,6 +296,8 @@ groupsRouter.get('/delete/:username/:password', (req, res) => {
     groups.splice(groups.indexOf(group), 1);
     db.set('groups', groups);
     res.json({ error: null });
+
+    updateApp('ALL', {'type': 'messageboard-group', 'action': 'delete', 'group': group.username});
 });
 
 const updateFollowers = async () => {

@@ -181,13 +181,14 @@ const createTeacherUnitplan = async (data: any) => {
         parseData(raw).then(data => {
             console.log('Parsed unit plan');
             if (isNew(data)) {
+                saveNewUnitplan(raw, []);
                 extractData(data).then(unitplan1 => {
                     createTeacherUnitplan(unitplan1).then(unitplan2 => {
                         console.log('Extracted unit plan');
                         unitplan1.concat(unitplan2).forEach(data => {
                             fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json'), JSON.stringify(data, null, 2));
                         });
-                        saveNewUnitplan(raw, unitplan1.concat(unitplan2));
+                        saveNewUnitplan('', unitplan1.concat(unitplan2));
                         console.log('Saved unit plan');
                     });
                 });
