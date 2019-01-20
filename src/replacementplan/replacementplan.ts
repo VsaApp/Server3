@@ -590,7 +590,7 @@ const doWork = async (today: boolean) => {
             });
             const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).replace('-Klassen-Vertretungsplan für ', '').replace('Januar', 'January').replace('Februar', 'February').replace('März', 'March').replace('Mai', 'May').replace('Juni', 'June').replace('Juli', 'July').replace('Oktober', 'October').replace('Dezember', 'December');
             const weekday = dateStr.split(', ')[0];
-            updateApp('All', {'type': 'replacementplan', 'action': 'update', 'day': day, 'weekday': weekday});
+            updateApp('All', {'type': 'replacementplan', 'action': 'update', 'day': day, 'weekday': weekday}, isDev);
         } catch (e) {
             console.log(e);
         }

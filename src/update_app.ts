@@ -1,11 +1,12 @@
 import got from 'got';
 import config from './config';
 
-export const updateApp = async (segment: string, data: any) => {
+export const updateApp = async (segment: string, data: any, dev? : Boolean) => {
+    if (!dev) dev = false;
     console.log(data);
     const dataString = {
         app_id: config.appId,
-        filters: [{ field: 'tag', key: 'dev', value: true }],
+        included_segments: [dev ? "Dev" : "Users"],
         content_available: true,
         data: {type: 'silent', data: data}
     };
