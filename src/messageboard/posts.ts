@@ -139,7 +139,7 @@ postsRouter.get('/delete/:id/:password', (req, res) => {
     db.set('groups', groups);
     res.json({ error: null });
 
-    updateApp('ALL', {'type': 'messageboard-post', 'action': 'delete', 'group': req.params.username});
+    updateApp('ALL', {'type': 'messageboard-post', 'action': 'delete', 'group': group.username});
 });
 
 postsRouter.get('/list/:username/:start/:end', (req, res) => {
