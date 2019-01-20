@@ -4,6 +4,7 @@ import config from '../config';
 import got from 'got';
 import {saveNewReplacementplan} from '../history/history';
 import {parse} from 'node-html-parser';
+import { updateApp } from '../update_app';
 
 const isDev = process.argv.length === 3;
 const isTest = process.argv.length === 4;
@@ -589,6 +590,9 @@ const doWork = async (today: boolean) => {
                     console.log(response);
                 }
             });
+            const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).replace('-Klassen-Vertretungsplan für ', '').replace('Januar', 'January').replace('Februar', 'February').replace('März', 'March').replace('Mai', 'May').replace('Juni', 'June').replace('Juli', 'July').replace('Oktober', 'October').replace('Dezember', 'December');
+            const weekday = dateStr.split(', ')[0];
+            updateApp('All', {'type': 'replacementplan', 'action': 'update', 'day': day, 'weekday': weekday});
         } catch (e) {
             console.log(e);
         }
