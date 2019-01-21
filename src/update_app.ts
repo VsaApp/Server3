@@ -1,9 +1,8 @@
 import got from 'got';
 import config from './config';
 
-export const updateApp = async (segment: string, data: any, dev? : Boolean) => {
+export const updateApp = async (segment: string, data: any, dev?: Boolean) => {
     if (!dev) dev = false;
-    console.log(data);
     const dataString = {
         app_id: config.appId,
         included_segments: [dev ? "Dev" : "Users"],

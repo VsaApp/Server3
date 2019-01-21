@@ -4,7 +4,7 @@ import config from '../config';
 import got from 'got';
 import {saveNewReplacementplan} from '../history/history';
 import {parse} from 'node-html-parser';
-import { updateApp } from '../update_app';
+import {updateApp} from '../update_app';
 
 const isDev = process.argv.length === 3;
 const isTest = process.argv.length === 4;
@@ -62,29 +62,45 @@ const extractData = async (data: any) => {
                             changed.push('');
                         }
                         let parsed = false;
-                        if (changed[0].includes('m.Aufg.')) {
-                            parsed = true;
-                            if ((original[0].match(/ /g) || []).length > 1) {
-                                if (original[0].includes('abc')) {
-                                    d.push({
-                                        unit: unit,
-                                        subject: original[0].split(' ')[1].toUpperCase(),
-                                        course: original[0].split(' ')[2].toUpperCase(),
-                                        room: original[1].toUpperCase(),
-                                        participant: '',
-                                        change: {
-                                            subject: changed[1].split(' ')[1].toUpperCase(),
-                                            teacher: changed[0].split(' ')[0],
-                                            room: changed[1].split(' ')[2].toUpperCase(),
-                                            info: changed[0].split(' ')[1]
-                                        }
-                                    });
+                        try {
+                            if (changed[0].includes('m.Aufg.')) {
+                                parsed = true;
+                                if ((original[0].match(/ /g) || []).length > 1) {
+                                    if (original[0].includes('abc')) {
+                                        d.push({
+                                            unit: unit,
+                                            subject: original[0].split(' ')[1].toUpperCase(),
+                                            course: original[0].split(' ')[2].toUpperCase(),
+                                            room: original[1].toUpperCase(),
+                                            participant: '',
+                                            change: {
+                                                subject: changed[1].split(' ')[1].toUpperCase(),
+                                                teacher: changed[0].split(' ')[0],
+                                                room: changed[1].split(' ')[2].toUpperCase(),
+                                                info: changed[0].split(' ')[1]
+                                            }
+                                        });
+                                    } else {
+                                        d.push({
+                                            unit: unit,
+                                            subject: original[0].split(' ')[1].toUpperCase(),
+                                            course: original[0].split(' ')[2].toUpperCase(),
+                                            room: original[1].toUpperCase(),
+                                            participant: '',
+                                            change: {
+                                                subject: changed[1].split(' ')[1].toUpperCase(),
+                                                teacher: changed[0].split(' ')[0],
+                                                room: changed[1].split(' ')[2].toUpperCase(),
+                                                info: changed[0].split(' ')[1]
+                                            }
+                                        });
+                                    }
                                 } else {
                                     d.push({
                                         unit: unit,
-                                        subject: original[0].split(' ')[1].toUpperCase(),
-                                        course: original[0].split(' ')[2].toUpperCase(),
-                                        room: original[1].toUpperCase(),
+                                        subject: original[0].split(' ')[0].toUpperCase(),
+                                        course: '',
+                                        room: original[0].split(' ')[1].toUpperCase(),
                                         participant: '',
                                         change: {
                                             subject: changed[1].split(' ')[1].toUpperCase(),
@@ -94,41 +110,9 @@ const extractData = async (data: any) => {
                                         }
                                     });
                                 }
-                            } else {
-                                d.push({
-                                    unit: unit,
-                                    subject: original[0].split(' ')[0].toUpperCase(),
-                                    course: '',
-                                    room: original[0].split(' ')[1].toUpperCase(),
-                                    participant: '',
-                                    change: {
-                                        subject: changed[1].split(' ')[1].toUpperCase(),
-                                        teacher: changed[0].split(' ')[0],
-                                        room: changed[1].split(' ')[2].toUpperCase(),
-                                        info: changed[0].split(' ')[1]
-                                    }
-                                });
                             }
-                        }
-                        if (changed[0].includes('Studienzeit')) {
-                            parsed = true;
-                            d.push({
-                                unit: unit,
-                                subject: original[0].split(' ')[1].toUpperCase(),
-                                course: original[0].split(' ')[2].toUpperCase(),
-                                room: original[1].toUpperCase(),
-                                participant: '',
-                                change: {
-                                    subject: '',
-                                    teacher: '',
-                                    room: '',
-                                    info: 'Freistunde'
-                                }
-                            });
-                        }
-                        if (changed[0].includes('abgehängt') || changed[0].includes('U-frei')) {
-                            parsed = true;
-                            if ((original[0].match(/ /g) || []).length > 1) {
+                            if (changed[0].includes('Studienzeit')) {
+                                parsed = true;
                                 d.push({
                                     unit: unit,
                                     subject: original[0].split(' ')[1].toUpperCase(),
@@ -142,120 +126,140 @@ const extractData = async (data: any) => {
                                         info: 'Freistunde'
                                     }
                                 });
-                            } else {
+                            }
+                            if (changed[0].includes('abgehängt') || changed[0].includes('U-frei')) {
+                                parsed = true;
+                                if ((original[0].match(/ /g) || []).length > 1) {
+                                    d.push({
+                                        unit: unit,
+                                        subject: original[0].split(' ')[1].toUpperCase(),
+                                        course: original[0].split(' ')[2].toUpperCase(),
+                                        room: original[1].toUpperCase(),
+                                        participant: '',
+                                        change: {
+                                            subject: '',
+                                            teacher: '',
+                                            room: '',
+                                            info: 'Freistunde'
+                                        }
+                                    });
+                                } else {
+                                    d.push({
+                                        unit: unit,
+                                        subject: original[0].split(' ')[0].toUpperCase(),
+                                        course: '',
+                                        room: original[0].split(' ')[1].toUpperCase(),
+                                        participant: '',
+                                        change: {
+                                            subject: '',
+                                            teacher: '',
+                                            room: '',
+                                            info: 'Freistunde'
+                                        }
+                                    });
+                                }
+                            }
+                            if (original[0].includes('Klausur')) {
+                                parsed = true;
+                                original.shift();
+                                if (original[0] === 'Nachschreiber') {
+                                    d.push({
+                                        unit: unit,
+                                        subject: '',
+                                        course: '',
+                                        room: '',
+                                        participant: '',
+                                        change: {
+                                            subject: '',
+                                            teacher: original[1].split(': Aufsicht in ')[0],
+                                            room: original[1].split(': Aufsicht in ')[1],
+                                            info: 'Klausurnachschreiber'
+                                        }
+                                    });
+                                } else {
+                                    for (let k = 0; k < original.length - 1; k++) {
+                                        d.push({
+                                            unit: unit,
+                                            subject: '',
+                                            course: original[k].split(' ')[3].toUpperCase(),
+                                            room: '',
+                                            participant: original[k].split(' ')[1].toUpperCase(),
+                                            change: {
+                                                subject: original[k].split(' ')[2].toUpperCase(),
+                                                teacher: original[original.length - 1].split(': Aufsicht in ')[0],
+                                                room: original[original.length - 1].split(': Aufsicht in ')[1],
+                                                info: 'Klausur'
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                            if (changed[0] === '' && changed[1] === '' && (original[1].match(/ /g) || []).length === 0) {
+                                parsed = true;
                                 d.push({
                                     unit: unit,
-                                    subject: original[0].split(' ')[0].toUpperCase(),
-                                    course: '',
-                                    room: original[0].split(' ')[1].toUpperCase(),
+                                    subject: original[0].split(' ')[1].toUpperCase(),
+                                    course: original[0].split(' ')[2].toUpperCase(),
+                                    room: original[1],
                                     participant: '',
                                     change: {
                                         subject: '',
                                         teacher: '',
                                         room: '',
-                                        info: 'Freistunde'
+                                        info: (original.length === 2 ? 'Freistunde' : original[2])
                                     }
                                 });
                             }
-                        }
-                        if (original[0].includes('Klausur')) {
-                            parsed = true;
-                            original.shift();
-                            if (original[0] === 'Nachschreiber') {
+                            if (changed[0] === 'Referendar(in)') {
+                                parsed = true;
                                 d.push({
                                     unit: unit,
-                                    subject: '',
-                                    course: '',
-                                    room: '',
+                                    subject: original[0].split(' ')[1].toUpperCase(),
+                                    course: (original[0].split(' ').length === 3 ? original[0].split(' ')[2].toUpperCase() : ''),
+                                    room: original[1],
                                     participant: '',
                                     change: {
                                         subject: '',
-                                        teacher: original[1].split(': Aufsicht in ')[0],
-                                        room: original[1].split(': Aufsicht in ')[1],
-                                        info: 'Klausurnachschreiber'
+                                        teacher: '',
+                                        room: '',
+                                        info: changed[0]
                                     }
                                 });
-                            } else {
-                                for (let k = 0; k < original.length - 1; k++) {
-                                    d.push({
-                                        unit: unit,
-                                        subject: original[k].split(' ')[2].toUpperCase(),
-                                        course: original[k].split(' ')[3].toUpperCase(),
-                                        room: '',
-                                        participant: original[k].split(' ')[1].toUpperCase(),
-                                        change: {
-                                            subject: '',
-                                            teacher: original[original.length - 1].split(': Aufsicht in ')[0],
-                                            room: original[original.length - 1].split(': Aufsicht in ')[1],
-                                            info: 'Klausur'
-                                        }
-                                    });
-                                }
                             }
-                        }
-                        if (changed[0] === '' && changed[1] === '' && (original[1].match(/ /g) || []).length === 0) {
-                            parsed = true;
-                            d.push({
-                                unit: unit,
-                                subject: original[0].split(' ')[1].toUpperCase(),
-                                course: original[0].split(' ')[2].toUpperCase(),
-                                room: original[1],
-                                participant: '',
-                                change: {
-                                    subject: '',
-                                    teacher: '',
-                                    room: '',
-                                    info: (original.length === 2 ? 'Freistunde' : original[2])
-                                }
-                            });
-                        }
-                        if (changed[0] === 'Referendar(in)') {
-                            parsed = true;
-                            d.push({
-                                unit: unit,
-                                subject: original[0].split(' ')[1].toUpperCase(),
-                                course: original[0].split(' ')[2].toUpperCase(),
-                                room: original[1],
-                                participant: '',
-                                change: {
-                                    subject: '',
-                                    teacher: '',
-                                    room: '',
-                                    info: changed[0]
-                                }
-                            });
-                        }
-                        if (changed[0].includes('R-Ändg.')) {
-                            parsed = true;
-                            d.push({
-                                unit: unit,
-                                subject: original[0].split(' ')[1].toUpperCase(),
-                                course: original[0].split(' ')[2].toUpperCase(),
-                                room: original[1],
-                                participant: '',
-                                change: {
-                                    subject: '',
-                                    teacher: '',
-                                    room: changed[0].split(' ')[1],
-                                    info: changed[0].split(' ')[0]
-                                }
-                            });
-                        }
-                        if (changed[0].includes('Aufs.aus')) {
-                            parsed = true;
-                            d.push({
-                                unit: unit,
-                                subject: original[0].split(' ')[1].toUpperCase(),
-                                course: original[0].split(' ')[2].toUpperCase(),
-                                room: original[1],
-                                participant: '',
-                                change: {
-                                    subject: '',
-                                    teacher: changed[0].split(' ')[0],
-                                    room: changed[0].split('R.')[1],
-                                    info: 'Aufsicht aus'
-                                }
-                            });
+                            if (changed[0].includes('R-Ändg.')) {
+                                parsed = true;
+                                d.push({
+                                    unit: unit,
+                                    subject: original[0].split(' ')[1].toUpperCase(),
+                                    course: original[0].split(' ')[2].toUpperCase(),
+                                    room: original[1],
+                                    participant: '',
+                                    change: {
+                                        subject: '',
+                                        teacher: '',
+                                        room: changed[0].split(' ')[1],
+                                        info: changed[0].split(' ')[0]
+                                    }
+                                });
+                            }
+                            if (changed[0].includes('Aufs.aus')) {
+                                parsed = true;
+                                d.push({
+                                    unit: unit,
+                                    subject: original[0].split(' ')[1].toUpperCase(),
+                                    course: original[0].split(' ')[2].toUpperCase(),
+                                    room: original[1],
+                                    participant: '',
+                                    change: {
+                                        subject: '',
+                                        teacher: changed[0].split(' ')[0],
+                                        room: changed[0].split('R.')[1],
+                                        info: 'Aufsicht aus'
+                                    }
+                                });
+                            }
+                        } catch (e) {
+                            console.log(e);
                         }
                         if (!parsed) {
                             let text = '';
@@ -279,7 +283,7 @@ const extractData = async (data: any) => {
             }
         });
         for (let l = 0; l < d.length; l++) {
-            d[l].subject = d[l].subject.replace('NWB', 'NW').replace('DFÖ', 'DF').replace(/[0-9]/g, '');
+            d[l].subject = d[l].subject.replace('NWB', 'NW').replace('DFÖ', 'DF').replace('MINT', 'MI').replace(/[0-9]/g, '');
             d[l].change.subject = d[l].change.subject.replace('NWB', 'NW').replace(/[0-9]/g, '');
         }
         const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).replace('-Klassen-Vertretungsplan für ', '').replace('Januar', 'January').replace('Februar', 'February').replace('März', 'March').replace('Mai', 'May').replace('Juni', 'June').replace('Juli', 'July').replace('Oktober', 'October').replace('Dezember', 'December');
@@ -405,6 +409,7 @@ const getInjectedUnitplan = (today: boolean, grade: string) => {
             const subjects = unitplan.data[weekday].lessons[change.unit.toString()];
             change.sure = false;
             change.exam = change.change.info.toLowerCase().includes('klausur');
+            change.rewriteExam = change.change.info.toLowerCase().includes('nachschreiber');
             if (change.exam) {
                 change.sure = !change.change.info.toLowerCase().includes('nachschreiber');
                 subjects.forEach((subject: any) => {
@@ -491,7 +496,7 @@ const doWork = async (today: boolean) => {
             }).map((device: any) => {
                 const id = device.id;
                 const grade = device.tags.grade;
-                const isDev = device.tags.dev !== undefined;
+                const isDev = device.tags.dev === 'true';
                 const exams: any = {};
                 Object.keys(device.tags).filter(key => key.startsWith('exams')).forEach(key => {
                     exams[key.split('-')[2]] = device.tags[key] === 'true';
@@ -525,6 +530,9 @@ const doWork = async (today: boolean) => {
                             if (device.unitplan[identifier] === subjects.indexOf(subject)) {
                                 if (subject.changes !== undefined) {
                                     subject.changes.forEach((change: any) => {
+                                        if (change.exam && !change.rewriteExam && !device.exams[change.change.subject]) {
+                                            return;
+                                        }
                                         text +=
                                             (!change.sure ? '(' : '')
                                             + (change.unit + 1) + '. Stunde ' + subject.subject
@@ -548,12 +556,6 @@ const doWork = async (today: boolean) => {
                         app_id: config.appId,
                         include_player_ids: [device.id],
                         android_group: weekday.toString(),
-                        android_group_message: {
-                            de: intToWeekday(weekday) + ': $[notif_count] Änderungen',
-                            en: intToWeekday(weekday) + ': $[notif_count] Änderungen',
-                        },
-                        android_led_color: 'ff5bc638',
-                        android_accent_color: 'ff5bc638',
                         contents: {
                             de: text,
                             en: text
