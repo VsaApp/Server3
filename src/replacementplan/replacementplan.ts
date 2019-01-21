@@ -278,9 +278,21 @@ const extractData = async (data: any) => {
                                     if (fs.existsSync(file)) {
                                         text = fs.readFileSync(file, 'utf-8');
                                     }
+                                    original = original.map((a: string) => {
+                                        while (a.includes('  ')) {
+                                            a = a.replace('  ', ' ');
+                                        }
+                                        return a;
+                                    });
+                                    changed = changed.map((a: string) => {
+                                        while (a.includes('  ')) {
+                                            a = a.replace('  ', ' ');
+                                        }
+                                        return a;
+                                    });
                                     const n = grade + '\n' + JSON.stringify(original) + '\n' + JSON.stringify(changed) + '\n';
                                     // Try to get unit
-                                    let unit = '?';
+                                    let unit = '-1';
                                     try {
                                         const leftColumn = data.querySelectorAll('tr')[j - 1].childNodes[0].childNodes[0].childNodes[0].rawText;
                                         unit = leftColumn.split(' ')[leftColumn.split(' ').length - 1].replace('.', '').trim();
