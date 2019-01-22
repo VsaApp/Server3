@@ -3,7 +3,7 @@ import db from './db';
 import got from 'got';
 import config from '../config';
 import crypto from 'crypto';
-import {getDevices} from '../replacementplan/replacementplan';
+import {getDevices} from '../replacementplan/notifications';
 import {updateApp} from '../update_app';
 
 const groupsRouter = express.Router();

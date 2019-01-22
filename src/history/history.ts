@@ -1,7 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 import { parse } from 'node-html-parser';
-import { print } from 'util';
+import {getJson} from '../replacementplan/replacementplan';
+
+export const getCurrentJson = async (year: number, month: number, day: number, time: string) => {
+    const raw = fs.readFileSync(path.resolve(process.cwd(), 'history', 'replacementplan', year.toString(), month.toString(), day.toString(), time.toString() + '.html')).toString();
+    return await getJson(raw);
+};
 
 const saveNewVersion = (directoriy: string, raw: string, data: any, year: string, month: string, day: string, time: string) => {
     
