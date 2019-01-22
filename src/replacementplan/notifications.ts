@@ -1,5 +1,6 @@
 import config from '../config';
 import got from 'got';
+import {getUsers} from '../tags/users';
 import { weekdayToInt, intToWeekday } from './utils';
 import {updateApp} from '../update_app';
 
@@ -22,16 +23,13 @@ export const getDevices = async () => {
 
 export const sendNotifications = async (isDev: Boolean, today: Boolean, data: any, replacementplan1: any, unitplans: any) => {
     try {
-        let devices = JSON.parse(await getDevices());
-        devices = devices.players.filter((device: any) => {
-            return device.tags.grade !== undefined;
-        }).map((device: any) => {
+        let devices = getUsers().map((device: any) => {
             const id = device.id;
             const grade = device.tags.grade;
-            const isDev = device.tags.dev === 'true';
+            const isDev = device.tags.dev;
             const exams: any = {};
             Object.keys(device.tags).filter(key => key.startsWith('exams')).forEach(key => {
-                exams[key.split('-')[2]] = device.tags[key] === 'true';
+                exams[key.split('-')[2]] = device.tags[key];
             });
             const unitplan: any = {};
             Object.keys(device.tags).filter(key => key.startsWith('unitPlan')).forEach(key => {

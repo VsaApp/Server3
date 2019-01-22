@@ -3,6 +3,7 @@ import cors from 'cors';
 import config from './config';
 import { fetchDataForUser } from './cafetoria/cafetoria';
 import router from './messageboard/messageboard';
+import tagsRouter from './tags/tags';
 
 const app = express();
 app.use(cors());
@@ -31,5 +32,6 @@ app.get('/cafetoria/login/:id/:pin', async (req, res) => {
 });
 
 app.use('/messageboard', router);
+app.use('/tags', tagsRouter);
 
 export default app;
