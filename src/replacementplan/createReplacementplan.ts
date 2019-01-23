@@ -7,6 +7,28 @@ export const extractData = async (data: any) => {
         const d: any = [];
         const u: any = [];
         let stop = false;
+
+        // Get dates
+        let date = new Date(2000, 0);
+        let weekday = '?';
+        try {
+            const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).replace('-Klassen-Vertretungsplan für ', '').replace('Januar', 'January').replace('Februar', 'February').replace('März', 'March').replace('Mai', 'May').replace('Juni', 'June').replace('Juli', 'July').replace('Oktober', 'October').replace('Dezember', 'December');
+            date = new Date(dateStr);
+            date.setHours(date.getHours() + 1);
+            weekday = dateStr.split(', ')[0];
+        } catch (e) {
+            console.error('Cannont get the \'for\' date of the replacement plan', e.toString());
+        }
+        let update = new Date().getUTCDate().toString() + '.' + (new Date().getUTCMonth() + 1).toString() + '.' + new Date().getUTCFullYear().toString();
+        let updateTime = new Date().getUTCMinutes().toString() + ':' + new Date().getUTCHours().toString();
+        try {
+            update = data.querySelectorAll('div')[1].childNodes[0].rawText.split('um')[0].trim().split(' den ')[1].trim();
+            updateTime = data.querySelectorAll('div')[1].childNodes[0].rawText.split('um')[1].trim();
+        } catch (e) {
+            console.error('Cannont get the \'update\' date of the replacement plan', e.toString());
+        }
+
+        // Parse changes
         try {
             data.querySelectorAll('tr').forEach((row: any, i: number) => {
                 if (!stop) {
@@ -29,6 +51,7 @@ export const extractData = async (data: any) => {
                                 let unit = -1;
                                 let original = [];
                                 let changed = [];
+                                let triedMethod;
                                 try {
                                     unit = parseInt(r.childNodes[0].childNodes.map((a: any) => a.childNodes[0].rawText)[0].split(' ')[1].slice(0, -1)) - 1;
                                     original = r.childNodes[1].childNodes.map((a: any) => a.childNodes[0].rawText.replace(/(\(|\)|\*\*\*| +(?= ))/g, '').trim());
@@ -40,8 +63,10 @@ export const extractData = async (data: any) => {
                                         changed.push('');
                                     }
                                     if (changed[0].includes('m.Aufg.')) {
+                                        triedMethod = 0.0;
                                         if ((original[0].match(/ /g) || []).length > 1) {
                                             if (original[0].includes('abc')) {
+                                                triedMethod = 0.1;
                                                 d.push({
                                                     unit: unit,
                                                     subject: original[0].split(' ')[1].toUpperCase(),
@@ -56,6 +81,7 @@ export const extractData = async (data: any) => {
                                                     }
                                                 });
                                             } else {
+                                                triedMethod = 0.2;
                                                 d.push({
                                                     unit: unit,
                                                     subject: original[0].split(' ')[1].toUpperCase(),
@@ -71,6 +97,7 @@ export const extractData = async (data: any) => {
                                                 });
                                             }
                                         } else {
+                                            triedMethod = 1.0;
                                             d.push({
                                                 unit: unit,
                                                 subject: original[0].split(' ')[0].toUpperCase(),
@@ -88,6 +115,7 @@ export const extractData = async (data: any) => {
                                         parsed = true;
                                     }
                                     if (changed[0].includes('Studienzeit')) {
+                                        triedMethod = 2.0;
                                         d.push({
                                             unit: unit,
                                             subject: original[0].split(' ')[1].toUpperCase(),
@@ -104,7 +132,9 @@ export const extractData = async (data: any) => {
                                         parsed = true;
                                     }
                                     if (changed[0].includes('abgehängt') || changed[0].includes('U-frei')) {
+                                        triedMethod = 3.0;
                                         if ((original[0].match(/ /g) || []).length > 1) {
+                                            triedMethod = 3.1;
                                             d.push({
                                                 unit: unit,
                                                 subject: original[0].split(' ')[1].toUpperCase(),
@@ -119,6 +149,7 @@ export const extractData = async (data: any) => {
                                                 }
                                             });
                                         } else {
+                                            triedMethod = 3.2;
                                             d.push({
                                                 unit: unit,
                                                 subject: original[0].split(' ')[0].toUpperCase(),
@@ -136,8 +167,10 @@ export const extractData = async (data: any) => {
                                         parsed = true;
                                     }
                                     if (original[0].includes('Klausur')) {
+                                        triedMethod = 4.0;
                                         original.shift();
                                         if (original[0] === 'Nachschreiber') {
+                                            triedMethod = 4.1;
                                             d.push({
                                                 unit: unit,
                                                 subject: '',
@@ -152,6 +185,7 @@ export const extractData = async (data: any) => {
                                                 }
                                             });
                                         } else {
+                                            triedMethod = 4.2;
                                             for (let k = 0; k < original.length - 1; k++) {
                                                 d.push({
                                                     unit: unit,
@@ -171,6 +205,7 @@ export const extractData = async (data: any) => {
                                         parsed = true;
                                     }
                                     if (changed[0] === '' && changed[1] === '' && (original[1].match(/ /g) || []).length === 0) {
+                                        triedMethod = 5.0;
                                         d.push({
                                             unit: unit,
                                             subject: original[0].split(' ')[1].toUpperCase(),
@@ -187,6 +222,7 @@ export const extractData = async (data: any) => {
                                         parsed = true;
                                     }
                                     if (changed[0] === 'Referendar(in)') {
+                                        triedMethod = 6.0;
                                         d.push({
                                             unit: unit,
                                             subject: original[0].split(' ')[1].toUpperCase(),
@@ -203,6 +239,7 @@ export const extractData = async (data: any) => {
                                         parsed = true;
                                     }
                                     if (changed[0].includes('R-Ändg.')) {
+                                        triedMethod = 7.0;
                                         d.push({
                                             unit: unit,
                                             subject: original[0].split(' ')[1].toUpperCase(),
@@ -219,6 +256,7 @@ export const extractData = async (data: any) => {
                                         parsed = true;
                                     }
                                     if (changed[0].includes('Aufs.aus')) {
+                                        triedMethod = 8.0;
                                         d.push({
                                             unit: unit,
                                             subject: original[0].split(' ')[1].toUpperCase(),
@@ -235,7 +273,7 @@ export const extractData = async (data: any) => {
                                         parsed = true;
                                     }
                                 } catch (e) {
-                                    console.error(`Cannot parse change in grade row ${i} in subrow ${rows.indexOf(r)}`, r, e);
+                                    console.error(`Error during parse change in grade ${grade} row ${i} in subrow ${rows.indexOf(r)}`, `Trie to parse with method '${triedMethod}' (You can check them in the code)`, `Replacementplan for ${date} (${weekday})`, `Replacementplan from ${update} ${updateTime}`, `Time: ${Math.round((new Date()).getTime() / 1000).toString()}`, 'Row (raw):', r, 'Exception:' + e);
                                 }
                                 if (!parsed) {
                                     let text = '';
@@ -262,7 +300,7 @@ export const extractData = async (data: any) => {
                                         const leftColumn = data.querySelectorAll('tr')[j - 1].childNodes[0].childNodes[0].childNodes[0].rawText;
                                         unit = leftColumn.split(' ')[leftColumn.split(' ').length - 1].replace('.', '').trim();
                                     } catch (e) {
-                                        console.error('Cannot get unit for unparsed change', e);
+                                        console.error(`Cannot get unit for unparsed change (Grade: ${grade}, For: ${date}, Updated: ${update}, ${updateTime})`, e);
                                     }
                                     u.push({
                                         unit: unit,
@@ -282,7 +320,7 @@ export const extractData = async (data: any) => {
                             });
                         }
                     } catch (e) {
-                        console.error(`Cannot parse row ${i}`, row, e);
+                        console.error(`Cannot parse row ${i}`,`(Grade: ${grade}, For: ${date}, Updated: ${update}, ${updateTime})`,  'Row (raw):', row, 'Exception:', e);
                     }
                 }
             });
@@ -293,23 +331,9 @@ export const extractData = async (data: any) => {
             d[l].subject = d[l].subject.replace('NWB', 'NW').replace('DFÖ', 'DF').replace('MINT', 'MI').replace(/[0-9]/g, '');
             d[l].change.subject = d[l].change.subject.replace('NWB', 'NW').replace(/[0-9]/g, '');
         }
-        let date = new Date(2000, 0);
-        let weekday = '?';
-        try {
-            const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).replace('-Klassen-Vertretungsplan für ', '').replace('Januar', 'January').replace('Februar', 'February').replace('März', 'March').replace('Mai', 'May').replace('Juni', 'June').replace('Juli', 'July').replace('Oktober', 'October').replace('Dezember', 'December');
-            date = new Date(dateStr);
-            date.setHours(date.getHours() + 1);
-            weekday = dateStr.split(', ')[0];
-        } catch (e) {
-            console.error('Cannont get the \'for\' date of the replacement plan', e.toString());
-        }
-        let update = new Date().getUTCDate().toString() + '.' + (new Date().getUTCMonth() + 1).toString() + '.' + new Date().getUTCFullYear().toString();
-        let updateTime = new Date().getUTCMinutes().toString() + ':' + new Date().getUTCHours().toString();
-        try {
-            update = data.querySelectorAll('div')[1].childNodes[0].rawText.split('um')[0].trim().split(' den ')[1].trim();
-            updateTime = data.querySelectorAll('div')[1].childNodes[0].rawText.split('um')[1].trim();
-        } catch (e) {
-            console.error('Cannont get the \'update\' date of the replacement plan', e.toString());
+        for (let l = 0; l < u.length; l++) {
+            u[l].subject = u[l].subject.replace('NWB', 'NW').replace('DFÖ', 'DF').replace('MINT', 'MI').replace(/[0-9]/g, '');
+            u[l].change.subject = u[l].change.subject.replace('NWB', 'NW').replace(/[0-9]/g, '');
         }
 
         return {

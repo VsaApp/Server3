@@ -6,6 +6,7 @@ import {extractData, createTeacherReplacementplan} from './createReplacementplan
 import {updateUnitPlan, getInjectedUnitplan} from './connectWithUntiplan';
 import {sendNotifications} from './notifications';
 
+const isCli = module.parent === null;
 const isDev = process.argv.length === 3;
 const isTest = process.argv.length === 4;
 
@@ -59,7 +60,7 @@ const doWork = async (today: boolean) => {
     }
 };
 
-if (!isTest) {
+if (!isTest && isCli) {
     doWork(true);
     doWork(false);
 }
