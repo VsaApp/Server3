@@ -326,7 +326,6 @@ export const extractData = async (data: any) => {
                             }
                         } catch (e) {
                             console.error(`Cannot parse row ${i}`, `(Grade: ${grade}, For: ${date}, Updated: ${update}, ${updateTime})`, 'Row (raw):', row, 'Exception:', e);
-                            process.exit();
                         }
                     }
                 }
