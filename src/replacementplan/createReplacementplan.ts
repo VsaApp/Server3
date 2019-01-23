@@ -155,7 +155,7 @@ export const extractData = async (data: any) => {
                                             for (let k = 0; k < original.length - 1; k++) {
                                                 d.push({
                                                     unit: unit,
-                                                    subject: '',
+                                                    subject: original[k].split(' ')[2].toUpperCase(),
                                                     course: original[k].split(' ')[3].toUpperCase(),
                                                     room: '',
                                                     participant: original[k].split(' ')[1].toUpperCase(),
