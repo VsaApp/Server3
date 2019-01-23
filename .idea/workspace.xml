@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts" line="406" />
+    <bookmark url="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts" line="66" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c4d3783b-a945-48d2-856f-8c33d2b55b9c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/replacementplan/replacementplan.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/replacementplan/replacementplan.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/replacementplan/createReplacementplan.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/replacementplan/createReplacementplan.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -18,11 +18,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-677">
-              <caret line="456" column="46" lean-forward="true" selection-start-line="456" selection-start-column="46" selection-end-line="456" selection-end-column="46" />
+            <state>
+              <caret line="19" column="35" selection-start-line="19" selection-start-column="35" selection-end-line="19" selection-end-column="35" />
+              <folding>
+                <element signature="e#0#20#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/replacementplan/createReplacementplan.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="182">
+              <caret line="46" column="59" selection-start-line="46" selection-start-column="59" selection-end-line="46" selection-end-column="59" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -33,8 +45,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/messageboard/groups.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1950">
-              <caret line="130" selection-start-line="130" selection-end-line="130" />
+            <state relative-caret-position="1935">
+              <caret line="135" selection-start-line="135" selection-end-line="135" />
               <folding>
                 <element signature="e#0#30#0" expanded="true" />
               </folding>
@@ -63,6 +75,7 @@
       <find>true</find>
       <find>weekdayTo</find>
       <find>console.log</find>
+      <find>u.push</find>
     </findStrings>
     <replaceStrings>
       <replace>'</replace>
@@ -82,6 +95,7 @@
         <option value="$PROJECT_DIR$/src/unitplan/unitplan.ts" />
         <option value="$PROJECT_DIR$/courses.ts" />
         <option value="$PROJECT_DIR$/src/replacementplan/replacementplan.ts" />
+        <option value="$PROJECT_DIR$/src/replacementplan/createReplacementplan.ts" />
       </list>
     </option>
   </component>
@@ -95,7 +109,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -124,6 +137,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -166,6 +180,7 @@
       <workItem from="1545156160889" duration="2505000" />
       <workItem from="1547849292951" duration="320000" />
       <workItem from="1547934883335" duration="694000" />
+      <workItem from="1548254679502" duration="1711000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed participants in unit plan">
       <created>1544305079874</created>
@@ -199,11 +214,10 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31553000" />
+    <option name="totallyTimeSpent" value="33264000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1" y="25" width="1282" height="776" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4977778" visible="true" weight="0.24502784" />
       <window_info id="Structure" order="1" sideWeight="0.50222224" side_tool="true" weight="0.24502784" />
@@ -219,7 +233,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="TypeScript" order="9" weight="0.32977098" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.52824426" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.2961832" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -376,22 +390,32 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/messageboard/groups.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1935">
+          <caret line="135" selection-start-line="135" selection-end-line="135" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-677">
-          <caret line="456" column="46" lean-forward="true" selection-start-line="456" selection-start-column="46" selection-end-line="456" selection-end-column="46" />
+        <state>
+          <caret line="19" column="35" selection-start-line="19" selection-start-column="35" selection-end-line="19" selection-end-column="35" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/messageboard/groups.ts">
+    <entry file="file://$PROJECT_DIR$/src/replacementplan/createReplacementplan.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1950">
-          <caret line="130" selection-start-line="130" selection-end-line="130" />
+        <state relative-caret-position="182">
+          <caret line="46" column="59" selection-start-line="46" selection-start-column="59" selection-end-line="46" selection-end-column="59" />
           <folding>
-            <element signature="e#0#30#0" expanded="true" />
+            <element signature="e#0#20#0" expanded="true" />
           </folding>
         </state>
       </provider>
