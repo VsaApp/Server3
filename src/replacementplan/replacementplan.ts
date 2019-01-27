@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import {saveNewReplacementplan} from '../history/history';
-import {fetchData, parseData, isNew, saveDate} from './utils';
-import {extractData, createTeacherReplacementplan} from './createReplacementplan';
-import {updateUnitPlan, getInjectedUnitplan} from './connectWithUntiplan';
+import {fetchData, isNew, parseData, saveDate} from './utils';
+import {createTeacherReplacementplan, extractData} from './createReplacementplan';
+import {getInjectedUnitplan, updateUnitPlan} from './connectWithUnitplan';
 import {sendNotifications} from './notifications';
 
 const isCli = module.parent === null;
@@ -36,7 +36,7 @@ const doWork = async (today: boolean) => {
         });
         saveNewReplacementplan('', replacementplan1.concat(replacementplan2));
         saveDate(data, today);
-        console.log('Saved replacement plan for ' + day + ' for ' + day);
+        console.log('Saved replacement plan for ' + day);
 
         // Get all grades
         const grades = [];
@@ -52,8 +52,9 @@ const doWork = async (today: boolean) => {
         const unitplans: any = {};
 
         grades.forEach((grade: string) => {
-            unitplans[grade + '-today'] = getInjectedUnitplan(true, grade);
-            unitplans[grade + '-tomorrow'] = getInjectedUnitplan(false, grade);
+            unitplans[grade] = getInjectedUnitplan(grade);
+
+            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', grade + '.json'), JSON.stringify(unitplans[grade], null, 2));
         });
 
         await sendNotifications(isDev, today, data, replacementplan1, unitplans);

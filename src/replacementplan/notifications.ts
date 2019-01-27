@@ -1,7 +1,7 @@
 import config from '../config';
 import got from 'got';
 import {getUsers} from '../tags/users';
-import { weekdayToInt, intToWeekday } from './utils';
+import {intToWeekday, weekdayToInt} from './utils';
 import {updateApp} from '../update_app';
 
 export const getDevices = async () => {
@@ -49,7 +49,7 @@ export const sendNotifications = async (isDev: Boolean, today: Boolean, data: an
         console.log('Sending notifications to ' + devices.length + ' devices');
         devices.forEach(async (device: any) => {
             try {
-                const unitplan = unitplans[device.grade + '-' + (today ? 'today' : 'tomorrow')];
+                const unitplan = unitplans[device.grade];
                 const weekday = weekdayToInt(replacementplan1[0].for.weekday);
                 const day = unitplan.data[weekday];
                 let text = '';
@@ -126,7 +126,12 @@ export const sendNotifications = async (isDev: Boolean, today: Boolean, data: an
         });
         const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).replace('-Klassen-Vertretungsplan für ', '').replace('Januar', 'January').replace('Februar', 'February').replace('März', 'March').replace('Mai', 'May').replace('Juni', 'June').replace('Juli', 'July').replace('Oktober', 'October').replace('Dezember', 'December');
         const weekday = dateStr.split(', ')[0];
-        updateApp('All', {'type': 'replacementplan', 'action': 'update', 'day': (today ? 'today' : 'tomorrow'), 'weekday': weekday}, isDev);
+        updateApp('All', {
+            'type': 'replacementplan',
+            'action': 'update',
+            'day': (today ? 'today' : 'tomorrow'),
+            'weekday': weekday
+        }, isDev);
     } catch (e) {
         console.error('Failed to send notifications', e);
     }
