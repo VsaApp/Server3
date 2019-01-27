@@ -44,26 +44,30 @@ export const getInjectedUnitplan = (grade: string) => {
         };
         return day;
     });
-    unitplan.data[replacementplan1.data[0].weekday].replacementplan = {
-        for: {
-            date: replacementplan1.for.date,
-            weekday: replacementplan1.for.weekday
-        },
-        updated: {
-            date: replacementplan1.updated.date,
-            time: replacementplan1.updated.time
-        }
-    };
-    unitplan.data[replacementplan2.data[0].weekday].replacementplan = {
-        for: {
-            date: replacementplan2.for.date,
-            weekday: replacementplan2.for.weekday
-        },
-        updated: {
-            date: replacementplan2.updated.date,
-            time: replacementplan2.updated.time
-        }
-    };
+    if (replacementplan1.data.length > 0) {
+        unitplan.data[replacementplan1.data[0].weekday].replacementplan = {
+            for: {
+                date: replacementplan1.for.date,
+                weekday: replacementplan1.for.weekday
+            },
+            updated: {
+                date: replacementplan1.updated.date,
+                time: replacementplan1.updated.time
+            }
+        };
+    }
+    if (replacementplan2.data.length > 0) {
+        unitplan.data[replacementplan2.data[0].weekday].replacementplan = {
+            for: {
+                date: replacementplan2.for.date,
+                weekday: replacementplan2.for.weekday
+            },
+            updated: {
+                date: replacementplan2.updated.date,
+                time: replacementplan2.updated.time
+            }
+        };
+    }
     replacementplan1.data.concat(replacementplan2.data).forEach((change: any) => {
             const subjects = unitplan.data[change.weekday].lessons[change.unit.toString()];
             change.sure = false;
