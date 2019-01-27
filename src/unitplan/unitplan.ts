@@ -31,7 +31,20 @@ const parseData = async (raw: string) => {
 const extractData = async (data: any) => {
     return await grades.map(grade => {
         let d: any = weekdays.map((weekday: string) => {
-            return {weekday: weekday, lessons: {}};
+            return {
+                weekday: weekday,
+                replacementplan: {
+                    for: {
+                        date: '',
+                        weekday: ''
+                    },
+                    updated: {
+                        date: '',
+                        time: ''
+                    }
+                },
+                lessons: {}
+            };
         });
         data.querySelectorAll('table')[grades.indexOf(grade)].childNodes.slice(1).forEach((row: any, unit: number) => {
             row.childNodes.slice(1).forEach((field: any, day: number) => {
@@ -125,69 +138,6 @@ const extractData = async (data: any) => {
     });
 };
 
-const createTeacherUnitplan = async (data: any) => {
-    let teachers = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'teachers', 'teachers.json')).toString());
-    teachers = teachers.map((teacher: any) => teacher.shortName);
-    teachers = teachers.map((teacher: string) => {
-        const weekdays = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
-        let d: any = weekdays.map((weekday: string) => {
-            return {weekday, lessons: {}};
-        });
-        data.forEach((a: any) => {
-            a.data.forEach((b: any) => {
-                Object.keys(b.lessons).forEach((unit: string) => {
-                    const lesson = b.lessons[unit];
-                    lesson.forEach((subject: any) => {
-                        if (subject.participant === teacher) {
-                            if (d[weekdays.indexOf(b.weekday)].lessons[unit] === undefined) {
-                                d[weekdays.indexOf(b.weekday)].lessons[unit] = [];
-                            }
-                            d[weekdays.indexOf(b.weekday)].lessons[unit].push({
-                                block: subject.block,
-                                participant: a.participant,
-                                subject: subject.subject,
-                                room: subject.room,
-                                course: subject.course,
-                                changes: []
-                            });
-                        }
-                    });
-                });
-            });
-        });
-        d.forEach((e: any) => {
-            const units = ['9', '8', '7', '6', '5', '4', '3', '2', '1', '0'];
-            let notEmpty = false;
-            units.forEach((unit: string) => {
-                if (notEmpty) {
-                    if (e.lessons[unit] === undefined) {
-                        e.lessons[unit] = [];
-                    }
-                    if (e.lessons[unit].length === 0) {
-                        e.lessons[unit].push({
-                            block: '',
-                            participant: '',
-                            subject: (unit === '5' ? 'Mittagspause' : 'Freistunde'),
-                            room: '',
-                            course: '',
-                            changes: []
-                        });
-                    }
-                }
-                if (e.lessons[unit] !== undefined) {
-                    notEmpty = true;
-                }
-            });
-        });
-        return {
-            participant: teacher,
-            date: data[0].date,
-            data: d
-        };
-    });
-    return await teachers;
-};
-
 (async () => {
     fetchData().then(raw => {
         console.log('Fetched unit plan');
@@ -195,20 +145,19 @@ const createTeacherUnitplan = async (data: any) => {
             console.log('Parsed unit plan');
             if (isNew(data)) {
                 saveNewUnitplan(raw, []);
-                extractData(data).then(unitplan1 => {
-                    createTeacherUnitplan(unitplan1).then(unitplan2 => {
-                        console.log('Extracted unit plan');
-                        unitplan1.concat(unitplan2).forEach(data => {
-                            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json'), JSON.stringify(data, null, 2));
-                            try {
-                                fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json'), JSON.stringify(getInjectedUnitplan(data.participant), null, 2))
-                            } catch (e) {
+                extractData(data).then(unitplan => {
+                    console.log('Extracted unit plan');
+                    unitplan.forEach(data => {
+                        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json'), JSON.stringify(data, null, 2));
+                        try {
+                            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json'), JSON.stringify(getInjectedUnitplan(data.participant), null, 2))
+                        } catch (e) {
 
-                            }
-                        });
-                        saveNewUnitplan('', unitplan1.concat(unitplan2));
-                        console.log('Saved unit plan');
+                        }
                     });
+                    saveNewUnitplan('', unitplan);
+                    console.log('Saved unit plan');
+
                 });
             }
         });

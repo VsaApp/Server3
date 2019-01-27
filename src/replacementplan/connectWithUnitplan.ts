@@ -32,8 +32,38 @@ export const getInjectedUnitplan = (grade: string) => {
             });
             return day.lessons[unit];
         });
+        day.replacementplan = {
+            for: {
+                date: '',
+                weekday: ''
+            },
+            updated: {
+                date: '',
+                time: ''
+            }
+        };
         return day;
     });
+    unitplan.data[replacementplan1.data[0].weekday].replacementplan = {
+        for: {
+            date: replacementplan1.for.date,
+            weekday: replacementplan1.for.weekday
+        },
+        updated: {
+            date: replacementplan1.updated.date,
+            time: replacementplan1.updated.time
+        }
+    };
+    unitplan.data[replacementplan2.data[0].weekday].replacementplan = {
+        for: {
+            date: replacementplan2.for.date,
+            weekday: replacementplan2.for.weekday
+        },
+        updated: {
+            date: replacementplan2.updated.date,
+            time: replacementplan2.updated.time
+        }
+    };
     replacementplan1.data.concat(replacementplan2.data).forEach((change: any) => {
             const subjects = unitplan.data[change.weekday].lessons[change.unit.toString()];
             change.sure = false;
@@ -98,43 +128,4 @@ export const getInjectedUnitplan = (grade: string) => {
         }
     );
     return unitplan;
-};
-
-export const updateUnitPlan = (data: any) => {
-    const file = path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json');
-    let unitplan = JSON.parse(fs.readFileSync(file, 'utf-8'));
-    data.data.forEach((change: any) => {
-        const day = unitplan.data.filter((day: any) => {
-            return data.for.weekday === day.weekday;
-        })[0];
-        const lesson = day.lessons[change.unit.toString()];
-        if (lesson.length === 1) {
-            lesson.course = change.course;
-        }
-        const matchingSubjects = lesson.filter((subject: any) => {
-            return (subject.subject === change.subject || subject.room === change.room || subject.teacher === change.room) && change.change.info !== 'Klausur';
-        });
-        if (matchingSubjects.length === 1) {
-            lesson[lesson.indexOf(matchingSubjects[0])].course = change.course;
-        }
-        const multiMatchingSubjects: any = [];
-        unitplan.data.forEach((day: any) => {
-            Object.keys(day.lessons).forEach((unit: string) => {
-                const lesson = day.lessons[unit];
-                if (lesson.length > 0) {
-                    lesson.forEach((subject: any) => {
-                        if (subject.subject === change.subject && subject.teacher === subject.teacher) {
-                            multiMatchingSubjects.push(subject);
-                        }
-                    });
-                }
-            });
-        });
-        if (multiMatchingSubjects.length <= 3) {
-            for (let m = 0; m < multiMatchingSubjects.length; m++) {
-                multiMatchingSubjects[m].course = change.course;
-            }
-        }
-    });
-    fs.writeFileSync(file, JSON.stringify(unitplan, null, 2));
 };

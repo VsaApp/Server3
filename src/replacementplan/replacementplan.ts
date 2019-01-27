@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import {saveNewReplacementplan} from '../history/history';
 import {fetchData, isNew, parseData, saveDate} from './utils';
-import {createTeacherReplacementplan, extractData} from './createReplacementplan';
-import {getInjectedUnitplan, updateUnitPlan} from './connectWithUnitplan';
+import {extractData} from './createReplacementplan';
+import {getInjectedUnitplan} from './connectWithUnitplan';
 import {sendNotifications} from './notifications';
 
 const isCli = module.parent === null;
@@ -11,10 +11,7 @@ const isDev = process.argv.length === 3;
 const isTest = process.argv.length === 4;
 
 export const getJson = async (raw: string) => {
-    const data = await parseData(raw);
-    const replacementplan1 = await extractData(data);
-    const replacementplan2 = await createTeacherReplacementplan(replacementplan1);
-    return replacementplan1.concat(replacementplan2);
+    return await extractData(await parseData(raw));
 };
 
 const doWork = async (today: boolean) => {
@@ -25,16 +22,12 @@ const doWork = async (today: boolean) => {
     console.log('Parsed replacement plan for ' + day);
     if (isNew(data, today) || isDev) {
         saveNewReplacementplan(raw, []);
-        const replacementplan1 = await extractData(data);
-        const replacementplan2 = await createTeacherReplacementplan(replacementplan1);
+        const replacementplan = await extractData(data);
         console.log('Extracted replacement plan for ' + day);
-        replacementplan1.concat(replacementplan2).forEach(async (data) => {
-            if (data.participant.length < 3) {
-                updateUnitPlan(data);
-            }
+        replacementplan.forEach(async (data) => {
             fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', day, data.participant + '.json'), JSON.stringify(data, null, 2));
         });
-        saveNewReplacementplan('', replacementplan1.concat(replacementplan2));
+        saveNewReplacementplan('', replacementplan);
         saveDate(data, today);
         console.log('Saved replacement plan for ' + day);
 
@@ -57,7 +50,7 @@ const doWork = async (today: boolean) => {
             fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', grade + '.json'), JSON.stringify(unitplans[grade], null, 2));
         });
 
-        await sendNotifications(isDev, today, data, replacementplan1, unitplans);
+        await sendNotifications(isDev, today, data, replacementplan, unitplans);
     }
 };
 

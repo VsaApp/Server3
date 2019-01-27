@@ -374,37 +374,3 @@ export const extractData = async (data: any) => {
         }
     });
 };
-
-export const createTeacherReplacementplan = async (data: any) => {
-    let teachers = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'teachers', 'teachers.json')).toString());
-    teachers = teachers.map((teacher: any) => teacher.shortName);
-    teachers = teachers.map((teacher: string) => {
-        let d: any = {
-            participant: teacher,
-            for: data[0].for,
-            updated: data[0].updated,
-            data: []
-        };
-        data.forEach((a: any) => {
-            a.data.forEach((change: any) => {
-                if (change.teacher === teacher || change.change.teacher === teacher) {
-                    d.data.push({
-                        'unit': change.unit,
-                        'subject': change.subject,
-                        'course': change.course,
-                        'room': change.room,
-                        'participant': a.participant,
-                        'change': {
-                            'subject': change.change.subject,
-                            'teacher': change.change.teacher,
-                            'room': change.change.room,
-                            'info': change.change.info
-                        }
-                    });
-                }
-            });
-        });
-        return d;
-    });
-    return await teachers;
-};
