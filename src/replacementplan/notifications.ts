@@ -1,5 +1,6 @@
 import config from '../config';
 import got from 'got';
+import changesForUserID from '../changes/changesForUserID'; 
 import {getUsers} from '../tags/users';
 import {intToWeekday, weekdayToInt} from './utils';
 import {updateApp} from '../update_app';
@@ -23,62 +24,27 @@ export const getDevices = async () => {
 
 export const sendNotifications = async (isDev: Boolean, today: Boolean, data: any, replacementplan1: any, unitplans: any) => {
     try {
-        let devices = getUsers().map((device: any) => {
-            const id = device.id;
-            const grade = device.tags.grade;
-            const isDev = device.tags.dev;
-            const exams: any = {};
-            Object.keys(device.tags).filter(key => key.startsWith('exams')).forEach(key => {
-                exams[key.split('-')[2]] = device.tags[key];
-            });
-            const unitplan: any = {};
-            Object.keys(device.tags).filter(key => key.startsWith('unitPlan')).forEach(key => {
-                unitplan[key.split(grade + '-')[1]] = parseInt(device.tags[key]);
-            });
-            return {
-                id,
-                grade,
-                isDev,
-                exams,
-                unitplan
-            }
-        });
+        let devices = getUsers();
         if (isDev) {
             devices = devices.filter((device: any) => device.isDev);
         }
         console.log('Sending notifications to ' + devices.length + ' devices');
         devices.forEach(async (device: any) => {
             try {
-                const unitplan = unitplans[device.grade];
-                const weekday = weekdayToInt(replacementplan1[0].for.weekday);
-                const day = unitplan.data[weekday];
+                const changes = changesForUserID(device.id, unitplans[device.grade], weekdayToInt(replacementplan1[0].for.weekday));
                 let text = '';
-                Object.keys(day.lessons).forEach((unit: string) => {
-                    let subjects = day.lessons[unit];
-                    subjects.forEach((subject: any) => {
-                        let identifier = (subject.block !== '' ? subject.block : weekday + '-' + unit);
-                        if (Object.keys(device.unitplan).indexOf(identifier) > 0) {
-                            if (device.unitplan[identifier] === subjects.indexOf(subject)) {
-                                if (subject.changes !== undefined) {
-                                    subject.changes.forEach((change: any) => {
-                                        if (change.exam && !change.rewriteExam && !device.exams[change.change.subject]) {
-                                            return;
-                                        }
-                                        text +=
-                                            (!change.sure ? '(' : '')
-                                            + (change.unit + 1) + '. Stunde ' + subject.subject
-                                            + (subject.participant !== '' ? ' ' + subject.participant : '') + ':'
-                                            + (change.change.subject !== '' ? ' ' + change.change.subject : '')
-                                            + (change.change.info !== '' ? ' ' + change.change.info : '')
-                                            + (change.change.teacher !== '' ? ' ' + change.change.teacher : '')
-                                            + (change.change.room !== '' ? ' ' + change.change.room : '')
-                                            + (!change.sure ? ')' : '') + '\n';
-                                    });
-                                }
-                            }
-                        }
-                    });
+                changes.forEach((change: any) => {
+                    text +=
+                        (change.isMy == -1 ? '(' : '')
+                        + (change.unit + 1) + '. Stunde ' + change.nSubject.subject
+                        + (change.nSubject.participant !== '' ? ' ' + change.nSubject.participant : '') + ':'
+                        + (change.change.subject !== '' ? ' ' + change.change.subject : '')
+                        + (change.change.info !== '' ? ' ' + change.change.info : '')
+                        + (change.change.teacher !== '' ? ' ' + change.change.teacher : '')
+                        + (change.change.room !== '' ? ' ' + change.change.room : '')
+                        + (change.isMy == -1 ? ')' : '') + '\n';
                 });
+
                 text = text.slice(0, -1);
                 if (text.length === 0) {
                     text = 'Es gibt keine Änderungen';
