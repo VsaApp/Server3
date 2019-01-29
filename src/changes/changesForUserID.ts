@@ -1,9 +1,9 @@
 
 const changesForUserID = (_device: any, unitplan: any, weekday: number): any[] => {
     const examTags: any = {};
-        Object.keys(_device.tags).filter(key => key.startsWith('exams')).forEach(key => {
-            examTags[key.split('-')[2]] = _device.tags[key];
-        });
+    Object.keys(_device.tags).filter(key => key.startsWith('exams')).forEach(key => {
+        examTags[key.split('-')[2]] = _device.tags[key];
+    });
     const unitplanTags: any = {};
     Object.keys(_device.tags).filter(key => key.startsWith('unitPlan')).forEach(key => {
         unitplanTags[key.split(_device.tags.grade + '-')[1]] = parseInt(_device.tags[key]);
