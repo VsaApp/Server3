@@ -56,9 +56,8 @@ export const extractData = async (data: any) => {
                                     rows.forEach(r => {
                                         let parsed = false;
                                         let unit = -1;
-                                        let original = [];
-                                        let changed = [];
-                                        let triedMethod;
+                                        let original:any = [];
+                                        let changed:any = [];
                                         try {
                                             unit = parseInt(r.childNodes[0].childNodes.map((a: any) => a.childNodes[0].rawText)[0].split(' ')[1].slice(0, -1)) - 1;
                                             original = r.childNodes[1].childNodes.map((a: any) => a.childNodes[0].rawText.replace(/(\(|\)|\*\*\*| +(?= ))/g, '').trim());
@@ -70,10 +69,8 @@ export const extractData = async (data: any) => {
                                                 changed.push('');
                                             }
                                             if (changed[0].includes('m.Aufg.')) {
-                                                triedMethod = 0.0;
                                                 if ((original[0].match(/ /g) || []).length > 1) {
                                                     if (original[0].includes('abc')) {
-                                                        triedMethod = 0.1;
                                                         d.push({
                                                             unit: unit,
                                                             subject: original[0].split(' ')[1].toUpperCase(),
@@ -88,7 +85,6 @@ export const extractData = async (data: any) => {
                                                             }
                                                         });
                                                     } else {
-                                                        triedMethod = 0.2;
                                                         d.push({
                                                             unit: unit,
                                                             subject: original[0].split(' ')[1].toUpperCase(),
@@ -104,7 +100,6 @@ export const extractData = async (data: any) => {
                                                         });
                                                     }
                                                 } else {
-                                                    triedMethod = 1.0;
                                                     d.push({
                                                         unit: unit,
                                                         subject: original[0].split(' ')[0].toUpperCase(),
@@ -122,7 +117,6 @@ export const extractData = async (data: any) => {
                                                 parsed = true;
                                             }
                                             if (changed[0].includes('Studienzeit')) {
-                                                triedMethod = 2.0;
                                                 d.push({
                                                     unit: unit,
                                                     subject: original[0].split(' ')[1].toUpperCase(),
@@ -139,9 +133,7 @@ export const extractData = async (data: any) => {
                                                 parsed = true;
                                             }
                                             if (changed[0].includes('abgehängt') || changed[0].includes('U-frei')) {
-                                                triedMethod = 3.0;
                                                 if ((original[0].match(/ /g) || []).length > 1) {
-                                                    triedMethod = 3.1;
                                                     d.push({
                                                         unit: unit,
                                                         subject: original[0].split(' ')[1].toUpperCase(),
@@ -156,7 +148,6 @@ export const extractData = async (data: any) => {
                                                         }
                                                     });
                                                 } else {
-                                                    triedMethod = 3.2;
                                                     d.push({
                                                         unit: unit,
                                                         subject: original[0].split(' ')[0].toUpperCase(),
@@ -174,10 +165,8 @@ export const extractData = async (data: any) => {
                                                 parsed = true;
                                             }
                                             if (original[0].includes('Klausur')) {
-                                                triedMethod = 4.0;
                                                 original.shift();
                                                 if (original[0] === 'Nachschreiber') {
-                                                    triedMethod = 4.1;
                                                     d.push({
                                                         unit: unit,
                                                         subject: '',
@@ -192,7 +181,6 @@ export const extractData = async (data: any) => {
                                                         }
                                                     });
                                                 } else {
-                                                    triedMethod = 4.2;
                                                     for (let k = 0; k < original.length - 1; k++) {
                                                         d.push({
                                                             unit: unit,
@@ -212,24 +200,38 @@ export const extractData = async (data: any) => {
                                                 parsed = true;
                                             }
                                             if (changed[0] === '' && changed[1] === '' && (original[1].match(/ /g) || []).length === 0) {
-                                                triedMethod = 5.0;
-                                                d.push({
-                                                    unit: unit,
-                                                    subject: original[0].split(' ')[1].toUpperCase(),
-                                                    course: original[0].split(' ')[2].toUpperCase(),
-                                                    room: original[1],
-                                                    participant: '',
-                                                    change: {
-                                                        subject: '',
-                                                        teacher: '',
-                                                        room: '',
-                                                        info: (original.length === 2 ? 'Freistunde' : original[2])
-                                                    }
-                                                });
+                                                if (original[0].split(' ').length === 3) {
+                                                    d.push({
+                                                        unit: unit,
+                                                        subject: original[0].split(' ')[1].toUpperCase(),
+                                                        course: original[0].split(' ')[2].toUpperCase(),
+                                                        room: original[1],
+                                                        participant: '',
+                                                        change: {
+                                                            subject: '',
+                                                            teacher: '',
+                                                            room: '',
+                                                            info: (original.length === 2 ? 'Freistunde' : original[2])
+                                                        }
+                                                    });
+                                                } else {
+                                                    d.push({
+                                                        unit: unit,
+                                                        subject: original[0].split(' ')[1].toUpperCase(),
+                                                        course: '',
+                                                        room: original[1],
+                                                        participant: '',
+                                                        change: {
+                                                            subject: '',
+                                                            teacher: '',
+                                                            room: '',
+                                                            info: (original.length === 2 ? 'Freistunde' : original[2])
+                                                        }
+                                                    });
+                                                }
                                                 parsed = true;
                                             }
                                             if (changed[0] === 'Referendar(in)') {
-                                                triedMethod = 6.0;
                                                 d.push({
                                                     unit: unit,
                                                     subject: original[0].split(' ')[1].toUpperCase(),
@@ -246,9 +248,7 @@ export const extractData = async (data: any) => {
                                                 parsed = true;
                                             }
                                             if (changed[0].includes('R-Ändg.')) {
-                                                triedMethod = 7.0;
                                                 if (original[1].length) {
-                                                    triedMethod = 7.1;
                                                     d.push({
                                                         unit: unit,
                                                         subject: original[0].split(' ')[1].toUpperCase(),
@@ -263,7 +263,6 @@ export const extractData = async (data: any) => {
                                                         }
                                                     });
                                                 } else {
-                                                    triedMethod = 7.2;
                                                     d.push({
                                                         unit: unit,
                                                         subject: original[0].split(' ')[0].toUpperCase(),
@@ -281,7 +280,6 @@ export const extractData = async (data: any) => {
                                                 parsed = true;
                                             }
                                             if (changed[0].includes('Aufs.aus')) {
-                                                triedMethod = 8.0;
                                                 d.push({
                                                     unit: unit,
                                                     subject: original[0].split(' ')[1].toUpperCase(),
@@ -298,7 +296,7 @@ export const extractData = async (data: any) => {
                                                 parsed = true;
                                             }
                                         } catch (e) {
-                                            console.error(`Error during parse change in grade ${grade} row ${i} in subrow ${rows.indexOf(r)}`, `Tried to parse with method '${triedMethod}' (You can check them in the code)`, `Replacementplan for ${date} (${weekday})`, `Replacementplan from ${update} ${updateTime}`, `Time: ${Math.round((new Date()).getTime() / 1000).toString()}`, 'Row (raw):', r, 'Exception:' + e);
+                                            console.error(grade, date, original, changed, e);
                                         }
                                         if (!parsed) {
                                             let text = '';
@@ -325,7 +323,7 @@ export const extractData = async (data: any) => {
                                                 const leftColumn = data.querySelectorAll('tr')[j - 1].childNodes[0].childNodes[0].childNodes[0].rawText;
                                                 unit = leftColumn.split(' ')[leftColumn.split(' ').length - 1].replace('.', '').trim();
                                             } catch (e) {
-                                                console.error(`Cannot get unit for unparsed change (Grade: ${grade}, For: ${date}, Updated: ${update}, ${updateTime})`, e);
+                                                console.error(grade, date, e);
                                             }
                                             u.push({
                                                 unit: unit,
@@ -346,7 +344,7 @@ export const extractData = async (data: any) => {
                                 }
                             }
                         } catch (e) {
-                            console.error(`Cannot parse row ${i}`, `(Grade: ${grade}, For: ${date}, Updated: ${update}, ${updateTime})`, 'Row (raw):', row, 'Exception:', e);
+                            console.error(grade, date, row, e);
                         }
                     }
                 }

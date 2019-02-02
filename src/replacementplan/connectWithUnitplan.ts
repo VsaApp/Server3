@@ -4,13 +4,13 @@ import {weekdayToInt} from './utils';
 
 export const getInjectedUnitplan = (grade: string) => {
     const unitplan = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'unitplan', grade + '.json')).toString());
-    let replacementplan1: any = {data: []};
+    let replacementplan1: any = {};
     try {
         replacementplan1 = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'today', grade + '.json')).toString());
     } catch (e) {
 
     }
-    let replacementplan2: any = {data: []};
+    let replacementplan2: any = {};
     try {
         replacementplan2 = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'tomorrow', grade + '.json')).toString());
     } catch (e) {
@@ -44,8 +44,8 @@ export const getInjectedUnitplan = (grade: string) => {
         };
         return day;
     });
-    if (replacementplan1.data.length > 0) {
-        unitplan.data[replacementplan1.data[0].weekday].replacementplan = {
+    if (replacementplan1.data !== undefined) {
+        unitplan.data[weekdayToInt(replacementplan1.for.weekday)].replacementplan = {
             for: {
                 date: replacementplan1.for.date,
                 weekday: replacementplan1.for.weekday
@@ -56,8 +56,8 @@ export const getInjectedUnitplan = (grade: string) => {
             }
         };
     }
-    if (replacementplan2.data.length > 0) {
-        unitplan.data[replacementplan2.data[0].weekday].replacementplan = {
+    if (replacementplan2.data !== undefined) {
+        unitplan.data[weekdayToInt(replacementplan2.for.weekday)].replacementplan = {
             for: {
                 date: replacementplan2.for.date,
                 weekday: replacementplan2.for.weekday
