@@ -5,7 +5,7 @@ export const updateApp = async (segment: string, data: any, dev?: Boolean) => {
     if (!dev) dev = false;
     const dataString = {
         app_id: config.appId,
-        included_segments: [dev ? "Dev" : "Users"],
+        included_segments: ["Users"],
         content_available: true,
         data: {type: 'silent', data: data}
     };
