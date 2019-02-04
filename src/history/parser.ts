@@ -8,7 +8,7 @@ const testParser = () => {
             fs.readdirSync(path.resolve(process.cwd(), 'history', 'replacementplan', year, month)).forEach((day: string) => {
                 fs.readdirSync(path.resolve(process.cwd(), 'history', 'replacementplan', year, month, day)).filter((file: string) => file.endsWith('.html')).forEach(async (file: string) => {
                     const filePath = path.resolve(process.cwd(), 'history', 'replacementplan', year, month, day, file);
-                    const json = await getCurrentJson(year, month, day, file);
+                    const json = await getCurrentJson(filePath);
                     console.log(`Parse file '${filePath}'`);
 
                     const pathSegments = ['historyTest', 'replacementplan', year, month, day];

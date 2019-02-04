@@ -3,8 +3,8 @@ import path from 'path';
 import { parse } from 'node-html-parser';
 import {getJson} from '../replacementplan/replacementplan';
 
-export const getCurrentJson = async (year: string, month: string, day: string, time: string) => {
-    const raw = fs.readFileSync(path.resolve(process.cwd(), 'history', 'replacementplan', year, month, day, time)).toString();
+export const getCurrentJson = async (filePath: string) => {
+    const raw = fs.readFileSync(filePath).toString();
     return await getJson(raw);
 };
 

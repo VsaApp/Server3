@@ -16,16 +16,15 @@ export const getInjectedUnitplan = (grade: string) => {
     } catch (e) {
 
     }
-    // Convert weekday strings to numbers
-    replacementplan1.data = replacementplan1.data.map((change: any) => {
-        change.weekday = weekdayToInt(replacementplan1.for.weekday);
-        return change;
-    });
-    replacementplan2.data = replacementplan2.data.map((change: any) => {
-        change.weekday = weekdayToInt(replacementplan2.for.weekday);
-        return change;
-    });
 
+    resetOldChanges(unitplan);
+    setChangesInUntiplan(grade, unitplan, replacementplan1);
+    setChangesInUntiplan(grade, unitplan, replacementplan2);
+
+    return unitplan;
+};
+
+export const resetOldChanges = (unitplan: any) => {
     // Reset old replacementplan data
     unitplan.data = unitplan.data.map((day: any) => {
         Object.keys(day.lessons).forEach((unit: string) => {
@@ -47,33 +46,32 @@ export const getInjectedUnitplan = (grade: string) => {
         };
         return day;
     });
-    if (replacementplan1.data !== undefined) {
-        unitplan.data[weekdayToInt(replacementplan1.for.weekday)].replacementplan = {
+};
+
+export const setChangesInUntiplan = (grade: string, unitplan: any, replacementplan: any) => {
+    
+    // Convert weekday strings to numbers
+    replacementplan.data = replacementplan.data.map((change: any) => {
+        change.weekday = weekdayToInt(replacementplan.for.weekday);
+        return change;
+    });
+
+    // Set new replacementplan dates
+    if (replacementplan.data !== undefined) {
+        unitplan.data[weekdayToInt(replacementplan.for.weekday)].replacementplan = {
             for: {
-                date: replacementplan1.for.date,
-                weekday: replacementplan1.for.weekday
+                date: replacementplan.for.date,
+                weekday: replacementplan.for.weekday
             },
             updated: {
-                date: replacementplan1.updated.date,
-                time: replacementplan1.updated.time
-            }
-        };
-    }
-    if (replacementplan2.data !== undefined) {
-        unitplan.data[weekdayToInt(replacementplan2.for.weekday)].replacementplan = {
-            for: {
-                date: replacementplan2.for.date,
-                weekday: replacementplan2.for.weekday
-            },
-            updated: {
-                date: replacementplan2.updated.date,
-                time: replacementplan2.updated.time
+                date: replacementplan.updated.date,
+                time: replacementplan.updated.time
             }
         };
     }
 
     // Add new replacementplan changes
-    replacementplan1.data.concat(replacementplan2.data).forEach((change: any) => {
+    replacementplan.data.forEach((change: any) => {
         // Get normal subjects in the lesson of the change
         const subjects = unitplan.data[change.weekday].lessons[change.unit.toString()];
         change.sure = false;
@@ -134,5 +132,4 @@ export const getInjectedUnitplan = (grade: string) => {
             console.log(grade, change, subjects);
         }
     });
-    return unitplan;
 };
