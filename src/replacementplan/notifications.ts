@@ -1,8 +1,8 @@
 import config from '../config';
 import got from 'got';
-import changesForUserID from '../changes/changesForUserID'; 
+import changesForUserID from '../changes/changesForUserID';
 import {getUsers} from '../tags/users';
-import {intToWeekday, weekdayToInt} from './utils';
+import {weekdayToInt} from './utils';
 import {updateApp} from '../update_app';
 
 export const getDevices = async () => {

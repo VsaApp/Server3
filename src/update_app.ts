@@ -1,11 +1,13 @@
 import got from 'got';
 import config from './config';
+import {getUsers} from "./tags/users";
 
 export const updateApp = async (segment: string, data: any, dev?: Boolean) => {
     if (!dev) dev = false;
+    const ids = getUsers().filter((device: any) => !dev || device.tags.dev).map((device: any) => device.id);
     const dataString = {
         app_id: config.appId,
-        included_segments: ["Users"],
+        include_player_ids: ids,
         content_available: true,
         data: {type: 'silent', data: data}
     };

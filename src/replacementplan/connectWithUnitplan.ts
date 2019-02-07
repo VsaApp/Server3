@@ -49,7 +49,7 @@ export const resetOldChanges = (unitplan: any) => {
 };
 
 export const setChangesInUntiplan = (grade: string, unitplan: any, replacementplan: any) => {
-    
+
     // Convert weekday strings to numbers
     replacementplan.data = replacementplan.data.map((change: any) => {
         change.weekday = weekdayToInt(replacementplan.for.weekday);
@@ -78,7 +78,7 @@ export const setChangesInUntiplan = (grade: string, unitplan: any, replacementpl
         change.exam = change.change.info.toLowerCase().includes('klausur');
         change.rewriteExam = change.change.info.toLowerCase().includes('nachschreiber');
         if (change.exam) {
-            change.sure = !change.rewriteExam
+            change.sure = !change.rewriteExam;
             subjects.forEach((subject: any) => {
                 subject.changes.push(change);
             });
@@ -89,24 +89,30 @@ export const setChangesInUntiplan = (grade: string, unitplan: any, replacementpl
             if (duplicates.length === 1) {
                 change.sure = true;
                 duplicates[0].changes.push(change);
-            } else {
-                // If there is only one change with the corrct room, add change to it
-                if (subjects.filter((subject: any) => subject.room === change.room).length === 1) {
-                    change.sure = true;
-                    const subject = subjects.filter((subject: any) => subject.room === change.room)[0];
-                    subject.changes.push(change);
+            } else if (subjects.filter((subject: any) => subject.room === change.room).length === 1) {
+                change.sure = true;
+                const subject = subjects.filter((subject: any) => subject.room === change.room)[0];
+                subject.changes.push(change);
+            } else if (subjects.filter((subject: any) => subject.subject + '-' + subject.course === change.subject + '-' + change.course).length === 1) {
+                change.sure = true;
+                const subject = subjects.filter((subject: any) => subject.subject + '-' + subject.course === change.subject + '-' + change.course)[0];
+                subject.changes.push(change);
+            } else if (duplicates.filter((duplicate: any) => duplicate.course === '').length === 1) {
+                change.sure = true;
+                const subject = duplicates.filter((duplicate: any) => duplicate.course === '')[0];
+                subject.changes.push(change);
+            }
+            if (!change.sure) {
+                if (duplicates.length === 0) {
+                    subjects.forEach((subject: any) => {
+                        subject.changes.push(change);
+                    });
+                } else {
+                    duplicates.forEach((subject: any) => {
+                        subject.changes.push(change);
+                    });
                 }
-                if (!change.sure) {
-                    if (duplicates.length === 0) {
-                        subjects.forEach((subject: any) => {
-                            subject.changes.push(change);
-                        });
-                    } else {
-                        duplicates.forEach((subject: any) => {
-                            subject.changes.push(change);
-                        });
-                    }
-                }
+
             }
         }
         subjects.forEach((subject: any) => {
@@ -129,7 +135,7 @@ export const setChangesInUntiplan = (grade: string, unitplan: any, replacementpl
             });
         });
         if (!change.sure && change.change.info !== 'Klausurnachschreiber') {
-            console.log(grade, change, subjects);
+            //console.log(grade, change, subjects, route);
         }
     });
 };

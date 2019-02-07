@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { parse } from 'node-html-parser';
+import {parse} from 'node-html-parser';
 import {getJson} from '../replacementplan/replacementplan';
 
 export const getCurrentJson = async (filePath: string) => {
@@ -9,14 +9,14 @@ export const getCurrentJson = async (filePath: string) => {
 };
 
 const saveNewVersion = (directoriy: string, raw: string, data: any, year: string, month: string, day: string, time: string) => {
-    
+
     // Create all directories...
     const pathSegments = ['history', directoriy, year, month, day];
-    for (let i = 0; i < pathSegments.length; i++){
+    for (let i = 0; i < pathSegments.length; i++) {
         let relDir = '';
-        for(let j = 0; j <= i; j++) relDir += pathSegments[j] + '/';
+        for (let j = 0; j <= i; j++) relDir += pathSegments[j] + '/';
         const dir = path.resolve(process.cwd(), relDir);
-        if (!fs.existsSync(dir)){
+        if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
         }
     }
@@ -38,8 +38,7 @@ export const saveNewReplacementplan = async (raw: string, parsed: any) => {
             const day = parsed[0].for.date.split('.')[0];
 
             saveNewVersion('replacementplan', raw, parsed, year, month, day, getFileName());
-        }
-        else {
+        } else {
             const data = await parse(raw);
             const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).replace('-Klassen-Vertretungsplan für ', '').replace('Januar', 'January').replace('Februar', 'February').replace('März', 'March').replace('Mai', 'May').replace('Juni', 'June').replace('Juli', 'July').replace('Oktober', 'October').replace('Dezember', 'December');
             const date = new Date(dateStr);
@@ -58,10 +57,9 @@ export const saveNewUnitplan = async (raw: string, parsed: any) => {
             const year = parsed[0].date.split('.')[2].length < 4 ? '20' + parsed[0].date.split('.')[2] : parsed[0].date.split('.')[2];
             const month = parsed[0].date.split('.')[1];
             const day = parsed[0].date.split('.')[0];
-        
+
             saveNewVersion('unitplan', raw, parsed, year, month, day, getFileName());
-        }
-        else {
+        } else {
             const data = await parse(raw);
             const date = data.querySelector('div').childNodes[0].rawText.split(' den ')[1].trim()
             const year = date.split('.')[2].length < 4 ? '20' + date.split('.')[2] : date.split('.')[2];

@@ -53,15 +53,19 @@ export const extractData = async (data: any) => {
                                         rows.push(data.querySelectorAll('tr')[j]);
                                         j++;
                                     }
-                                    rows.forEach(r => {
+                                    rows.filter((r: any) => r.childNodes.length === 3).forEach(r => {
                                         let parsed = false;
                                         let unit = -1;
-                                        let original:any = [];
-                                        let changed:any = [];
+                                        let original: any = [];
+                                        let changed: any = [];
                                         try {
                                             unit = parseInt(r.childNodes[0].childNodes.map((a: any) => a.childNodes[0].rawText)[0].split(' ')[1].slice(0, -1)) - 1;
                                             original = r.childNodes[1].childNodes.map((a: any) => a.childNodes[0].rawText.replace(/(\(|\)|\*\*\*| +(?= ))/g, '').trim());
-                                            changed = r.childNodes[2].childNodes.map((a: any) => a.childNodes[0].rawText.trim());
+                                            try {
+                                                changed = r.childNodes[2].childNodes.map((a: any) => a.childNodes[0].rawText.trim());
+                                            } catch (e) {
+                                                console.log(r.childNodes, update, updateTime);
+                                            }
                                             while (original.length < 2) {
                                                 original.push('');
                                             }
@@ -353,8 +357,8 @@ export const extractData = async (data: any) => {
             console.error('Cannot find \'tr\' selectors', e.toString());
         }
         for (let l = 0; l < d.length; l++) {
-            d[l].subject = d[l].subject.replace('NWB', 'NW').replace('DFÖ', 'DF').replace('MINT', 'MI').replace(/[0-9]/g, '');
-            d[l].change.subject = d[l].change.subject.replace('NWB', 'NW').replace(/[0-9]/g, '');
+            d[l].subject = d[l].subject.replace('NWB', 'NW').replace('DFÖ', 'DF').replace('MINT', 'MI').replace(/PJ.+/g, 'PJ').replace(/[0-9]/g, '');
+            d[l].change.subject = d[l].change.subject.replace('NWB', 'NW').replace(/PJ.+/g, 'PJ').replace(/[0-9]/g, '');
         }
 
         return {

@@ -12,23 +12,23 @@ const testParser = () => {
                     console.log(`Parse file '${filePath}'`);
 
                     const pathSegments = ['historyTest', 'replacementplan', year, month, day];
-                    for (let i = 0; i < pathSegments.length; i++){
+                    for (let i = 0; i < pathSegments.length; i++) {
                         let relDir = '';
-                        for(let j = 0; j <= i; j++) relDir += pathSegments[j] + '/';
+                        for (let j = 0; j <= i; j++) relDir += pathSegments[j] + '/';
                         const dir = path.resolve(process.cwd(), relDir);
-                        if (!fs.existsSync(dir)){
+                        if (!fs.existsSync(dir)) {
                             fs.mkdirSync(dir);
                         }
                     }
-                
+
                     // Create files...
                     fs.writeFileSync(path.resolve(process.cwd(), 'historyTest', 'replacementplan', year, month, day, file.replace('.html', '.json')), JSON.stringify(json, null, 2));
-                
+
                     //console.log(`Current json: ${json}`);
                 });
             });
         });
     });
-} 
+}
 
 testParser();
