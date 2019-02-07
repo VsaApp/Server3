@@ -5,7 +5,10 @@ import got from 'got';
 import {parse} from 'node-html-parser';
 import {saveNewUnitplan} from '../history/history';
 import {getInjectedUnitplan} from "../replacementplan/connectWithUnitplan";
+import {getUsers} from '../tags/users';
+import {updateApp} from '../update_app';
 
+const isDev = process.argv.length === 3;
 const grades = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c', '9a', '9b', '9c', 'EF', 'Q1', 'Q2'];
 const weekdays = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
 
@@ -138,12 +141,68 @@ const extractData = async (data: any) => {
     });
 };
 
+export const sendNotifications = async (isDev: Boolean) => {
+    try {
+        const devices = getUsers().filter((device: any) => !isDev || device.tags.dev);
+        console.log('Sending notifications to ' + devices.length + ' devices');
+        devices.forEach(async (device: any) => {
+            try {
+                const dataString = {
+                        app_id: config.appId,
+                        include_player_ids: [device.id],
+                        android_group: 'unitplan',
+                        contents: {
+                            de: 'Es gibt einen neuen Stundenplan',
+                            en: 'Es gibt einen neuen Stundenplan'
+                        },
+                        headings: {
+                            de: 'Stundenplan',
+                            en: 'Stundenplan'
+                        },
+                        data: {
+                            type: 'unitplan'
+                        }
+                    }
+                ;
+                let url = 'https://onesignal.com/api/v1/notifications';
+                try {
+                    const response = await got.post(
+                        url,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json; charset=utf-8',
+                                'Authorization': 'Basic ' + config.appAuthKey
+                            },
+                            body: JSON.stringify(dataString)
+                        });
+                    if (JSON.parse(response.body).errors !== undefined) {
+                        if (JSON.parse(response.body).errors[0] === 'All included players are not subscribed') {
+                            return;
+                        }
+                    }
+                    console.log(response.body);
+                } catch (response) {
+                    console.log(response);
+                }
+            } catch (e) {
+                console.error('Cannot send notification to device: ', device, e);
+            }
+        });
+        updateApp('All', {
+            'type': 'unitplan',
+            'action': 'update'
+        }, isDev);
+    } catch (e) {
+        console.error('Failed to send notifications', e);
+    }
+}
+
 (async () => {
     fetchData().then(raw => {
         console.log('Fetched unit plan');
         parseData(raw).then(data => {
             console.log('Parsed unit plan');
-            if (isNew(data)) {
+            if (isNew(data) || isDev) {
                 saveNewUnitplan(raw, []);
                 extractData(data).then(unitplan => {
                     console.log('Extracted unit plan');
@@ -157,7 +216,7 @@ const extractData = async (data: any) => {
                     });
                     saveNewUnitplan('', unitplan);
                     console.log('Saved unit plan');
-
+                    sendNotifications(isDev);
                 });
             }
         });
