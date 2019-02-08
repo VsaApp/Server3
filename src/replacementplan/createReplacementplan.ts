@@ -72,28 +72,102 @@ export const extractData = async (data: any) => {
                                             while (changed.length < 2) {
                                                 changed.push('');
                                             }
+                                            original = original.map((a: string) => {
+                                                while (a.includes('  ')) {
+                                                    a = a.replace('  ', ' ');
+                                                }
+                                                return a;
+                                            });
+                                            changed = changed.map((a: string) => {
+                                                while (a.includes('  ')) {
+                                                    a = a.replace('  ', ' ');
+                                                }
+                                                return a;
+                                            });
                                             if (changed[0].includes('m.Aufg.')) {
                                                 if ((original[0].match(/ /g) || []).length > 1) {
                                                     if (original[0].includes('abc')) {
+                                                        if (changed[1].split(' ').length === 2) {
+                                                            d.push({
+                                                                unit: unit,
+                                                                subject: original[0].split(' ')[1].toUpperCase(),
+                                                                course: original[0].split(' ')[2].toUpperCase(),
+                                                                room: original[1].toUpperCase(),
+                                                                participant: '',
+                                                                change: {
+                                                                    subject: changed[1].split(' ')[1].toUpperCase(),
+                                                                    teacher: changed[0].split(' ')[0],
+                                                                    room: '',
+                                                                    info: changed[0].split(' ')[1]
+                                                                }
+                                                            });
+                                                        } else {
+                                                            d.push({
+                                                                unit: unit,
+                                                                subject: original[0].split(' ')[1].toUpperCase(),
+                                                                course: original[0].split(' ')[2].toUpperCase(),
+                                                                room: original[1].toUpperCase(),
+                                                                participant: '',
+                                                                change: {
+                                                                    subject: changed[1].split(' ')[1].toUpperCase(),
+                                                                    teacher: changed[0].split(' ')[0],
+                                                                    room: changed[1].split(' ')[2].toUpperCase(),
+                                                                    info: changed[0].split(' ')[1]
+                                                                }
+                                                            });
+                                                        }
+                                                    } else {
+                                                        if (changed[1].split(' ').length === 2) {
+                                                            d.push({
+                                                                unit: unit,
+                                                                subject: original[0].split(' ')[1].toUpperCase(),
+                                                                course: original[0].split(' ')[2].toUpperCase(),
+                                                                room: original[1].toUpperCase(),
+                                                                participant: '',
+                                                                change: {
+                                                                    subject: changed[1].split(' ')[1].toUpperCase(),
+                                                                    teacher: changed[0].split(' ')[0],
+                                                                    room: '',
+                                                                    info: changed[0].split(' ')[1]
+                                                                }
+                                                            });
+                                                        } else {
+                                                            d.push({
+                                                                unit: unit,
+                                                                subject: original[0].split(' ')[1].toUpperCase(),
+                                                                course: original[0].split(' ')[2].toUpperCase(),
+                                                                room: original[1].toUpperCase(),
+                                                                participant: '',
+                                                                change: {
+                                                                    subject: changed[1].split(' ')[1].toUpperCase(),
+                                                                    teacher: changed[0].split(' ')[0],
+                                                                    room: changed[1].split(' ')[2].toUpperCase(),
+                                                                    info: changed[0].split(' ')[1]
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+                                                } else {
+                                                    if (changed[1].split(' ').length === 2) {
                                                         d.push({
                                                             unit: unit,
-                                                            subject: original[0].split(' ')[1].toUpperCase(),
-                                                            course: original[0].split(' ')[2].toUpperCase(),
-                                                            room: original[1].toUpperCase(),
+                                                            subject: original[0].split(' ')[0].toUpperCase(),
+                                                            course: '',
+                                                            room: original[0].split(' ')[1].toUpperCase(),
                                                             participant: '',
                                                             change: {
                                                                 subject: changed[1].split(' ')[1].toUpperCase(),
                                                                 teacher: changed[0].split(' ')[0],
-                                                                room: changed[1].split(' ')[2].toUpperCase(),
+                                                                room: '',
                                                                 info: changed[0].split(' ')[1]
                                                             }
                                                         });
                                                     } else {
                                                         d.push({
                                                             unit: unit,
-                                                            subject: original[0].split(' ')[1].toUpperCase(),
-                                                            course: original[0].split(' ')[2].toUpperCase(),
-                                                            room: original[1].toUpperCase(),
+                                                            subject: original[0].split(' ')[0].toUpperCase(),
+                                                            course: '',
+                                                            room: original[0].split(' ')[1].toUpperCase(),
                                                             participant: '',
                                                             change: {
                                                                 subject: changed[1].split(' ')[1].toUpperCase(),
@@ -103,20 +177,6 @@ export const extractData = async (data: any) => {
                                                             }
                                                         });
                                                     }
-                                                } else {
-                                                    d.push({
-                                                        unit: unit,
-                                                        subject: original[0].split(' ')[0].toUpperCase(),
-                                                        course: '',
-                                                        room: original[0].split(' ')[1].toUpperCase(),
-                                                        participant: '',
-                                                        change: {
-                                                            subject: changed[1].split(' ')[1].toUpperCase(),
-                                                            teacher: changed[0].split(' ')[0],
-                                                            room: changed[1].split(' ')[2].toUpperCase(),
-                                                            info: changed[0].split(' ')[1]
-                                                        }
-                                                    });
                                                 }
                                                 parsed = true;
                                             }
@@ -297,6 +357,74 @@ export const extractData = async (data: any) => {
                                                         info: 'Aufsicht aus'
                                                     }
                                                 });
+                                                parsed = true;
+                                            }
+                                            if (original[0].includes('nach')) {
+                                                if (changed[0] === 'abghgt. versch.') {
+                                                    d.push({
+                                                        unit: unit,
+                                                        subject: original[0].split(' ')[0].toUpperCase(),
+                                                        course: '',
+                                                        room: original[0].split(' ')[1],
+                                                        participant: '',
+                                                        change: {
+                                                            subject: '',
+                                                            teacher: '',
+                                                            room: '',
+                                                            info: 'Verschoben nach ' + original[0].split(' ')[3] + ' ' + original[0].split(' ')[4]
+                                                        }
+                                                    });
+                                                    parsed = true;
+                                                } else if (changed[0].includes('mit')) {
+                                                    d.push({
+                                                        unit: unit,
+                                                        subject: original[0].split(' ')[0].toUpperCase(),
+                                                        course: '',
+                                                        room: original[0].split(' ')[1],
+                                                        participant: '',
+                                                        change: {
+                                                            subject: '',
+                                                            teacher: '',
+                                                            room: '',
+                                                            info: 'Verschoben nach ' + original[0].split(' ')[3] + ' ' + original[0].split(' ')[4]
+                                                        }
+                                                    });
+                                                    parsed = true;
+                                                }
+                                            }
+                                            if (changed[0].includes('v.') && changed[0].includes('mit')) {
+                                                d.push({
+                                                    unit: unit,
+                                                    subject: original[0].split(' ')[0].toUpperCase(),
+                                                    course: '',
+                                                    room: original[0].split(' ')[1],
+                                                    participant: '',
+                                                    change: {
+                                                        subject: changed[1].split(' ')[1],
+                                                        teacher: changed[0].split(' ')[0],
+                                                        room: changed[1].split(' ')[2],
+                                                        info: 'Verschoben von ' + changed[0].split(' ')[2] + ' ' + changed[0].split(' ')[3]
+                                                    }
+                                                });
+                                                parsed = true;
+                                            }
+                                            if (original[0].includes('Block')) {
+                                                for (let k = 2; k < original.length; k += 2) {
+                                                    const text = (original[k] + ' ' + original[k + 1]).split(' ');
+                                                    d.push({
+                                                        unit: unit,
+                                                        subject: text[0].toUpperCase(),
+                                                        course: '',
+                                                        room: text[2],
+                                                        participant: '',
+                                                        change: {
+                                                            subject: changed[1].split(' ')[1],
+                                                            teacher: changed[1].split(' ')[2],
+                                                            room: changed[1].split(' ')[3],
+                                                            info: changed[0]
+                                                        }
+                                                    });
+                                                }
                                                 parsed = true;
                                             }
                                         } catch (e) {
