@@ -57,14 +57,25 @@ const extractData = async (data: any) => {
                         d[day].lessons[unit] = [];
                     }
                     if (a.length === 1) {
-                        d[day].lessons[unit].push({
-                            block: '',
-                            participant: a[0].split(' ')[0],
-                            subject: a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
-                            room: a[0].split(' ')[2].toUpperCase(),
-                            course: '',
-                            changes: []
-                        });
+                        if (a[0].includes('*')) {
+                            d[day].lessons[unit].push({
+                                block: '',
+                                participant: '',
+                                subject: '',
+                                room: '',
+                                course: '',
+                                changes: []
+                            });
+                        } else {
+                            d[day].lessons[unit].push({
+                                block: '',
+                                participant: a[0].split(' ')[0],
+                                subject: a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
+                                room: a[0].split(' ')[2].toUpperCase(),
+                                course: '',
+                                changes: []
+                            });
+                        }
                     } else {
                         for (let i = 1; i < a.length; i++) {
                             d[day].lessons[unit].push({
