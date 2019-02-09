@@ -1,10 +1,13 @@
 import fs from 'fs';
 import path from 'path';
-import {parse} from 'node-html-parser';
+import got from 'got';
+import { parse } from 'node-html-parser';
 import {getJson} from '../replacementplan/replacementplan';
 
 export const getCurrentJson = async (filePath: string) => {
-    const raw = fs.readFileSync(filePath).toString();
+    let raw;
+    if (filePath.includes("https://")) raw = (await got(filePath)).body
+    else raw = fs.readFileSync(filePath).toString();
     return await getJson(raw);
 };
 
