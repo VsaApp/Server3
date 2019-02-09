@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import got from 'got';
 
+const isCli = module.parent === null;
+
 const saveNewVersion = (directoriy: string, data: any, year: string, month: string, day: string, fileName: string) => {
 
     // Create all directories...
@@ -29,23 +31,21 @@ const getPaths = async (url: string) => {
     return paths;
 }
 
-const getJson = async (url: string) => {
-    const raw = (await got(url)).body;
-    return JSON.parse(raw);
-}
-
-const loadHistory = async () => {
-    console.log('Load all files...');
+export const downloadHistory = async () => {
+    console.log('Download all files...');
     const startTime = new Date();
-    const allNewestFiles: any = [];
     const directories = await getPaths('https://history.api.vsa.2bad2c0.de');
     for (let h = 0; h < directories.length; h++){
+        console.log(`download ${directories[h]}`);
         const years = await getPaths(`https://history.api.vsa.2bad2c0.de/${directories[h]}`);
         for (let i = 0; i < years.length; i++){
+            console.log(`   - download year ${years[i]}`);
             const months = await getPaths(`https://history.api.vsa.2bad2c0.de/${directories[h]}/${years[i]}`);
             for (let j = 0; j < months.length; j++){
+                console.log(`      ~ download month ${months[j]}`);
                 const days = await getPaths(`https://history.api.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}`);
                 for (let k = 0; k < days.length; k++){
+                    console.log(`         -- download day ${days[k]}`);
                     const files = await getPaths(`https://history.api.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}/${days[k]}`);
                     for (let l = 0; l < files.length; l++){
                         const fileName = `https://history.api.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}/${days[k]}/${files[l]}`;
@@ -55,7 +55,7 @@ const loadHistory = async () => {
             }
         }
     }
-    console.log(`Finished loading after ${((new Date()).getTime() - startTime.getTime()) / 1000} sec`);
+    console.log(`Finished downloading after ${((new Date()).getTime() - startTime.getTime()) / 1000} sec`);
 };
 
-loadHistory();
+if (isCli) downloadHistory();

@@ -1,5 +1,8 @@
 import got from 'got';
 import {getCurrentJson} from './src/history/history';
+import { downloadHistory } from './src/history/download';
+
+const _downloadHistory = process.argv.length === 3 ? (process.argv[2] === '--download') : false;
 
 export const getPaths = async (url: string) => {
     const raw = (await got(url)).body;
@@ -16,6 +19,9 @@ export const getJson = async (url: string) => {
 }
 
 export const loadHistory = async () => {
+
+    if (_downloadHistory) await downloadHistory();
+
     console.log('Load all files...');
     const startTime = new Date();
     const allNewestFiles: any = [];
