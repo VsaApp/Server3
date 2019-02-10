@@ -18,8 +18,10 @@ export const getInjectedUnitplan = (grade: string) => {
     }
 
     resetOldChanges(unitplan);
-    setChangesInUntiplan(grade, unitplan, replacementplan1);
-    setChangesInUntiplan(grade, unitplan, replacementplan2);
+    setChangesInUnitplan(grade, unitplan, replacementplan1);
+    setChangesInUnitplan(grade, unitplan, replacementplan2);
+    fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'today', grade + '.json'), JSON.stringify(replacementplan1, null, 2));
+    fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'tomorrow', grade + '.json'), JSON.stringify(replacementplan2, null, 2));
 
     return unitplan;
 };
@@ -48,7 +50,7 @@ export const resetOldChanges = (unitplan: any) => {
     });
 };
 
-export const setChangesInUntiplan = (grade: string, unitplan: any, replacementplan: any) => {
+export const setChangesInUnitplan = (grade: string, unitplan: any, replacementplan: any) => {
 
     // Convert weekday strings to numbers
     replacementplan.data = replacementplan.data.map((change: any) => {
