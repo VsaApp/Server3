@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import {setChangesInUntiplan, resetOldChanges} from './src/replacementplan/connectWithUnitplan';
+import {resetOldChanges, setChangesInUnitplan} from './src/replacementplan/connectWithUnitplan';
 import {getCurrentJson} from './src/history/history';
 import {weekdayToInt} from './src/replacementplan/utils'
 
@@ -46,11 +46,11 @@ fs.readdirSync(path.resolve(process.cwd(), 'history', 'replacementplan')).forEac
     }
 });
 
-const getUnitplan = (grade: string): any => { 
+const getUnitplan = (grade: string): any => {
     return JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'unitplan', grade + '.json')).toString());
-}
+};
 
-const doWork = async () => { 
+const doWork = async () => {
     // Get all unitplans...
     const allUnitplans: any = {};
     for (let i = 0; i < allFiles.length; i++) {
@@ -58,11 +58,11 @@ const doWork = async () => {
         parsed.forEach((replacementplan: any) => {
             const grade = replacementplan.participant;
             if (allUnitplans[grade] === undefined) allUnitplans[grade] = getUnitplan(grade);
-            
+
             // Create unitplan
             const unitplan = getUnitplan(grade);
             resetOldChanges(unitplan);
-            setChangesInUntiplan(grade, unitplan, replacementplan);    
+            setChangesInUnitplan(grade, unitplan, replacementplan);
 
 
             unitplan.data.forEach((day: any) => {
