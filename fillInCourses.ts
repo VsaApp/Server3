@@ -1,49 +1,52 @@
 import fs from 'fs';
 import path from 'path';
 import {resetOldChanges, setChangesInUnitplan} from './src/replacementplan/connectWithUnitplan';
-import {getCurrentJson} from './src/history/history';
+import {getCurrentJson} from './src/history/utils';
 import {weekdayToInt} from './src/replacementplan/utils'
 
-// Logs help info
-if (process.argv.length > 2 && (process.argv[2].includes('h') || process.argv[2].includes('help'))) {
-    console.log('fillInCourses.ts                     -> for all replacementplans');
-    console.log('fillInCourses.ts  1.1.2000           -> for all replacementplans since given date (includes start date)');
-    console.log('fillInCourses.ts  1.1.2000 1.6.2000  -> for all replacementplans between given dates (includes dates)');
-    process.exit();
-}
+const startDate = new Date(1, 1, 1);
+const endDate = new Date(3000, 1, 1);
+let days = 0;
 
-const startDate = [0, 0, 0];
-const endDate = [10000, 100, 100];
-
-if (process.argv.length > 2) {
-    startDate[0] = parseInt(process.argv[2].split('.')[2]);
-    startDate[1] = parseInt(process.argv[2].split('.')[1]);
-    startDate[2] = parseInt(process.argv[2].split('.')[0]);
-}
-
-if (process.argv.length > 3) {
-    endDate[0] = parseInt(process.argv[3].split('.')[2]);
-    endDate[1] = parseInt(process.argv[3].split('.')[1]);
-    endDate[2] = parseInt(process.argv[3].split('.')[0]);
-}
+process.argv.forEach((arg: string, index: number) => {
+    if (arg.startsWith('--start:')) {
+        const date = arg.split(':')[1];
+        startDate.setFullYear(parseInt(date.split('.')[2]));
+        startDate.setUTCMonth(parseInt(date.split('.')[1]) - 2);
+        startDate.setDate(parseInt(date.split('.')[0]));
+        console.log("from " + startDate.toDateString());
+    }
+    else if (arg.startsWith('--end:')) {
+        const date = arg.split(':')[1];
+        endDate.setFullYear(parseInt(date.split('.')[2]));
+        endDate.setUTCMonth(parseInt(date.split('.')[1]) - 2);
+        endDate.setDate(parseInt(date.split('.')[0]));
+        console.log("to " + endDate.toDateString());
+    }
+    else if (arg.includes('h')) {
+        console.log('fillInCourses.ts                                   -> for all replacementplans');
+        console.log('fillInCourses.ts  --start:1.1.2000                 -> for all replacementplans since given date (includes start date)');
+        console.log('fillInCourses.ts  --start:1.1.2000 --end:1.6.2000  -> for all replacementplans between given dates (includes dates)');
+        process.exit();
+    }
+});
 
 // Create all unitplans for each replacementplan version in the given range
 const allFiles: string[] = [];
 fs.readdirSync(path.resolve(process.cwd(), 'history', 'replacementplan')).forEach((year: string) => {
-    if (parseInt(year) >= startDate[0] && parseInt(year) <= endDate[0]) {
-        fs.readdirSync(path.resolve(process.cwd(), 'history', 'replacementplan', year)).forEach((month: string) => {
-            if (parseInt(month) >= startDate[1] && parseInt(month) <= endDate[1]) {
-                fs.readdirSync(path.resolve(process.cwd(), 'history', 'replacementplan', year, month)).forEach((day: string) => {
-                    if (parseInt(day) >= startDate[2] && parseInt(day) <= endDate[2]) {
-                        fs.readdirSync(path.resolve(process.cwd(), 'history', 'replacementplan', year, month, day)).filter((file: string) => file.endsWith('.html')).forEach((file: string) => {
-                            const filePath = path.resolve(process.cwd(), 'history', 'replacementplan', year, month, day, file);
-                            allFiles.push(filePath);
-                        });
-                    }
+    fs.readdirSync(path.resolve(process.cwd(), 'history', 'replacementplan', year)).forEach((month: string) => {
+        fs.readdirSync(path.resolve(process.cwd(), 'history', 'replacementplan', year, month)).forEach((day: string) => {
+            if (startDate.getTime() <= new Date(parseInt(year), parseInt(month) - 1, parseInt(day)).getTime() && 
+                endDate.getTime() >= new Date(parseInt(year), parseInt(month) - 1, parseInt(day)).getTime()) {
+                days++;
+
+                fs.readdirSync(path.resolve(process.cwd(), 'history', 'replacementplan', year, month, day)).filter((file: string) => file.endsWith('.html')).forEach((file: string) => {
+                    const filePath = path.resolve(process.cwd(), 'history', 'replacementplan', year, month, day, file);
+                    allFiles.push(filePath);
                 });
             }
         });
-    }
+    });
 });
 
 const getUnitplan = (grade: string): any => {
@@ -53,6 +56,7 @@ const getUnitplan = (grade: string): any => {
 const doWork = async () => {
     // Get all unitplans...
     const allUnitplans: any = {};
+    console.log(`Load ${allFiles.length} replacementplan versions (${days} days)`);
     for (let i = 0; i < allFiles.length; i++) {
         const parsed = await getCurrentJson(allFiles[i]);
         parsed.forEach((replacementplan: any) => {
