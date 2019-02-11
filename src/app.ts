@@ -5,6 +5,7 @@ import { fetchDataForUser } from './cafetoria/cafetoria';
 import router from './messageboard/messageboard';
 import tagsRouter from './tags/tags';
 import changesRouter from './changes/changes';
+import historyRouter from './history/history';
 
 const app = express();
 app.use(cors());
@@ -35,5 +36,6 @@ app.get('/cafetoria/login/:id/:pin', async (req, res) => {
 app.use('/messageboard', router);
 app.use('/tags', tagsRouter);
 app.use('/changes', changesRouter);
+app.use('/history', historyRouter);
 
 export default app;

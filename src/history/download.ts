@@ -18,8 +18,7 @@ const saveNewVersion = (directoriy: string, data: any, year: string, month: stri
     }
 
     // Create files...
-    if (fileName.endsWith('.json')) fs.writeFileSync(path.resolve(process.cwd(), 'history', directoriy, year, month, day, fileName), JSON.stringify(data, null, 2));
-    else fs.writeFileSync(path.resolve(process.cwd(), 'history', directoriy, year, month, day, fileName), data);
+    fs.writeFileSync(path.resolve(process.cwd(), 'history', directoriy, year, month, day, fileName), data);
 };
 
 const getPaths = async (url: string) => {

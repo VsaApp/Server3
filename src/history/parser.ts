@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import {getCurrentJson} from './history';
+import {getCurrentJson} from './utils';
 
 const testParser = () => {
     fs.readdirSync(path.resolve(process.cwd(), 'history', 'replacementplan')).forEach((year: string) => {

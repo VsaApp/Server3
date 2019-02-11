@@ -1,37 +1,55 @@
+import express from 'express';
 import fs from 'fs';
 import path from 'path';
-import got from 'got';
 import { parse } from 'node-html-parser';
-import {getJson} from '../replacementplan/replacementplan';
+import { getCurrentJson, saveNewVersion, getFileName } from './utils';
 
-export const getCurrentJson = async (filePath: string) => {
-    let raw;
-    if (filePath.includes("https://")) raw = (await got(filePath)).body
-    else raw = fs.readFileSync(filePath).toString();
-    return await getJson(raw);
-};
+const historyRouter = express.Router();
 
-const saveNewVersion = (directoriy: string, raw: string, data: any, year: string, month: string, day: string, time: string) => {
-
-    // Create all directories...
-    const pathSegments = ['history', directoriy, year, month, day];
-    for (let i = 0; i < pathSegments.length; i++) {
-        let relDir = '';
-        for (let j = 0; j <= i; j++) relDir += pathSegments[j] + '/';
-        const dir = path.resolve(process.cwd(), relDir);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir);
-        }
+historyRouter.get('/:directory', (req, res) => {
+    if (req.params.directory != 'replacementplan' && req.params.directory != 'unitplan') {
+        res.json({'error': 'Invalid directory'});
+        return;
     }
+    const result: any = [];
+    fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory)).forEach((year: string) => {
+        result.push({year: year, months: []});
+        const yearIndex = result.length - 1;
+        fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory , year)).forEach((month: string) => {
+            result[yearIndex].months.push({month: month, days: []});
+            const monthIndex = result[yearIndex].months.length - 1;
+            fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory, year, month)).forEach((day: string) => {
+                result[yearIndex].months[monthIndex].days.push({day: day, files: []});
+                const dayIndex = result[yearIndex].months[monthIndex].days.length - 1;
+                result[yearIndex].months[monthIndex].days[dayIndex].files = fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory, year, month, day));
+            });
+        });
+    });
 
-    // Create files...
-    if (data.length > 0) fs.writeFileSync(path.resolve(process.cwd(), 'history', directoriy, year, month, day, time + '.json'), JSON.stringify(data, null, 2));
-    if (raw !== '') fs.writeFileSync(path.resolve(process.cwd(), 'history', directoriy, year, month, day, time + '.html'), raw);
-};
+    res.json(result);
+});
 
-const getFileName = () => {
-    return Math.round((new Date()).getTime() / 1000).toString();
-}
+historyRouter.get('/:directory/:year/:month/:day/:file', async (req, res) => {
+    const directory = req.params.directory;
+    const year = req.params.year;
+    const month = req.params.month;
+    const day = req.params.day;
+    const file = req.params.file;
+
+    const filePath = path.resolve(process.cwd(), 'history', directory, year, month, day, file);
+
+    if (!fs.existsSync(filePath)) {
+        res.json({'error': 'Invalid path'});
+        return;
+    }
+    if (file.includes('.json')) {
+        res.json(await getCurrentJson(filePath.replace('.json', '.html')));
+        return;
+    }
+    else {
+        res.send(fs.readFileSync(filePath).toString());
+    }
+});
 
 export const saveNewReplacementplan = async (raw: string, parsed: any) => {
     try {
@@ -73,3 +91,5 @@ export const saveNewUnitplan = async (raw: string, parsed: any) => {
         saveNewVersion('unitplan', raw, parsed, '-', '-', '-', getFileName());
     }
 };
+
+export default historyRouter;
