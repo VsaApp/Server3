@@ -4,12 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts" line="60" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4d3783b-a945-48d2-856f-8c33d2b55b9c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/daily.sh" beforeDir="false" afterPath="$PROJECT_DIR$/daily.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minutely.sh" beforeDir="false" afterPath="$PROJECT_DIR$/minutely.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/replacementplan/connectWithUnitplan.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/replacementplan/connectWithUnitplan.ts" afterDir="false" />
-    </list>
+    <list default="true" id="c4d3783b-a945-48d2-856f-8c33d2b55b9c" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -20,38 +15,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/replacementplan/connectWithUnitplan.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="112">
-              <caret line="20" column="4" selection-start-line="20" selection-start-column="4" selection-end-line="20" selection-end-column="4" />
-              <folding>
-                <element signature="e#0#20#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/daily.sh">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="69">
-              <caret line="3" column="36" selection-start-line="3" selection-start-column="36" selection-end-line="3" selection-end-column="36" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="115">
-              <caret line="5" column="14" selection-start-line="5" selection-start-column="14" selection-end-line="5" selection-end-column="14" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -122,9 +86,9 @@
         <option value="$PROJECT_DIR$/fillInCourses.ts" />
         <option value="$PROJECT_DIR$/tags.json" />
         <option value="$PROJECT_DIR$/out/unitplan/EF.json" />
-        <option value="$PROJECT_DIR$/src/replacementplan/connectWithUnitplan.ts" />
         <option value="$PROJECT_DIR$/minutely.sh" />
         <option value="$PROJECT_DIR$/daily.sh" />
+        <option value="$PROJECT_DIR$/src/replacementplan/connectWithUnitplan.ts" />
       </list>
     </option>
   </component>
@@ -215,7 +179,7 @@
       <workItem from="1549793928846" duration="873000" />
       <workItem from="1549797176811" duration="597000" />
       <workItem from="1549808471266" duration="151000" />
-      <workItem from="1549905383455" duration="1063000" />
+      <workItem from="1549905383455" duration="1312000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed participants in unit plan">
       <created>1544305079874</created>
@@ -263,7 +227,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="54713000" />
+    <option name="totallyTimeSpent" value="54962000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1" y="25" width="1282" height="776" extended-state="6" />
@@ -628,13 +592,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="5" column="14" selection-start-line="5" selection-start-column="14" selection-end-line="5" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/out/unitplan/EF.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="130">
@@ -649,6 +606,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/replacementplan/connectWithUnitplan.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="158">
+          <caret line="148" column="11" selection-start-line="148" selection-start-column="11" selection-end-line="148" selection-end-column="11" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/daily.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="69">
@@ -656,13 +623,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/replacementplan/connectWithUnitplan.ts">
+    <entry file="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="20" column="4" selection-start-line="20" selection-start-column="4" selection-end-line="20" selection-end-column="4" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="115">
+          <caret line="5" column="14" selection-start-line="5" selection-start-column="14" selection-end-line="5" selection-end-column="14" />
         </state>
       </provider>
     </entry>

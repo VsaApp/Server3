@@ -90,12 +90,12 @@ export const extractData = async (data: any) => {
                                                         if (changed[1].split(' ').length === 2) {
                                                             d.push({
                                                                 unit: unit,
-                                                                subject: original[0].split(' ')[1].toUpperCase(),
-                                                                course: original[0].split(' ')[2].toUpperCase(),
-                                                                room: original[1].toUpperCase(),
+                                                                subject: original[0].split(' ')[1],
+                                                                course: original[0].split(' ')[2],
+                                                                room: original[1],
                                                                 participant: '',
                                                                 change: {
-                                                                    subject: changed[1].split(' ')[1].toUpperCase(),
+                                                                    subject: changed[1].split(' ')[1],
                                                                     teacher: changed[0].split(' ')[0],
                                                                     room: '',
                                                                     info: changed[0].split(' ')[1]
@@ -104,14 +104,14 @@ export const extractData = async (data: any) => {
                                                         } else {
                                                             d.push({
                                                                 unit: unit,
-                                                                subject: original[0].split(' ')[1].toUpperCase(),
-                                                                course: original[0].split(' ')[2].toUpperCase(),
-                                                                room: original[1].toUpperCase(),
+                                                                subject: original[0].split(' ')[1],
+                                                                course: original[0].split(' ')[2],
+                                                                room: original[1],
                                                                 participant: '',
                                                                 change: {
-                                                                    subject: changed[1].split(' ')[1].toUpperCase(),
+                                                                    subject: changed[1].split(' ')[1],
                                                                     teacher: changed[0].split(' ')[0],
-                                                                    room: changed[1].split(' ')[2].toUpperCase(),
+                                                                    room: changed[1].split(' ')[2],
                                                                     info: changed[0].split(' ')[1]
                                                                 }
                                                             });
@@ -120,12 +120,12 @@ export const extractData = async (data: any) => {
                                                         if (changed[1].split(' ').length === 2) {
                                                             d.push({
                                                                 unit: unit,
-                                                                subject: original[0].split(' ')[1].toUpperCase(),
-                                                                course: original[0].split(' ')[2].toUpperCase(),
-                                                                room: original[1].toUpperCase(),
+                                                                subject: original[0].split(' ')[1],
+                                                                course: original[0].split(' ')[2],
+                                                                room: original[1],
                                                                 participant: '',
                                                                 change: {
-                                                                    subject: changed[1].split(' ')[1].toUpperCase(),
+                                                                    subject: changed[1].split(' ')[1],
                                                                     teacher: changed[0].split(' ')[0],
                                                                     room: '',
                                                                     info: changed[0].split(' ')[1]
@@ -134,14 +134,14 @@ export const extractData = async (data: any) => {
                                                         } else {
                                                             d.push({
                                                                 unit: unit,
-                                                                subject: original[0].split(' ')[1].toUpperCase(),
-                                                                course: original[0].split(' ')[2].toUpperCase(),
-                                                                room: original[1].toUpperCase(),
+                                                                subject: original[0].split(' ')[1],
+                                                                course: original[0].split(' ')[2],
+                                                                room: original[1],
                                                                 participant: '',
                                                                 change: {
-                                                                    subject: changed[1].split(' ')[1].toUpperCase(),
+                                                                    subject: changed[1].split(' ')[1],
                                                                     teacher: changed[0].split(' ')[0],
-                                                                    room: changed[1].split(' ')[2].toUpperCase(),
+                                                                    room: changed[1].split(' ')[2],
                                                                     info: changed[0].split(' ')[1]
                                                                 }
                                                             });
@@ -151,12 +151,12 @@ export const extractData = async (data: any) => {
                                                     if (changed[1].split(' ').length === 2) {
                                                         d.push({
                                                             unit: unit,
-                                                            subject: original[0].split(' ')[0].toUpperCase(),
+                                                            subject: original[0].split(' ')[0],
                                                             course: '',
-                                                            room: original[0].split(' ')[1].toUpperCase(),
+                                                            room: original[0].split(' ')[1],
                                                             participant: '',
                                                             change: {
-                                                                subject: changed[1].split(' ')[1].toUpperCase(),
+                                                                subject: changed[1].split(' ')[1],
                                                                 teacher: changed[0].split(' ')[0],
                                                                 room: '',
                                                                 info: changed[0].split(' ')[1]
@@ -165,14 +165,14 @@ export const extractData = async (data: any) => {
                                                     } else {
                                                         d.push({
                                                             unit: unit,
-                                                            subject: original[0].split(' ')[0].toUpperCase(),
+                                                            subject: original[0].split(' ')[0],
                                                             course: '',
-                                                            room: original[0].split(' ')[1].toUpperCase(),
+                                                            room: original[0].split(' ')[1],
                                                             participant: '',
                                                             change: {
-                                                                subject: changed[1].split(' ')[1].toUpperCase(),
+                                                                subject: changed[1].split(' ')[1],
                                                                 teacher: changed[0].split(' ')[0],
-                                                                room: changed[1].split(' ')[2].toUpperCase(),
+                                                                room: changed[1].split(' ')[2],
                                                                 info: changed[0].split(' ')[1]
                                                             }
                                                         });
@@ -183,9 +183,9 @@ export const extractData = async (data: any) => {
                                             if (changed[0].includes('Studienzeit')) {
                                                 d.push({
                                                     unit: unit,
-                                                    subject: original[0].split(' ')[1].toUpperCase(),
-                                                    course: original[0].split(' ')[2].toUpperCase(),
-                                                    room: original[1].toUpperCase(),
+                                                    subject: original[0].split(' ')[1],
+                                                    course: original[0].split(' ')[2],
+                                                    room: original[1],
                                                     participant: '',
                                                     change: {
                                                         subject: '',
@@ -200,9 +200,9 @@ export const extractData = async (data: any) => {
                                                 if ((original[0].match(/ /g) || []).length > 1) {
                                                     d.push({
                                                         unit: unit,
-                                                        subject: original[0].split(' ')[1].toUpperCase(),
-                                                        course: original[0].split(' ')[2].toUpperCase(),
-                                                        room: original[1].toUpperCase(),
+                                                        subject: original[0].split(' ')[1],
+                                                        course: original[0].split(' ')[2],
+                                                        room: original[1],
                                                         participant: '',
                                                         change: {
                                                             subject: '',
@@ -214,9 +214,9 @@ export const extractData = async (data: any) => {
                                                 } else {
                                                     d.push({
                                                         unit: unit,
-                                                        subject: original[0].split(' ')[0].toUpperCase(),
+                                                        subject: original[0].split(' ')[0],
                                                         course: '',
-                                                        room: original[0].split(' ')[1].toUpperCase(),
+                                                        room: original[0].split(' ')[1],
                                                         participant: '',
                                                         change: {
                                                             subject: '',
@@ -248,12 +248,12 @@ export const extractData = async (data: any) => {
                                                     for (let k = 0; k < original.length - 1; k++) {
                                                         d.push({
                                                             unit: unit,
-                                                            subject: original[k].split(' ')[2].toUpperCase(),
-                                                            course: original[k].split(' ')[3].toUpperCase(),
+                                                            subject: original[k].split(' ')[2],
+                                                            course: original[k].split(' ')[3],
                                                             room: '',
-                                                            participant: original[k].split(' ')[1].toUpperCase(),
+                                                            participant: original[k].split(' ')[1],
                                                             change: {
-                                                                subject: original[k].split(' ')[2].toUpperCase(),
+                                                                subject: original[k].split(' ')[2],
                                                                 teacher: original[original.length - 1].split(': Aufsicht in ')[0],
                                                                 room: original[original.length - 1].split(': Aufsicht in ')[1],
                                                                 info: 'Klausur'
@@ -267,8 +267,8 @@ export const extractData = async (data: any) => {
                                                 if (original[0].split(' ').length === 3) {
                                                     d.push({
                                                         unit: unit,
-                                                        subject: original[0].split(' ')[1].toUpperCase(),
-                                                        course: original[0].split(' ')[2].toUpperCase(),
+                                                        subject: original[0].split(' ')[1],
+                                                        course: original[0].split(' ')[2],
                                                         room: original[1],
                                                         participant: '',
                                                         change: {
@@ -281,7 +281,7 @@ export const extractData = async (data: any) => {
                                                 } else {
                                                     d.push({
                                                         unit: unit,
-                                                        subject: original[0].split(' ')[1].toUpperCase(),
+                                                        subject: original[0].split(' ')[1],
                                                         course: '',
                                                         room: original[1],
                                                         participant: '',
@@ -298,8 +298,8 @@ export const extractData = async (data: any) => {
                                             if (changed[0] === 'Referendar(in)') {
                                                 d.push({
                                                     unit: unit,
-                                                    subject: original[0].split(' ')[1].toUpperCase(),
-                                                    course: (original[0].split(' ').length === 3 ? original[0].split(' ')[2].toUpperCase() : ''),
+                                                    subject: original[0].split(' ')[1],
+                                                    course: (original[0].split(' ').length === 3 ? original[0].split(' ')[2] : ''),
                                                     room: original[1],
                                                     participant: '',
                                                     change: {
@@ -315,8 +315,8 @@ export const extractData = async (data: any) => {
                                                 if (original[1].length) {
                                                     d.push({
                                                         unit: unit,
-                                                        subject: original[0].split(' ')[1].toUpperCase(),
-                                                        course: original[0].split(' ')[2].toUpperCase(),
+                                                        subject: original[0].split(' ')[1],
+                                                        course: original[0].split(' ')[2],
                                                         room: original[1],
                                                         participant: '',
                                                         change: {
@@ -329,7 +329,7 @@ export const extractData = async (data: any) => {
                                                 } else {
                                                     d.push({
                                                         unit: unit,
-                                                        subject: original[0].split(' ')[0].toUpperCase(),
+                                                        subject: original[0].split(' ')[0],
                                                         course: '',
                                                         room: original[0].split(' ')[1],
                                                         participant: '',
@@ -346,8 +346,8 @@ export const extractData = async (data: any) => {
                                             if (changed[0].includes('Aufs.aus')) {
                                                 d.push({
                                                     unit: unit,
-                                                    subject: original[0].split(' ')[1].toUpperCase(),
-                                                    course: original[0].split(' ')[2].toUpperCase(),
+                                                    subject: original[0].split(' ')[1],
+                                                    course: original[0].split(' ')[2],
                                                     room: original[1],
                                                     participant: '',
                                                     change: {
@@ -363,7 +363,7 @@ export const extractData = async (data: any) => {
                                                 if (changed[0] === 'abghgt. versch.') {
                                                     d.push({
                                                         unit: unit,
-                                                        subject: original[0].split(' ')[0].toUpperCase(),
+                                                        subject: original[0].split(' ')[0],
                                                         course: '',
                                                         room: original[0].split(' ')[1],
                                                         participant: '',
@@ -378,7 +378,7 @@ export const extractData = async (data: any) => {
                                                 } else if (changed[0].includes('mit')) {
                                                     d.push({
                                                         unit: unit,
-                                                        subject: original[0].split(' ')[0].toUpperCase(),
+                                                        subject: original[0].split(' ')[0],
                                                         course: '',
                                                         room: original[0].split(' ')[1],
                                                         participant: '',
@@ -395,7 +395,7 @@ export const extractData = async (data: any) => {
                                             if (changed[0].includes('v.') && changed[0].includes('mit')) {
                                                 d.push({
                                                     unit: unit,
-                                                    subject: original[0].split(' ')[0].toUpperCase(),
+                                                    subject: original[0].split(' ')[0],
                                                     course: '',
                                                     room: original[0].split(' ')[1],
                                                     participant: '',
@@ -413,7 +413,7 @@ export const extractData = async (data: any) => {
                                                     const text = (original[k] + ' ' + original[k + 1]).split(' ');
                                                     d.push({
                                                         unit: unit,
-                                                        subject: text[0].toUpperCase(),
+                                                        subject: text[0],
                                                         course: '',
                                                         room: text[2],
                                                         participant: '',
@@ -487,6 +487,14 @@ export const extractData = async (data: any) => {
         for (let l = 0; l < d.length; l++) {
             d[l].subject = d[l].subject.replace('NWB', 'NW').replace('DFÖ', 'DF').replace('MINT', 'MI').replace(/PJ.+/g, 'PJ').replace(/[0-9]/g, '');
             d[l].change.subject = d[l].change.subject.replace('NWB', 'NW').replace(/PJ.+/g, 'PJ').replace(/[0-9]/g, '');
+            d[l].subject = d[l].subject.trim().toUpperCase();
+            d[l].course = d[l].course.trim().toUpperCase();
+            d[l].room = d[l].room.trim().toUpperCase();
+            d[l].participant = d[l].participant.trim().toUpperCase();
+            d[l].change.subject = d[l].change.subject.trim().toUpperCase();
+            d[l].change.room = d[l].change.room.trim().toUpperCase();
+            d[l].change.teacher = d[l].change.teacher.trim().toUpperCase();
+            d[l].change.info = d[l].change.info.trim();
         }
 
         return {
