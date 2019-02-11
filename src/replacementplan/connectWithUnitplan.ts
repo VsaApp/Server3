@@ -52,14 +52,14 @@ export const resetOldChanges = (unitplan: any) => {
 
 export const setChangesInUnitplan = (grade: string, unitplan: any, replacementplan: any) => {
 
-    // Convert weekday strings to numbers
-    replacementplan.data = replacementplan.data.map((change: any) => {
-        change.weekday = weekdayToInt(replacementplan.for.weekday);
-        return change;
-    });
-
-    // Set new replacementplan dates
     if (replacementplan.data !== undefined) {
+        // Convert weekday strings to numbers
+        replacementplan.data = replacementplan.data.map((change: any) => {
+            change.weekday = weekdayToInt(replacementplan.for.weekday);
+            return change;
+        });
+
+        // Set new replacementplan dates
         unitplan.data[weekdayToInt(replacementplan.for.weekday)].replacementplan = {
             for: {
                 date: replacementplan.for.date,
@@ -70,74 +70,82 @@ export const setChangesInUnitplan = (grade: string, unitplan: any, replacementpl
                 time: replacementplan.updated.time
             }
         };
-    }
 
-    // Add new replacementplan changes
-    replacementplan.data.forEach((change: any) => {
-        // Get normal subjects in the lesson of the change
-        const subjects = unitplan.data[change.weekday].lessons[change.unit.toString()];
-        change.sure = false;
-        change.exam = change.change.info.toLowerCase().includes('klausur');
-        change.rewriteExam = change.change.info.toLowerCase().includes('nachschreiber');
-        if (change.exam) {
-            change.sure = !change.rewriteExam;
+        // Add new replacementplan changes
+        replacementplan.data.forEach((change: any) => {
+            // Get normal subjects in the lesson of the change
+            const subjects = unitplan.data[change.weekday].lessons[change.unit.toString()];
+            change.sure = false;
+            change.exam = change.change.info.toLowerCase().includes('klausur');
+            change.rewriteExam = change.change.info.toLowerCase().includes('nachschreiber');
+            if (change.exam) {
+                change.sure = !change.rewriteExam;
+                subjects.forEach((subject: any) => {
+                    subject.changes.push(change);
+                });
+            } else {
+                let duplicates;
+                duplicates = subjects.filter((subject: any) => subject.subject === change.subject);
+                // If there is only one subject with the correct name, add change to it
+                if (duplicates.length === 1) {
+                    change.sure = true;
+                    duplicates[0].changes.push(change);
+                } else if (subjects.filter((subject: any) => subject.room === change.room).length === 1) {
+                    change.sure = true;
+                    const subject = subjects.filter((subject: any) => subject.room === change.room)[0];
+                    subject.changes.push(change);
+                } else if (subjects.filter((subject: any) => subject.subject + '-' + subject.course === change.subject + '-' + change.course).length === 1) {
+                    change.sure = true;
+                    const subject = subjects.filter((subject: any) => subject.subject + '-' + subject.course === change.subject + '-' + change.course)[0];
+                    subject.changes.push(change);
+                } else if (duplicates.filter((duplicate: any) => duplicate.course === '').length === 1) {
+                    change.sure = true;
+                    const subject = duplicates.filter((duplicate: any) => duplicate.course === '')[0];
+                    subject.changes.push(change);
+                }
+                if (!change.sure) {
+                    if (duplicates.length === 0) {
+                        subjects.forEach((subject: any) => {
+                            subject.changes.push(change);
+                        });
+                    } else {
+                        duplicates.forEach((subject: any) => {
+                            subject.changes.push(change);
+                        });
+                    }
+
+                }
+            }
             subjects.forEach((subject: any) => {
-                subject.changes.push(change);
+                subject.changes.forEach((subject: any) => {
+                    delete subject['weekday'];
+                });
+                subject.changes.filter((change: any) => change.sure && !change.exam && !change.rewriteExam).forEach((change: any) => {
+                    if (change.participant === '') {
+                        change.participant = subject.participant;
+                    }
+                    if (change.room === '') {
+                        change.room = subject.room;
+                    }
+                    if (change.course === '' && subject.course !== '') {
+                        change.course = subject.course;
+                    }
+                    if (subject.course === '' && change.course !== '') {
+                        subject.course = change.course;
+                        if (subject.block !== '') {
+                            Object.keys(unitplan.data[weekdayToInt(replacementplan.for.weekday)].lessons).forEach((unit: string) => {
+                                const s = unitplan.data[weekdayToInt(replacementplan.for.weekday)].lessons[unit];
+                                if (s[0].block === subject.block) {
+                                    s[subjects.indexOf(subject)].course = subject.course;
+                                }
+                            });
+                        }
+                    }
+                });
             });
-        } else {
-            let duplicates;
-            duplicates = subjects.filter((subject: any) => subject.subject === change.subject);
-            // If there is only one subject with the correct name, add change to it
-            if (duplicates.length === 1) {
-                change.sure = true;
-                duplicates[0].changes.push(change);
-            } else if (subjects.filter((subject: any) => subject.room === change.room).length === 1) {
-                change.sure = true;
-                const subject = subjects.filter((subject: any) => subject.room === change.room)[0];
-                subject.changes.push(change);
-            } else if (subjects.filter((subject: any) => subject.subject + '-' + subject.course === change.subject + '-' + change.course).length === 1) {
-                change.sure = true;
-                const subject = subjects.filter((subject: any) => subject.subject + '-' + subject.course === change.subject + '-' + change.course)[0];
-                subject.changes.push(change);
-            } else if (duplicates.filter((duplicate: any) => duplicate.course === '').length === 1) {
-                change.sure = true;
-                const subject = duplicates.filter((duplicate: any) => duplicate.course === '')[0];
-                subject.changes.push(change);
+            if (!change.sure && change.change.info !== 'Klausurnachschreiber') {
+                console.log(grade, change, subjects);
             }
-            if (!change.sure) {
-                if (duplicates.length === 0) {
-                    subjects.forEach((subject: any) => {
-                        subject.changes.push(change);
-                    });
-                } else {
-                    duplicates.forEach((subject: any) => {
-                        subject.changes.push(change);
-                    });
-                }
-
-            }
-        }
-        subjects.forEach((subject: any) => {
-            subject.changes.forEach((subject: any) => {
-                delete subject['weekday'];
-            });
-            subject.changes.filter((change: any) => change.sure && !change.exam && !change.rewriteExam).forEach((change: any) => {
-                if (change.participant === '') {
-                    change.participant = subject.participant;
-                }
-                if (change.room === '') {
-                    change.room = subject.room;
-                }
-                if (change.course === '' && subject.course !== '') {
-                    change.course = subject.course;
-                }
-                if (subject.course === '' && change.course !== '') {
-                    subject.course = change.course;
-                }
-            });
         });
-        if (!change.sure && change.change.info !== 'Klausurnachschreiber') {
-            //console.log(grade, change, subjects, route);
-        }
-    });
+    }
 };
