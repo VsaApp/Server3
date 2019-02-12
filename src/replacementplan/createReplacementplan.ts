@@ -266,7 +266,6 @@ export const extractData = async (data: any) => {
                                                 parsed = true;
                                             }
                                             if (changed[0] === '' && changed[1] === '' && (original[1].match(/ /g) || []).length === 0) {
-                                                console.log(original, changed);
                                                 if (original[0].split(' ').length === 3) {
                                                     d.push({
                                                         unit: unit,

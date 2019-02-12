@@ -2,19 +2,10 @@
 <project version="4">
   <component name="BookmarkManager">
     <bookmark url="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts" line="60" />
-    <bookmark url="file://$PROJECT_DIR$/src/replacementplan/createReplacementplan.ts" line="509" mnemonic="8" />
+    <bookmark url="file://$PROJECT_DIR$/src/replacementplan/createReplacementplan.ts" line="510" mnemonic="8" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4d3783b-a945-48d2-856f-8c33d2b55b9c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/rooms.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/subjects.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/history/parser.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/history/parser.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/replacementplan/createReplacementplan.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/replacementplan/createReplacementplan.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/teachers/teachers.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/teachers/teachers.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/unitplan/unitplan.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/unitplan/unitplan.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/workgroups/workgroups.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/workgroups/workgroups.ts" afterDir="false" />
-    </list>
+    <list default="true" id="c4d3783b-a945-48d2-856f-8c33d2b55b9c" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -25,47 +16,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/subjects.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="4" column="17" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/history/parser.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="11" column="22" selection-start-line="11" selection-start-column="22" selection-end-line="11" selection-end-column="22" />
-              <folding>
-                <element signature="e#0#20#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/history/replacementplan/2019/1/30/1548743463.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="53" column="9" selection-start-line="53" selection-start-column="9" selection-end-line="53" selection-end-column="9" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/replacementplan/createReplacementplan.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="223">
-              <caret line="266" column="45" selection-start-line="266" selection-start-column="45" selection-end-line="266" selection-end-column="45" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -129,7 +80,6 @@
         <option value="$PROJECT_DIR$/src/cafetoria/cafetoria.ts" />
         <option value="$PROJECT_DIR$/src/teachers/teachers.css" />
         <option value="$PROJECT_DIR$/courses.ts" />
-        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/src/replacementplan/replacementplan.ts" />
         <option value="$PROJECT_DIR$/src/tags/users.ts" />
         <option value="$PROJECT_DIR$/src/update_app.ts" />
@@ -147,9 +97,10 @@
         <option value="$PROJECT_DIR$/src/workgroups/workgroups.ts" />
         <option value="$PROJECT_DIR$/src/unitplan/unitplan.ts" />
         <option value="$PROJECT_DIR$/src/teachers/teachers.ts" />
-        <option value="$PROJECT_DIR$/src/history/parser.ts" />
         <option value="$PROJECT_DIR$/src/subjects.ts" />
         <option value="$PROJECT_DIR$/src/replacementplan/createReplacementplan.ts" />
+        <option value="$PROJECT_DIR$/src/history/parser.ts" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -185,18 +136,6 @@
               <item name="Server3" type="b2602c69:ProjectViewProjectNode" />
               <item name="Server3" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Server3" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Server3" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="history" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Server3" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Server3" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="replacementplan" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -264,7 +203,7 @@
       <workItem from="1549808471266" duration="151000" />
       <workItem from="1549905383455" duration="2545000" />
       <workItem from="1549965672057" duration="294000" />
-      <workItem from="1549973043429" duration="2126000" />
+      <workItem from="1549973043429" duration="2808000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed participants in unit plan">
       <created>1544305079874</created>
@@ -312,10 +251,10 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="58615000" />
+    <option name="totallyTimeSpent" value="59297000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1" y="25" width="1282" height="776" extended-state="6" />
+    <frame x="-1" y="25" width="1282" height="776" extended-state="7" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4977778" visible="true" weight="0.24502784" />
       <window_info id="Structure" order="1" sideWeight="0.50222224" side_tool="true" weight="0.24502784" />
@@ -435,13 +374,6 @@
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="66" selection-start-line="66" selection-end-line="66" />
         </state>
       </provider>
     </entry>
@@ -1065,30 +997,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/workgroups/workgroups.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="86" column="51" lean-forward="true" selection-start-line="86" selection-start-column="51" selection-end-line="86" selection-end-column="51" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/rooms.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="46">
           <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/teachers/teachers.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="6" column="39" selection-start-line="6" selection-start-column="39" selection-end-line="6" selection-end-column="39" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1102,34 +1014,64 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/subjects.ts">
+    <entry file="file://$PROJECT_DIR$/history/replacementplan/2019/1/30/1548743463.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="4" column="17" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/replacementplan/createReplacementplan.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="266" column="45" selection-start-line="266" selection-start-column="45" selection-end-line="266" selection-end-column="45" />
+        <state relative-caret-position="74">
+          <caret line="51" column="7" selection-start-line="51" selection-start-column="7" selection-end-line="51" selection-end-column="7" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/history/parser.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="204">
-          <caret line="11" column="22" selection-start-line="11" selection-start-column="22" selection-end-line="11" selection-end-column="22" />
+          <caret line="11" column="20" selection-start-line="11" selection-start-column="20" selection-end-line="11" selection-end-column="20" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/history/replacementplan/2019/1/30/1548743463.json">
+    <entry file="file://$PROJECT_DIR$/src/replacementplan/createReplacementplan.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="53" column="9" selection-start-line="53" selection-start-column="9" selection-end-line="53" selection-end-column="9" />
+        <state relative-caret-position="200">
+          <caret line="289" column="90" selection-start-line="289" selection-start-column="90" selection-end-line="289" selection-end-column="90" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="70" column="9" selection-start-line="70" selection-start-column="9" selection-end-line="70" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/teachers/teachers.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1035">
+          <caret line="6" column="39" selection-start-line="6" selection-start-column="39" selection-end-line="6" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/workgroups/workgroups.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="46">
+          <caret line="86" column="51" lean-forward="true" selection-start-line="86" selection-start-column="51" selection-end-line="86" selection-end-column="51" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/subjects.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1058">
+          <caret line="46" column="14" selection-start-line="46" selection-start-column="14" selection-end-line="46" selection-end-column="14" />
         </state>
       </provider>
     </entry>
