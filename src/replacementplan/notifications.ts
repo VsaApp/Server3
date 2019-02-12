@@ -24,7 +24,7 @@ export const getDevices = async () => {
 
 export const sendNotifications = async (isDev: Boolean, today: Boolean, data: any, replacementplan1: any, unitplans: any) => {
     try {
-        const devices = getUsers().filter((device: any) => !isDev || device.tags.dev);
+        let devices = getUsers().filter((device: any) => (!isDev || device.tags.dev) && device.tags.grade !== undefined);
         console.log('Sending notifications to ' + devices.length + ' devices');
         devices.forEach(async (device: any) => {
             try {
