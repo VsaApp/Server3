@@ -4,6 +4,7 @@ import {CookieJar} from 'tough-cookie';
 import FormData from 'form-data';
 import path from 'path';
 import fs from 'fs';
+import {getSubject} from '../subjects';
 
 const PDFParser = require('pdf2json');
 
@@ -65,7 +66,7 @@ const extractData = async (data: any) => {
                 if (value.length === 3 && value === value.toUpperCase()) {
                     teacher.shortName = value;
                 } else if (value.length <= 2) {
-                    teacher.subjects.push(value);
+                    teacher.subjects.push(getSubject(value));
                 } else {
                     //teacher.longName = value; Hug DSGVO
                 }

@@ -7,6 +7,8 @@ import {saveNewUnitplan} from '../history/history';
 import {getInjectedUnitplan} from "../replacementplan/connectWithUnitplan";
 import {getUsers} from '../tags/users';
 import {updateApp} from '../update_app';
+import {getRoom} from '../rooms';
+import {getSubject} from '../subjects';
 
 const isDev = process.argv.length === 3;
 const grades = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c', '9a', '9b', '9c', 'EF', 'Q1', 'Q2'];
@@ -70,8 +72,8 @@ const extractData = async (data: any) => {
                             d[day].lessons[unit].push({
                                 block: '',
                                 participant: a[0].split(' ')[0],
-                                subject: a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''),
-                                room: a[0].split(' ')[2].toUpperCase(),
+                                subject: getSubject(a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, '')),
+                                room: getRoom(a[0].split(' ')[2].toUpperCase()),
                                 course: '',
                                 changes: []
                             });
@@ -81,8 +83,8 @@ const extractData = async (data: any) => {
                             d[day].lessons[unit].push({
                                 block: a[0].split(' ')[1],
                                 participant: a[i].split(' ')[1],
-                                subject: a[i].split(' ')[0].toUpperCase().replace(/[0-9]/g, ''),
-                                room: a[i].split(' ')[2].toUpperCase(),
+                                subject: getSubject(a[i].split(' ')[0].toUpperCase().replace(/[0-9]/g, '')),
+                                room: getRoom(a[i].split(' ')[2].toUpperCase()),
                                 course: '',
                                 changes: []
                             });

@@ -11,7 +11,7 @@ const testParser = () => {
                     const json = await getCurrentJson(filePath);
                     console.log(`Parse file '${filePath}'`);
 
-                    const pathSegments = ['historyTest', 'replacementplan', year, month, day];
+                    const pathSegments = ['history', 'replacementplan', year, month, day];
                     for (let i = 0; i < pathSegments.length; i++) {
                         let relDir = '';
                         for (let j = 0; j <= i; j++) relDir += pathSegments[j] + '/';
@@ -22,7 +22,7 @@ const testParser = () => {
                     }
 
                     // Create files...
-                    fs.writeFileSync(path.resolve(process.cwd(), 'historyTest', 'replacementplan', year, month, day, file.replace('.html', '.json')), JSON.stringify(json, null, 2));
+                    fs.writeFileSync(path.resolve(process.cwd(), 'history', 'replacementplan', year, month, day, file.replace('.html', '.json')), JSON.stringify(json, null, 2));
 
                     //console.log(`Current json: ${json}`);
                 });

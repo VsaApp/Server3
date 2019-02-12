@@ -1,5 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import {getRoom} from '../rooms';
+import {getSubject} from "../subjects";
 
 export const extractData = async (data: any) => {
     const grades = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c', '9a', '9b', '9c', 'EF', 'Q1', 'Q2'];
@@ -264,6 +266,7 @@ export const extractData = async (data: any) => {
                                                 parsed = true;
                                             }
                                             if (changed[0] === '' && changed[1] === '' && (original[1].match(/ /g) || []).length === 0) {
+                                                console.log(original, changed);
                                                 if (original[0].split(' ').length === 3) {
                                                     d.push({
                                                         unit: unit,
@@ -279,19 +282,35 @@ export const extractData = async (data: any) => {
                                                         }
                                                     });
                                                 } else {
-                                                    d.push({
-                                                        unit: unit,
-                                                        subject: original[0].split(' ')[1],
-                                                        course: '',
-                                                        room: original[1],
-                                                        participant: '',
-                                                        change: {
-                                                            subject: '',
-                                                            teacher: '',
-                                                            room: '',
-                                                            info: (original.length === 2 ? 'Freistunde' : original[2])
-                                                        }
-                                                    });
+                                                    if (original[1] === 'Ersatzbereitschaft') {
+                                                        d.push({
+                                                            unit: unit,
+                                                            subject: original[0].split(' ')[0],
+                                                            course: '',
+                                                            room: original[0].split(' ')[1],
+                                                            participant: '',
+                                                            change: {
+                                                                subject: '',
+                                                                teacher: '',
+                                                                room: '',
+                                                                info: original[1]
+                                                            }
+                                                        });
+                                                    } else {
+                                                        d.push({
+                                                            unit: unit,
+                                                            subject: original[0].split(' ')[1],
+                                                            course: '',
+                                                            room: original[1],
+                                                            participant: '',
+                                                            change: {
+                                                                subject: '',
+                                                                teacher: '',
+                                                                room: '',
+                                                                info: (original.length === 2 ? 'Freistunde' : original[2])
+                                                            }
+                                                        });
+                                                    }
                                                 }
                                                 parsed = true;
                                             }
@@ -485,14 +504,14 @@ export const extractData = async (data: any) => {
             console.error('Cannot find \'tr\' selectors', e.toString());
         }
         for (let l = 0; l < d.length; l++) {
-            d[l].subject = d[l].subject.replace('NWB', 'NW').replace('DFÖ', 'DF').replace('MINT', 'MI').replace(/PJ.+/g, 'PJ').replace(/[0-9]/g, '');
-            d[l].change.subject = d[l].change.subject.replace('NWB', 'NW').replace(/PJ.+/g, 'PJ').replace(/[0-9]/g, '');
-            d[l].subject = d[l].subject.trim().toUpperCase();
+            d[l].subject = d[l].subject.replace(/PJ.+/g, 'PJ').replace(/[0-9]/g, '');
+            d[l].change.subject = d[l].change.subject.replace(/PJ.+/g, 'PJ').replace(/[0-9]/g, '');
+            d[l].subject = getSubject(d[l].subject);
             d[l].course = d[l].course.trim().toUpperCase();
-            d[l].room = d[l].room.trim().toUpperCase();
+            d[l].room = getRoom(d[l].room);
             d[l].participant = d[l].participant.trim().toUpperCase();
-            d[l].change.subject = d[l].change.subject.trim().toUpperCase();
-            d[l].change.room = d[l].change.room.trim().toUpperCase();
+            d[l].change.subject = getSubject(d[l].change.subject);
+            d[l].change.room = getRoom(d[l].change.room);
             d[l].change.teacher = d[l].change.teacher.trim().toUpperCase();
             d[l].change.info = d[l].change.info.trim();
         }

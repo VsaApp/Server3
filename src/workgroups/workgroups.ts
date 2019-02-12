@@ -1,6 +1,7 @@
 import got from 'got';
 import path from 'path';
 import fs from 'fs';
+import {getRoom} from '../rooms';
 
 const pdf_table_extractor = require('pdf-table-extractor');
 
@@ -35,7 +36,7 @@ const extractData = async (data: any) => {
             if (!column[0].toLowerCase().startsWith('bepa') && !column[0].toLowerCase().startsWith('ags')) {
                 if (i === 0) {
                     column.forEach((inRow: string) => {
-                        list.push({ weekday: inRow, data: [] });
+                        list.push({weekday: inRow, data: []});
                     });
                 } else {
                     if (column[0] !== '' && !column[0].toLowerCase().startsWith('lehrer') && !column[0].toLowerCase().includes('beeck')) {
@@ -77,7 +78,7 @@ const extractData = async (data: any) => {
                             }
                             time = timeS + ' - ' + timeE;
                         }
-                        let place = column[3]
+                        let place = getRoom(column[3]
                             .toLowerCase()
                             .replace('gr. halle', 'GRH')
                             .replace('gr halle', 'GRH')
@@ -87,7 +88,7 @@ const extractData = async (data: any) => {
                             .replace('kl. halle', 'KLH')
                             .replace('kl halle', 'KLH')
                             .replace('kl ha', 'KLH')
-                            .trim();
+                            .trim());
                         list[j].data.push({
                             name,
                             participants,
