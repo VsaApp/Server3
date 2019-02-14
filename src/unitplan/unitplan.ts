@@ -9,6 +9,7 @@ import {getUsers} from '../tags/users';
 import {updateApp} from '../update_app';
 import {getRoom} from '../rooms';
 import {getSubject} from '../subjects';
+import { print } from 'util';
 
 const isDev = process.argv.length === 3;
 const grades = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c', '9a', '9b', '9c', 'EF', 'Q1', 'Q2'];
@@ -25,8 +26,8 @@ const isNew = (data: any) => {
     return old !== n;
 };
 
-const fetchData = async () => {
-    return (await got('https://www.viktoriaschule-aachen.de/sundvplan/sps/left.html', {auth: config.username + ':' + config.password})).body;
+const fetchData = async (weekA = true) => {
+    return (await got(`https://www.viktoriaschule-aachen.de/sundvplan/sps/${weekA ? 'left' : 'right'}.html`, {auth: config.username + ':' + config.password})).body;
 };
 
 const parseData = async (raw: string) => {
@@ -41,7 +42,8 @@ const extractData = async (data: any) => {
                 replacementplan: {
                     for: {
                         date: '',
-                        weekday: ''
+                        weekday: '',
+                        weektype: ''
                     },
                     updated: {
                         date: '',
@@ -210,28 +212,104 @@ export const sendNotifications = async (isDev: Boolean) => {
     }
 }
 
-(async () => {
-    fetchData().then(raw => {
-        console.log('Fetched unit plan');
-        parseData(raw).then(data => {
-            console.log('Parsed unit plan');
-            if (isNew(data) || isDev) {
-                saveNewUnitplan(raw, []);
-                extractData(data).then(unitplan => {
-                    console.log('Extracted unit plan');
-                    unitplan.forEach(data => {
-                        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json'), JSON.stringify(data, null, 2));
-                        try {
-                            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json'), JSON.stringify(getInjectedUnitplan(data.participant), null, 2))
-                        } catch (e) {
+const contactWeeks = (dataA: any, dataB: any) => {
+    const unitplan: any = [];
+    dataA.forEach((gradeA: any, index: number) => {
+        const gradeB = dataB[index];
+        const grade: any = {};
 
+        Object.keys(gradeA).forEach((key: string) => {
+            if (key !== 'data') grade[key] = gradeA[key];
+            else grade.data = [];
+        });
+
+        for (let i = 0; i < 5; i++) {
+            grade.data.push({});
+            Object.keys(gradeA.data[i]).forEach((key: string) => {
+                if (key !== 'lessons') grade.data[i][key] = gradeA.data[i][key];
+                else grade.data[i].lessons = {};
+            });
+            for (let j = 0; j < 9; j++) {
+                const key = j.toString();
+                let lessonA: any;
+                let lessonB: any;
+                if (Object.keys(gradeA.data[i].lessons).length > j) lessonA = gradeA.data[i].lessons[key];
+                if (Object.keys(gradeB.data[i].lessons).length > j) lessonB = gradeB.data[i].lessons[key];
+                
+                if (lessonA === undefined && lessonB === undefined) continue;
+                if (lessonA === undefined && lessonB !== undefined) {
+                    grade.data[i].lessons[key] = lessonB;
+                    grade.data[i].lessons[key].forEach((subject: any) => subject.week = 'B');
+                }
+                else if (lessonA !== undefined && lessonB === undefined) {
+                    grade.data[i].lessons[key] = lessonA;
+                    grade.data[i].lessons[key].forEach((subject: any) => subject.week = 'A');
+                }
+                else {
+                    grade.data[i].lessons[key] = [];
+                    const listShort = lessonA.length >= lessonB.length ? lessonB : lessonA;
+                    const listLong = lessonA.length >= lessonB.length ? lessonA : lessonB;
+                    for (let k = 0; k < listLong.length; k++) {
+                        const subject1 = listLong[k];
+                        let found = false;
+                        for (let l = 0; l < listShort.length; l++) {
+                            const subject2 = listShort[l];
+                            if (subject1.subject === subject2.subject && subject1.participant === subject2.participant && subject1.room === subject2.room) {
+                                subject1.week = 'AB';
+                                grade.data[i].lessons[key].push(subject1);
+                                listShort.splice(l, 1);
+                                found = true;
+                                break;
+                            }
                         }
-                    });
-                    saveNewUnitplan('', unitplan);
-                    console.log('Saved unit plan');
-                    sendNotifications(isDev);
-                });
+                        if (!found) {
+                            console.log(grade.participant);
+                            console.log(i.toString() + ' ' + key);
+                            subject1.week = lessonA.length >= lessonB.length ? 'A' : 'B';
+                            grade.data[i].lessons[key].push(subject1);
+                        }
+                    }
+                    if (listShort.length > 0) {
+                        console.log(grade.participant);
+                        console.log(i.toString() + ' ' + key);
+                        listShort.forEach((subject: any) => {
+                            subject.week = lessonA.length >= lessonB.length ? 'B' : 'A';
+                            grade.data[i].lessons[key].push(subject);
+                        });
+                    }
+                }
+            }
+        }
+
+        unitplan.push(grade);
+    });
+
+    return unitplan;
+};
+
+(async () => {
+    const rawA = await fetchData(true);
+    const rawB = await fetchData(false);
+    console.log('Fetched unit plan');
+    const dataA = await parseData(rawA);
+    const dataB = await parseData(rawB);
+    console.log('Parsed unit plan');
+    if (isNew(dataA) || isDev) {
+        saveNewUnitplan(rawA, rawB, []);
+        const unitplanA = await extractData(dataA);
+        const unitplanB = await extractData(dataB);
+        const unitplan = contactWeeks(unitplanA, unitplanB);
+        console.log('Extracted unit plan');
+        unitplan.forEach((data: any) => {
+            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json'), JSON.stringify(data, null, 2));
+            try {
+                fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json'), JSON.stringify(getInjectedUnitplan(data.participant), null, 2))
+            } catch (e) {
+
             }
         });
-    });
+        saveNewUnitplan('', '', unitplan);
+        console.log('Saved unit plan');
+        sendNotifications(isDev);
+    }
 })();

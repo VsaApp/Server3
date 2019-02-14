@@ -39,7 +39,8 @@ export const resetOldChanges = (unitplan: any) => {
         day.replacementplan = {
             for: {
                 date: '',
-                weekday: ''
+                weekday: '',
+                weektype: ''
             },
             updated: {
                 date: '',
@@ -63,7 +64,8 @@ export const setChangesInUnitplan = (grade: string, unitplan: any, replacementpl
         unitplan.data[weekdayToInt(replacementplan.for.weekday)].replacementplan = {
             for: {
                 date: replacementplan.for.date,
-                weekday: replacementplan.for.weekday
+                weekday: replacementplan.for.weekday,
+                weektype: replacementplan.for.weektype
             },
             updated: {
                 date: replacementplan.updated.date,

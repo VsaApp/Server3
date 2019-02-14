@@ -72,23 +72,32 @@ export const saveNewReplacementplan = async (raw: string, parsed: any) => {
     }
 };
 
-export const saveNewUnitplan = async (raw: string, parsed: any) => {
+export const saveNewUnitplan = async (rawA: string, rawB: string, parsed: any) => {
     try {
         if (parsed.length > 0) {
             const year = parsed[0].date.split('.')[2].length < 4 ? '20' + parsed[0].date.split('.')[2] : parsed[0].date.split('.')[2];
             const month = parsed[0].date.split('.')[1];
             const day = parsed[0].date.split('.')[0];
 
-            saveNewVersion('unitplan', raw, parsed, year, month, day, getFileName());
+            const fileName = getFileName();
+            saveNewVersion('unitplan', rawA, [], year, month, day, fileName + 'A');
+            saveNewVersion('unitplan', rawB, [], year, month, day, fileName + 'B');
+            saveNewVersion('unitplan', '', parsed, year, month, day, fileName);
         } else {
-            const data = await parse(raw);
+            const data = await parse(rawA);
             const date = data.querySelector('div').childNodes[0].rawText.split(' den ')[1].trim()
             const year = date.split('.')[2].length < 4 ? '20' + date.split('.')[2] : date.split('.')[2];
-            saveNewVersion('unitplan', raw, parsed, year, date.split('.')[1], date.split('.')[0], getFileName());
+            const fileName = getFileName();
+            saveNewVersion('unitplan', rawA, [], year, date.split('.')[1], date.split('.')[0], fileName + 'A');
+            saveNewVersion('unitplan', rawB, [], year, date.split('.')[1], date.split('.')[0], fileName + 'B');
+            saveNewVersion('unitplan', '', parsed, year, date.split('.')[1], date.split('.')[0], fileName);
         }
     } catch (e) {
         console.log('Error in history parsing: ' + e.toString());
-        saveNewVersion('unitplan', raw, parsed, '-', '-', '-', getFileName());
+        const fileName = getFileName();
+        saveNewVersion('unitplan', rawA, [], '-', '-', '-', fileName + 'A');
+        saveNewVersion('unitplan', rawB, [], '-', '-', '-', fileName + 'B');
+        saveNewVersion('unitplan', '', parsed, '-', '-', '-', fileName);
     }
 };
 
