@@ -57,29 +57,18 @@ const extractData = async (data: any) => {
             row.childNodes.slice(1).forEach((field: any, day: number) => {
                 const a: any = field.childNodes.map((a: any) => a.childNodes[0].rawText.trim().replace(/ +(?= )/g, '')).filter((a: string, i: number) => a != '' || i == 5);
                 if (a.length > 0) {
-                    if (d[day].lessons[unit] === undefined) {
+                    if (d[day].lessons[unit] === undefined && !(a.length === 1 && a[0].includes('*'))) {
                         d[day].lessons[unit] = [];
                     }
-                    if (a.length === 1) {
-                        if (a[0].includes('*')) {
-                            d[day].lessons[unit].push({
-                                block: '',
-                                participant: '',
-                                subject: '',
-                                room: '',
-                                course: '',
-                                changes: []
-                            });
-                        } else {
-                            d[day].lessons[unit].push({
-                                block: '',
-                                participant: a[0].split(' ')[0],
-                                subject: getSubject(a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, '')),
-                                room: getRoom(a[0].split(' ')[2].toUpperCase()),
-                                course: '',
-                                changes: []
-                            });
-                        }
+                    if (a.length === 1 && !a[0].includes('*')) {
+                        d[day].lessons[unit].push({
+                            block: '',
+                            participant: a[0].split(' ')[0],
+                            subject: getSubject(a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, '')),
+                            room: getRoom(a[0].split(' ')[2].toUpperCase()),
+                            course: '',
+                            changes: []
+                        });
                     } else {
                         for (let i = 1; i < a.length; i++) {
                             d[day].lessons[unit].push({
