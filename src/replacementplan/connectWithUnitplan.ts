@@ -76,7 +76,9 @@ export const setChangesInUnitplan = (grade: string, unitplan: any, replacementpl
         // Add new replacementplan changes
         replacementplan.data.forEach((change: any) => {
             // Get normal subjects in the lesson of the change
-            const subjects = unitplan.data[change.weekday].lessons[change.unit.toString()];
+            const subjects = unitplan.data[change.weekday].lessons[change.unit.toString()].filter((subject: any) => {
+                return subject.week.toLowerCase().includes(replacementplan.for.weektype.toLowerCase());
+            });
             change.sure = false;
             change.exam = change.change.info.toLowerCase().includes('klausur');
             change.rewriteExam = change.change.info.toLowerCase().includes('nachschreiber');
