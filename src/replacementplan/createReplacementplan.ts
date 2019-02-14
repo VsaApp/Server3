@@ -11,9 +11,11 @@ export const extractData = async (data: any) => {
         let stop = false;
 
         // Get dates
+        let weektype = '';
         let date = new Date(2000, 0);
         let weekday = '?';
         try {
+            if (data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).includes('-Klassen-Vertretungsplan für ')) weektype = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(0, 1);
             const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).replace('-Klassen-Vertretungsplan für ', '').replace('Januar', 'January').replace('Februar', 'February').replace('März', 'March').replace('Mai', 'May').replace('Juni', 'June').replace('Juli', 'July').replace('Oktober', 'October').replace('Dezember', 'December');
             date = new Date(dateStr);
             date.setHours(date.getHours() + 1);
@@ -519,7 +521,8 @@ export const extractData = async (data: any) => {
             participant: grade,
             for: {
                 date: date.getUTCDate() + '.' + (date.getUTCMonth() + 1) + '.' + date.getUTCFullYear(),
-                weekday: weekday
+                weekday: weekday,
+                weektype: weektype
             },
             updated: {
                 date: update,
