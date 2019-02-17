@@ -1,4 +1,4 @@
-const subjects: any = {
+export const subjects: any = {
     CH: 'Chemie',
     PH: 'Physik',
     MI: 'Mint',

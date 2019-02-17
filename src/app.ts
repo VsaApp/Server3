@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import config from './config';
 import { fetchDataForUser } from './cafetoria/cafetoria';
+import { subjects } from './subjects';
 import router from './messageboard/messageboard';
 import tagsRouter from './tags/tags';
 import changesRouter from './changes/changes';
@@ -31,6 +32,10 @@ app.get('/cafetoria/login/:id/:pin', async (req, res) => {
     } catch (e) {
         res.json(e);
     }
+});
+
+app.get('/subjects', (req, res) => {
+    res.send(JSON.stringify(subjects, null, 2));
 });
 
 app.use('/messageboard', router);
