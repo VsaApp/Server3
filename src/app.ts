@@ -35,7 +35,7 @@ app.get('/cafetoria/login/:id/:pin', async (req, res) => {
 });
 
 app.get('/subjects', (req, res) => {
-    res.send(JSON.stringify(subjects, null, 2));
+    res.json(subjects);
 });
 
 app.use('/messageboard', router);
