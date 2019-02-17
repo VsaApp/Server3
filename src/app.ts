@@ -3,6 +3,7 @@ import cors from 'cors';
 import config from './config';
 import { fetchDataForUser } from './cafetoria/cafetoria';
 import { subjects } from './subjects';
+import { rooms } from './rooms';
 import router from './messageboard/messageboard';
 import tagsRouter from './tags/tags';
 import changesRouter from './changes/changes';
@@ -36,6 +37,10 @@ app.get('/cafetoria/login/:id/:pin', async (req, res) => {
 
 app.get('/subjects', (req, res) => {
     res.json(subjects);
+});
+
+app.get('/rooms', (req, res) => {
+    res.json(rooms);
 });
 
 app.use('/messageboard', router);

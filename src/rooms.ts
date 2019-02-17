@@ -1,9 +1,11 @@
-const rooms: any = {
+export const rooms: any = {
     KLH: 'klH',
     GRH: 'grH',
     SB: 'schH',
     PC1: 'PC1',
+    223: 'PC1',
     PC2: 'PC2',
+    528: 'PC2',
     KU1: 'Ku1',
     KU2: 'Ku2',
     AULA: 'Aul',
@@ -13,11 +15,11 @@ const rooms: any = {
 export const getRoom = (name: string) => {
     if (name === undefined) return undefined;
     name = name.trim().toUpperCase();
-    if (/^\d+$/.test(name) || /^([ABCD])$/m.test(name)) {
+    if (/^([ABCD])$/m.test(name)) {
         return name;
     }
     if (rooms[name] === undefined) {
-        if (name !== '') {
+        if (name !== '' && !/^\d+$/.test(name)) {
             console.log(`Unknown room ${name}`);
         }
         return name;
