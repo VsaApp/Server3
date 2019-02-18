@@ -18,8 +18,28 @@ export const getInjectedUnitplan = (grade: string) => {
     }
 
     resetOldChanges(unitplan);
-    setChangesInUnitplan(grade, unitplan, replacementplan1);
-    setChangesInUnitplan(grade, unitplan, replacementplan2);
+    if (replacementplan1.for.date === replacementplan2.for.date) {
+        const updated1 = replacementplan1.updated;
+        const date1 = new Date(
+            parseInt(updated1.date.split('.')[2]) + 2000,
+            parseInt(updated1.date.split('.')[1]) - 1,
+            parseInt(updated1.date.split('.')[0]),
+            parseInt(updated1.time.split(':')[0]),
+            parseInt(updated1.time.split(':')[1])
+        );
+        const updated2 = replacementplan1.updated;
+        const date2 = new Date(
+            parseInt(updated2.date.split('.')[2]) + 2000,
+            parseInt(updated2.date.split('.')[1]) - 1,
+            parseInt(updated2.date.split('.')[0]),
+            parseInt(updated2.time.split(':')[0]),
+            parseInt(updated2.time.split(':')[1])
+        );
+        setChangesInUnitplan(grade, unitplan, date1.getTime() > date2.getTime() ? replacementplan1 : replacementplan2);
+    } else {
+        setChangesInUnitplan(grade, unitplan, replacementplan1);
+        setChangesInUnitplan(grade, unitplan, replacementplan2);
+    }
     fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'today', grade + '.json'), JSON.stringify(replacementplan1, null, 2));
     fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', 'tomorrow', grade + '.json'), JSON.stringify(replacementplan2, null, 2));
 
