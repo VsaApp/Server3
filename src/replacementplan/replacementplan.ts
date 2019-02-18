@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import {saveNewReplacementplan} from '../history/history';
-import {fetchData, isNew, parseData, saveDate} from './utils';
+import {fetchData, isNew, parseData, saveData} from './utils';
 import {extractData} from './createReplacementplan';
 import {getInjectedUnitplan} from './connectWithUnitplan';
 import {sendNotifications} from './notifications';
@@ -20,7 +20,7 @@ const doWork = async (today: boolean) => {
     console.log('Fetched replacement plan for ' + day);
     const data = await parseData(raw);
     console.log('Parsed replacement plan for ' + day);
-    if (isNew(data, today) || isDev) {
+    if (isNew(raw, today) || isDev) {
         saveNewReplacementplan(raw, []);
         const replacementplan = await extractData(data);
         console.log('Extracted replacement plan for ' + day);
@@ -28,7 +28,7 @@ const doWork = async (today: boolean) => {
             fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', day, data.participant + '.json'), JSON.stringify(data, null, 2));
         });
         saveNewReplacementplan('', replacementplan);
-        saveDate(data, today);
+        saveData(raw, today);
         console.log('Saved replacement plan for ' + day);
 
         // Get all grades

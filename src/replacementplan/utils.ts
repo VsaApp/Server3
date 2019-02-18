@@ -5,22 +5,17 @@ import got from 'got';
 import config from '../config';
 
 export const isNew = (data: any, today: boolean) => {
-    const file = path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow') + '.txt');
+    const file = path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow') + '.html');
     let old = '';
     if (fs.existsSync(file)) {
         old = fs.readFileSync(file, 'utf-8').toString();
     }
-    try {
-        return old !== data.querySelectorAll('div')[1].childNodes[0].rawText;
-    } catch (e) {
-        console.log('Cannot get new date: ' + e.toString());
-        return false;
-    }
+    return old !== data;
 };
 
-export const saveDate = (data: any, today: boolean) => {
-    const file = path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow') + '.txt');
-    fs.writeFileSync(file, data.querySelectorAll('div')[1].childNodes[0].rawText);
+export const saveData = (data: any, today: boolean) => {
+    const file = path.resolve(process.cwd(), 'out', 'replacementplan', (today ? 'today' : 'tomorrow') + '.html');
+    fs.writeFileSync(file, data);
 };
 
 export const fetchData = async (today: boolean) => {
