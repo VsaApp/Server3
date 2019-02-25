@@ -10,6 +10,7 @@ export const subjects: any = {
     EK: 'Erdkunde',
     EF: 'Englisch Förder',
     E: 'Englisch',
+    FS: 'Schreibwerkstatt',
     FÖ: 'Förder',
     FF: 'Französisch Förder',
     F: 'Französisch',
