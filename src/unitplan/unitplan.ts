@@ -9,7 +9,6 @@ import {getUsers} from '../tags/users';
 import {updateApp} from '../update_app';
 import {getRoom} from '../rooms';
 import {getSubject} from '../subjects';
-import { print } from 'util';
 
 const isDev = process.argv.length === 3;
 const grades = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c', '9a', '9b', '9c', 'EF', 'Q1', 'Q2'];
@@ -92,7 +91,8 @@ const extractData = async (data: any) => {
                     subject: 'Mittagspause',
                     room: '',
                     course: '',
-                    changes: []
+                    changes: [],
+                    week: 'AB'
                 }];
             }
             Object.keys(a.lessons).forEach((lesson: any) => {
@@ -103,7 +103,8 @@ const extractData = async (data: any) => {
                         subject: 'Freistunde',
                         room: '',
                         course: '',
-                        changes: []
+                        changes: [],
+                        week: 'AB'
                     });
                 }
             });
@@ -224,17 +225,15 @@ const contactWeeks = (dataA: any, dataB: any) => {
                 let lessonB: any;
                 if (Object.keys(gradeA.data[i].lessons).length > j) lessonA = gradeA.data[i].lessons[key];
                 if (Object.keys(gradeB.data[i].lessons).length > j) lessonB = gradeB.data[i].lessons[key];
-                
+
                 if (lessonA === undefined && lessonB === undefined) continue;
                 if (lessonA === undefined && lessonB !== undefined) {
                     grade.data[i].lessons[key] = lessonB;
                     grade.data[i].lessons[key].forEach((subject: any) => subject.week = 'B');
-                }
-                else if (lessonA !== undefined && lessonB === undefined) {
+                } else if (lessonA !== undefined && lessonB === undefined) {
                     grade.data[i].lessons[key] = lessonA;
                     grade.data[i].lessons[key].forEach((subject: any) => subject.week = 'A');
-                }
-                else {
+                } else {
                     grade.data[i].lessons[key] = [];
                     const listShort = lessonA.length >= lessonB.length ? lessonB : lessonA;
                     const listLong = lessonA.length >= lessonB.length ? lessonA : lessonB;
@@ -252,15 +251,11 @@ const contactWeeks = (dataA: any, dataB: any) => {
                             }
                         }
                         if (!found) {
-                            console.log(grade.participant);
-                            console.log(i.toString() + ' ' + key);
                             subject1.week = lessonA.length >= lessonB.length ? 'A' : 'B';
                             grade.data[i].lessons[key].push(subject1);
                         }
                     }
                     if (listShort.length > 0) {
-                        console.log(grade.participant);
-                        console.log(i.toString() + ' ' + key);
                         listShort.forEach((subject: any) => {
                             subject.week = lessonA.length >= lessonB.length ? 'B' : 'A';
                             grade.data[i].lessons[key].push(subject);

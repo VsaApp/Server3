@@ -18,7 +18,7 @@ export const getInjectedUnitplan = (grade: string) => {
     }
 
     resetOldChanges(unitplan);
-    if (replacementplan1.for.date === replacementplan2.for.date) {
+    if (replacementplan1.for !== undefined && replacementplan2.for !== undefined && replacementplan1.for.date === replacementplan2.for.date) {
         const updated1 = replacementplan1.updated;
         const date1 = new Date(
             parseInt(updated1.date.split('.')[2]) + 2000,
@@ -96,6 +96,29 @@ export const setChangesInUnitplan = (grade: string, unitplan: any, replacementpl
         // Add new replacementplan changes
         replacementplan.data.forEach((change: any) => {
             // Get normal subjects in the lesson of the change
+            if (unitplan.data[change.weekday].lessons[change.unit.toString()] === undefined) {
+                if (change.unit === 5) {
+                    unitplan.data[change.weekday].lessons[change.unit.toString()] = [{
+                        block: '',
+                        participant: '',
+                        subject: 'Mittagspause',
+                        room: '',
+                        course: '',
+                        changes: [],
+                        week: 'AB'
+                    }];
+                } else {
+                    unitplan.data[change.weekday].lessons[change.unit.toString()] = [{
+                        block: '',
+                        participant: '',
+                        subject: 'Freistunde',
+                        room: '',
+                        course: '',
+                        changes: [],
+                        week: 'AB'
+                    }];
+                }
+            }
             const subjects = unitplan.data[change.weekday].lessons[change.unit.toString()].filter((subject: any) => {
                 return subject.week.toLowerCase().includes(replacementplan.for.weektype.toLowerCase());
             });
