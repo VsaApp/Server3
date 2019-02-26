@@ -6,25 +6,39 @@ import { getCurrentJson, saveNewVersion, getFileName } from './utils';
 
 const historyRouter = express.Router();
 
-historyRouter.get('/:directory', (req, res) => {
+historyRouter.get('/:directory', async (req, res) => {
     if (req.params.directory != 'replacementplan' && req.params.directory != 'unitplan') {
         res.json({'error': 'Invalid directory'});
         return;
     }
     const result: any = [];
-    fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory)).forEach((year: string) => {
+    const years = fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory));
+    for (let i = 0; i < years.length; i++){
+        const year = years[i];
         result.push({year: year, months: []});
         const yearIndex = result.length - 1;
-        fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory , year)).forEach((month: string) => {
+        const months = fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory , year));
+        for (let j = 0; j < months.length; j++) {
+            const month = months[j];
             result[yearIndex].months.push({month: month, days: []});
             const monthIndex = result[yearIndex].months.length - 1;
-            fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory, year, month)).forEach((day: string) => {
+            const days = fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory, year, month));
+            for (let k = 0; k < days.length; k++) {
+                const day = days[k];
                 result[yearIndex].months[monthIndex].days.push({day: day, files: []});
                 const dayIndex = result[yearIndex].months[monthIndex].days.length - 1;
                 result[yearIndex].months[monthIndex].days[dayIndex].files = fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory, year, month, day));
-            });
-        });
-    });
+                result[yearIndex].months[monthIndex].days[dayIndex].htmls = fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory, year, month, day)).filter((file: string) => file.endsWith('.html'));
+                result[yearIndex].months[monthIndex].days[dayIndex].times = [];
+                const files = result[yearIndex].months[monthIndex].days[dayIndex].htmls;
+                for (let l = 0; l < files.length; l++) {
+                    const file = files[l];
+                    const parsed = await getCurrentJson(path.resolve(process.cwd(), 'history', req.params.directory, year, month, day, file));
+                    result[yearIndex].months[monthIndex].days[dayIndex].times.push(parsed[0].updated.time);
+                }
+            }
+        }
+    }
 
     res.json(result);
 });
