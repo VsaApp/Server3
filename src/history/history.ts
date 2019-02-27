@@ -2,9 +2,58 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { parse } from 'node-html-parser';
+import { resetOldChanges, setChangesInUnitplan } from '../replacementplan/connectWithUnitplan';
 import { getCurrentJson, saveNewVersion, getFileName } from './utils';
 
 const historyRouter = express.Router();
+
+historyRouter.get('/injectedunitplan/', async (req, res) => {
+    const grade = req.body.grade;
+    const unitplanFile = req.body.unitplanFile;
+    const replacementplanFile = req.body.replacementplanFile;
+    const replacementplanVersion = req.body.today;
+
+    // Check all errors...
+    if (grade === undefined) {
+        res.json({'error': 'Grade must be set'});
+        return;
+    }
+    if (replacementplanFile === undefined && replacementplanVersion == undefined) {
+        res.json({'error': 'One of ReplacementplanFile or ReplacementplanVersion must be set!'});
+        return;
+    }
+    if (replacementplanFile !== undefined && !fs.existsSync(path.resolve(process.cwd(), 'history', 'replacementplan', replacementplanFile))) {
+        res.json({'error': 'Invalid replacementplan path'});
+        return;
+    }
+    if (unitplanFile !== undefined && !fs.existsSync(path.resolve(process.cwd(), 'history', 'unitplan', unitplanFile))) {
+        res.json({'error': 'Invalid unitplan path'});
+        return;
+    }
+
+    // Get the correct versions...
+    let unitplan: any;
+    if (unitplanFile !== undefined) {
+        const parsed = await getCurrentJson(path.resolve(process.cwd(), 'history', 'unitplan', unitplanFile));
+        unitplan = parsed.filter((i: any) => i.participant === grade)[0];
+    }
+    else unitplan = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'unitplan', grade + '.json')).toString());
+    let replacementplan: any;
+    if (replacementplanFile !== undefined) {
+        console.log(path.resolve(process.cwd(), 'history', 'replacementplan', replacementplanFile));
+        const parsed = await getCurrentJson(path.resolve(process.cwd(), 'history', 'replacementplan', replacementplanFile));
+        replacementplan = parsed.filter((i: any) => i.participant === grade)[0];
+    }
+    else replacementplan = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', replacementplanVersion ? 'today' : 'tomorrow', grade + '.json')).toString());
+
+    // Get injected unitplan...
+    resetOldChanges(unitplan);
+    console.log(grade, unitplan, replacementplan);
+    setChangesInUnitplan(grade, unitplan, replacementplan);
+
+    // Send the injected unitplan...
+    res.json(unitplan);
+});
 
 historyRouter.get('/:directory', async (req, res) => {
     if (req.params.directory != 'replacementplan' && req.params.directory != 'unitplan') {
