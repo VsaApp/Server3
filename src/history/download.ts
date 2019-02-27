@@ -33,21 +33,21 @@ const getPaths = async (url: string) => {
 export const downloadHistory = async () => {
     console.log('Download all files...');
     const startTime = new Date();
-    const directories = await getPaths('https://history.api.vsa.2bad2c0.de');
+    const directories = await getPaths('https://history.vsa.2bad2c0.de');
     for (let h = 0; h < directories.length; h++){
         console.log(`download ${directories[h]}`);
-        const years = await getPaths(`https://history.api.vsa.2bad2c0.de/${directories[h]}`);
+        const years = await getPaths(`https://history.vsa.2bad2c0.de/${directories[h]}`);
         for (let i = 0; i < years.length; i++){
             console.log(`   - download year ${years[i]}`);
-            const months = await getPaths(`https://history.api.vsa.2bad2c0.de/${directories[h]}/${years[i]}`);
+            const months = await getPaths(`https://history.vsa.2bad2c0.de/${directories[h]}/${years[i]}`);
             for (let j = 0; j < months.length; j++){
                 console.log(`      ~ download month ${months[j]}`);
-                const days = await getPaths(`https://history.api.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}`);
+                const days = await getPaths(`https://history.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}`);
                 for (let k = 0; k < days.length; k++){
                     console.log(`         -- download day ${days[k]}`);
-                    const files = await getPaths(`https://history.api.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}/${days[k]}`);
+                    const files = await getPaths(`https://history.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}/${days[k]}`);
                     for (let l = 0; l < files.length; l++){
-                        const fileName = `https://history.api.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}/${days[k]}/${files[l]}`;
+                        const fileName = `https://history.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}/${days[k]}/${files[l]}`;
                         saveNewVersion(directories[h], (await got(fileName)).body, years[i], months[j], days[k], files[l]);
                     }
                 }
