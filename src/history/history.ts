@@ -7,7 +7,8 @@ import { getCurrentJson, saveNewVersion, getFileName } from './utils';
 
 const historyRouter = express.Router();
 
-historyRouter.get('/injectedunitplan/', async (req, res) => {
+const injectedunitplan = async (req: any) => {
+    if (req.body == undefined) return {'error': 'Missing body'};
     const grade = req.body.grade;
     const unitplanFile = req.body.unitplanFile;
     const replacementplanFile = req.body.replacementplanFile;
@@ -15,20 +16,16 @@ historyRouter.get('/injectedunitplan/', async (req, res) => {
 
     // Check all errors...
     if (grade === undefined) {
-        res.json({'error': 'Grade must be set'});
-        return;
+        return {'error': 'Grade must be set'};
     }
     if (replacementplanFile === undefined && replacementplanVersion == undefined) {
-        res.json({'error': 'One of ReplacementplanFile or ReplacementplanVersion must be set!'});
-        return;
+        return {'error': 'One of ReplacementplanFile or ReplacementplanVersion must be set!'};
     }
     if (replacementplanFile !== undefined && !fs.existsSync(path.resolve(process.cwd(), 'history', 'replacementplan', replacementplanFile))) {
-        res.json({'error': 'Invalid replacementplan path'});
-        return;
+        return {'error': 'Invalid replacementplan path'};
     }
     if (unitplanFile !== undefined && !fs.existsSync(path.resolve(process.cwd(), 'history', 'unitplan', unitplanFile))) {
-        res.json({'error': 'Invalid unitplan path'});
-        return;
+        return {'error': 'Invalid unitplan path'};
     }
 
     // Get the correct versions...
@@ -52,10 +49,18 @@ historyRouter.get('/injectedunitplan/', async (req, res) => {
     setChangesInUnitplan(grade, unitplan, replacementplan);
 
     // Send the injected unitplan...
-    res.json(unitplan);
+    return unitplan;
+}
+
+historyRouter.post('/injectedunitplan/', async (req, res) => {
+    res.json(await injectedunitplan(req));
 });
 
 historyRouter.get('/:directory', async (req, res) => {
+    if (req.params.directory == 'injectedunitplan'){
+        res.json(await injectedunitplan(req));
+        return;
+    }
     if (req.params.directory != 'replacementplan' && req.params.directory != 'unitplan') {
         res.json({'error': 'Invalid directory'});
         return;
