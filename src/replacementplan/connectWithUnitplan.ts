@@ -2,6 +2,16 @@ import fs from 'fs';
 import path from 'path';
 import {weekdayToInt} from './utils';
 
+const getDate = (updated: any): Date => {
+    return new Date(
+        parseInt(updated.date.split('.')[2]) + 2000,
+        parseInt(updated.date.split('.')[1]) - 1,
+        parseInt(updated.date.split('.')[0]),
+        parseInt(updated.time.split(':')[0]),
+        parseInt(updated.time.split(':')[1])
+    );
+}
+
 export const getInjectedUnitplan = (grade: string) => {
     const unitplan = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'unitplan', grade + '.json')).toString());
     let replacementplan1: any = {};
@@ -20,22 +30,31 @@ export const getInjectedUnitplan = (grade: string) => {
     resetOldChanges(unitplan);
     if (replacementplan1.for !== undefined && replacementplan2.for !== undefined && replacementplan1.for.date === replacementplan2.for.date) {
         const updated1 = replacementplan1.updated;
-        const date1 = new Date(
-            parseInt(updated1.date.split('.')[2]) + 2000,
-            parseInt(updated1.date.split('.')[1]) - 1,
-            parseInt(updated1.date.split('.')[0]),
-            parseInt(updated1.time.split(':')[0]),
-            parseInt(updated1.time.split(':')[1])
-        );
+        const date1 = getDate(updated1);
         const updated2 = replacementplan1.updated;
-        const date2 = new Date(
-            parseInt(updated2.date.split('.')[2]) + 2000,
-            parseInt(updated2.date.split('.')[1]) - 1,
-            parseInt(updated2.date.split('.')[0]),
-            parseInt(updated2.time.split(':')[0]),
-            parseInt(updated2.time.split(':')[1])
-        );
+        const date2 = getDate(updated2);
         setChangesInUnitplan(grade, unitplan, date1.getTime() > date2.getTime() ? replacementplan1 : replacementplan2);
+    }
+    else if (replacementplan1.for !== undefined && replacementplan2.for !== undefined && replacementplan1.for.weekday === replacementplan2.for.weekday) {
+        const for1 = replacementplan1.for;
+        const date1 = new Date(
+            parseInt(for1.date.split('.')[2]),
+            parseInt(for1.date.split('.')[1]) - 1,
+            parseInt(for1.date.split('.')[0])
+        );
+        const for2 = replacementplan2.for;
+        const date2 = new Date(
+            parseInt(for2.date.split('.')[2]),
+            parseInt(for2.date.split('.')[1]) - 1,
+            parseInt(for2.date.split('.')[0])
+        );
+        const current = new Date();
+        const today = new Date(
+            current.getFullYear(),
+            current.getMonth(),
+            current.getDate(),
+        );
+        setChangesInUnitplan(grade, unitplan, date1.getTime() < date2.getTime() ? (date1.getTime() >= today.getTime() ? replacementplan1 : replacementplan2) : (date2.getTime() >= today.getTime() ? replacementplan2 : replacementplan1));
     } else {
         setChangesInUnitplan(grade, unitplan, replacementplan1);
         setChangesInUnitplan(grade, unitplan, replacementplan2);
