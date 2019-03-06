@@ -33,22 +33,22 @@ const getPaths = async (url: string) => {
 export const downloadHistory = async () => {
     console.log('Download all files...');
     const startTime = new Date();
-    const directories = await getPaths('https://history.vsa.2bad2c0.de');
+    const directories = ["replacementplan", "unitplan"];
     for (let h = 0; h < directories.length; h++){
         console.log(`download ${directories[h]}`);
-        const years = await getPaths(`https://history.vsa.2bad2c0.de/${directories[h]}`);
+        const years = await getPaths(`https://history.api.vsa.2bad2c0.de/${directories[h]}`);
         for (let i = 0; i < years.length; i++){
-            console.log(`   - download year ${years[i]}`);
-            const months = await getPaths(`https://history.vsa.2bad2c0.de/${directories[h]}/${years[i]}`);
+            console.log(`   - download year ${years[i].year}`);
+            const months = years[i].months;
             for (let j = 0; j < months.length; j++){
-                console.log(`      ~ download month ${months[j]}`);
-                const days = await getPaths(`https://history.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}`);
+                console.log(`      ~ download month ${months[j].month}`);
+                const days = months[j].days;
                 for (let k = 0; k < days.length; k++){
-                    console.log(`         -- download day ${days[k]}`);
-                    const files = await getPaths(`https://history.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}/${days[k]}`);
+                    console.log(`         -- download day ${days[k].day}`);
+                    const files = days[k].files;
                     for (let l = 0; l < files.length; l++){
-                        const fileName = `https://history.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}/${days[k]}/${files[l]}`;
-                        saveNewVersion(directories[h], (await got(fileName)).body, years[i], months[j], days[k], files[l]);
+                        const fileName = `https://history.vsa.2bad2c0.de/${directories[h]}/${years[i].year}/${months[j].month}/${days[k].day}/${files[l]}`;
+                        saveNewVersion(directories[h], (await got(fileName)).body, years[i].year, months[j].month, days[k].day, files[l]);
                     }
                 }
             }
