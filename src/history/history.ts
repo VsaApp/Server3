@@ -9,7 +9,7 @@ const historyRouter = express.Router();
 
 const injectedunitplan = async (req: any) => {
     if (req.body == undefined) return {'error': 'Missing body'};
-    const grade = req.body.grade;
+    const grade = req.params.grade;
     const unitplanFile = req.body.unitplanFile;
     const replacementplanFile = req.body.replacementplanFile;
     const replacementplanVersion = req.body.today;
@@ -52,15 +52,11 @@ const injectedunitplan = async (req: any) => {
     return unitplan;
 }
 
-historyRouter.post('/injectedunitplan/', async (req, res) => {
+historyRouter.post('/injectedunitplan/:grade', async (req, res) => {
     res.json(await injectedunitplan(req));
 });
 
 historyRouter.get('/:directory', async (req, res) => {
-    if (req.params.directory == 'injectedunitplan'){
-        res.json(await injectedunitplan(req));
-        return;
-    }
     if (req.params.directory != 'replacementplan' && req.params.directory != 'unitplan') {
         res.json({'error': 'Invalid directory'});
         return;
