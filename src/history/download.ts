@@ -21,13 +21,8 @@ const saveNewVersion = (directoriy: string, data: any, year: string, month: stri
     fs.writeFileSync(path.resolve(process.cwd(), 'history', directoriy, year, month, day, fileName), data);
 };
 
-const getPaths = async (url: string) => {
-    const raw = (await got(url)).body;
-    const paths: any = [];
-    raw.split('<a href="').filter((fragment: string, index: number) => {
-        if (!fragment.startsWith('..') && fragment.includes('</a>')) paths.push(fragment.split('>')[1].split('<')[0].replace('/', ''));
-    });
-    return paths;
+const getJson = async (url: string) => {
+    return JSON.parse((await got(url)).body)
 }
 
 export const downloadHistory = async () => {
@@ -36,7 +31,7 @@ export const downloadHistory = async () => {
     const directories = ["replacementplan", "unitplan"];
     for (let h = 0; h < directories.length; h++){
         console.log(`download ${directories[h]}`);
-        const years = await getPaths(`https://history.api.vsa.2bad2c0.de/${directories[h]}`);
+        const years = await getJson(`https://history.api.vsa.2bad2c0.de/${directories[h]}`);
         for (let i = 0; i < years.length; i++){
             console.log(`   - download year ${years[i].year}`);
             const months = years[i].months;

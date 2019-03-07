@@ -1,11 +1,14 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import fs from 'fs';
 import path from 'path';
 import { parse } from 'node-html-parser';
 import { resetOldChanges, setChangesInUnitplan } from '../replacementplan/connectWithUnitplan';
 import { getCurrentJson, saveNewVersion, getFileName } from './utils';
+import { print } from 'util';
 
 const historyRouter = express.Router();
+historyRouter.use(bodyParser.json());
 
 const injectedunitplan = async (req: any) => {
     if (req.body == undefined) return {'error': 'Missing body'};
@@ -77,10 +80,16 @@ historyRouter.get('/:directory', async (req, res) => {
                 const day = days[k];
                 result[yearIndex].months[monthIndex].days.push({day: day, files: []});
                 const dayIndex = result[yearIndex].months[monthIndex].days.length - 1;
-                result[yearIndex].months[monthIndex].days[dayIndex].files = fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory, year, month, day));
-                result[yearIndex].months[monthIndex].days[dayIndex].htmls = fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory, year, month, day)).filter((file: string) => file.endsWith('.html'));
+                const files = fs.readdirSync(path.resolve(process.cwd(), 'history', req.params.directory, year, month, day)).filter((file: string) => file.endsWith('.html'));
+                for (let l = files.length - 1; l >= 0; l--) {
+                    if (l > 0) {
+                        const fileName1 = path.resolve(process.cwd(), 'history', req.params.directory, year, month, day, files[l]);
+                        const fileName2 = path.resolve(process.cwd(), 'history', req.params.directory, year, month, day, files[l - 1]);
+                        if (fs.readFileSync(fileName1).toString() === fs.readFileSync(fileName2).toString()) files.splice(l, 1);
+                    }
+                }
+                result[yearIndex].months[monthIndex].days[dayIndex].files = files;
                 result[yearIndex].months[monthIndex].days[dayIndex].times = [];
-                const files = result[yearIndex].months[monthIndex].days[dayIndex].htmls;
                 for (let l = 0; l < files.length; l++) {
                     const file = files[l];
                     const parsed = await getCurrentJson(path.resolve(process.cwd(), 'history', req.params.directory, year, month, day, file));
@@ -89,7 +98,6 @@ historyRouter.get('/:directory', async (req, res) => {
             }
         }
     }
-
     res.json(result);
 });
 
