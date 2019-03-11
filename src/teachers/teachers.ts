@@ -18,7 +18,7 @@ const fetchData = (file: string) => {
             cookieJar, body: form
         });
         const stream = fs.createWriteStream(file);
-        got.stream('https://viktoriaschule-aachen.de/dokumente/upload/d7716_Lehrer_F%C3%A4cher_20190213.pdf', {
+        got.stream('https://viktoriaschule-aachen.de/dokumente/upload/3058d_Lehrer_Fakultenliste_20190307.pdf', {
             auth: config.username + ':' + config.password,
             cookieJar
         }).pipe(stream);
