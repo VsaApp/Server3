@@ -202,7 +202,19 @@ export const sendNotifications = async (isDev: Boolean) => {
     }
 }
 
-const contactWeeks = (dataA: any, dataB: any) => {
+const getFreeLesson = (week: string, block: string) => {
+    return {
+        block: block,
+        participant: '',
+        subject: 'Freistunde',
+        room: '',
+        course: '',
+        changes: [],
+        week: week
+    }
+}
+
+const concatWeeks = (dataA: any, dataB: any) => {
     const unitplan: any = [];
     dataA.forEach((gradeA: any, index: number) => {
         const gradeB = dataB[index];
@@ -223,6 +235,7 @@ const contactWeeks = (dataA: any, dataB: any) => {
                 const key = j.toString();
                 let lessonA: any;
                 let lessonB: any;
+                const addFreeLesson = [false, false];
                 if (Object.keys(gradeA.data[i].lessons).length > j) lessonA = gradeA.data[i].lessons[key];
                 if (Object.keys(gradeB.data[i].lessons).length > j) lessonB = gradeB.data[i].lessons[key];
 
@@ -230,9 +243,11 @@ const contactWeeks = (dataA: any, dataB: any) => {
                 if (lessonA === undefined && lessonB !== undefined) {
                     grade.data[i].lessons[key] = lessonB;
                     grade.data[i].lessons[key].forEach((subject: any) => subject.week = 'B');
+                    if (key !== '5') addFreeLesson[0] = true;
                 } else if (lessonA !== undefined && lessonB === undefined) {
                     grade.data[i].lessons[key] = lessonA;
                     grade.data[i].lessons[key].forEach((subject: any) => subject.week = 'A');
+                    if (key !== '5') addFreeLesson[1] = true;
                 } else {
                     grade.data[i].lessons[key] = [];
                     const listShort = lessonA.length >= lessonB.length ? lessonB : lessonA;
@@ -252,16 +267,21 @@ const contactWeeks = (dataA: any, dataB: any) => {
                         }
                         if (!found) {
                             subject1.week = lessonA.length >= lessonB.length ? 'A' : 'B';
+                            addFreeLesson[subject1.week == 'B' ?  0 : 1] = true;
                             grade.data[i].lessons[key].push(subject1);
                         }
                     }
                     if (listShort.length > 0) {
                         listShort.forEach((subject: any) => {
                             subject.week = lessonA.length >= lessonB.length ? 'B' : 'A';
+                            addFreeLesson[subject.week == 'B' ?  0 : 1] = true;
                             grade.data[i].lessons[key].push(subject);
                         });
                     }
                 }
+                addFreeLesson.forEach((j, index) => {
+                    if (j) grade.data[i].lessons[key].push(getFreeLesson(index == 0 ? 'A' : 'B', grade.data[i].lessons[key][0].block));
+                });
             }
         }
 
@@ -282,7 +302,7 @@ const contactWeeks = (dataA: any, dataB: any) => {
         saveNewUnitplan(rawA, rawB, []);
         const unitplanA = await extractData(dataA);
         const unitplanB = await extractData(dataB);
-        const unitplan = contactWeeks(unitplanA, unitplanB);
+        const unitplan = concatWeeks(unitplanA, unitplanB);
         console.log('Extracted unit plan');
         unitplan.forEach((data: any) => {
             fs.writeFileSync(path.resolve(process.cwd(), 'out', 'unitplan', data.participant + '.json'), JSON.stringify(data, null, 2));
