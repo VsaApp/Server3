@@ -31,7 +31,7 @@ export const getInjectedUnitplan = (grade: string) => {
     if (replacementplan1.for !== undefined && replacementplan2.for !== undefined && replacementplan1.for.date === replacementplan2.for.date) {
         const updated1 = replacementplan1.updated;
         const date1 = getDate(updated1);
-        const updated2 = replacementplan1.updated;
+        const updated2 = replacementplan2.updated;
         const date2 = getDate(updated2);
         setChangesInUnitplan(grade, unitplan, date1.getTime() > date2.getTime() ? replacementplan1 : replacementplan2);
     }
