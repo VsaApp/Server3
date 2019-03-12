@@ -28,6 +28,7 @@ export const sendNotifications = async (isDev: Boolean, today: Boolean, data: an
         console.log('Sending notifications to ' + devices.length + ' devices');
         devices.forEach(async (device: any) => {
             try {
+                console.log(unitplans[device.tags.grade]);
                 const changes = changesForUserID(device, unitplans[device.tags.grade], weekdayToInt(replacementplan1[0].for.weekday));
                 let text = '';
                 changes.forEach((change: any) => {
