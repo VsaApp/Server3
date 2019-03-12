@@ -5,10 +5,13 @@ import {fetchData, isNew, parseData, saveData} from './utils';
 import {extractData} from './createReplacementplan';
 import {getInjectedUnitplan} from './connectWithUnitplan';
 import {sendNotifications} from './notifications';
+import '../../downloadMyTags';
+import downloadTags from '../../downloadMyTags';
 
 const isCli = module.parent === null;
-const isDev = process.argv.length === 3;
-const isTest = process.argv.length === 4;
+const isDev = process.argv.length >= 3;
+const isTest = process.argv.length === 4 && process.argv[3] == '--test';
+const updateTags = process.argv.length === 4 && process.argv[3] == '--update';
 
 export const getJson = async (raw: string) => {
     return await extractData(await parseData(raw));
@@ -54,7 +57,12 @@ const doWork = async (today: boolean) => {
     }
 };
 
-if (!isTest && isCli) {
-    doWork(true);
-    doWork(false);
+const work = async () => {
+    if (updateTags) await downloadTags();
+    if (!isTest && isCli) {
+        doWork(true);
+        doWork(false);
+    }
 }
+
+work();
