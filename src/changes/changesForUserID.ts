@@ -41,9 +41,56 @@ const getSelectedSubject = (subjects: any, unit: number, selected: string, week:
     else return subject[0];
 }
 
-const isMyExam = (unitplan: any, exam: any) => {
-    //TODO: Write Exam filter...
-    return 0;
+const isMyExam = (device: any, unitplan: any, exam: any) => {
+    if (exam.rewriteExam) return -1;
+    if (!device.exams[exam.subject]) return 0;
+
+    const courseCount: any = {};
+    let selected = 0;
+    let containsLK = false;
+    let count = 0;
+    for (let i = 0; i < unitplan.length; i++) {
+      const day = unitplan[i];
+      for (let j = 0; j < Object.keys(day.lessons).length; j++) {
+        const subjects = day.lessons[Object.keys(day.lessons)[j]];
+        const _selected = getSelectedSubject(subjects, j, 
+            device.unitplan[(subjects[0].block !== '' ? subjects[0].block : `${i}-${j}`)],
+            'A'
+        );
+        for (let k = 0; k < subjects.length; k++) {
+          const subject = subjects[k];
+          if ((subject.subject === exam.subject &&
+                  subject.course === exam.course) ||
+              (subject.course.length === 0 &&
+                  subject.subject === exam.subject &&
+                  subject.participant === exam.participant)) {
+            containsLK = containsLK || subject.course.toLowerCase().includes('lk') || exam.course.toLowerCase().includes('lk');
+            count++;
+            if (courseCount[subject.course] === undefined) courseCount[subject.course] = [0, 1];
+            else courseCount[subject.course][1]++;
+            if (subject === _selected) {
+              selected++;
+              courseCount[subject.course][0]++;
+            }
+          }
+        }
+      }
+    }
+
+    if (selected === 0) return 0;
+    if (selected >= count - 1) return 1;
+    for (let i = 0; i < Object.keys(courseCount).length; i++) {
+      const key = Object.keys(courseCount)[i];
+      if (key === exam.course) {
+        if (courseCount[key][0] > 0) return 1;
+      }
+    }
+    if (courseCount[''] !== undefined) {
+      if (courseCount[''][0] >= courseCount[''][1] - 1) return 1;
+      if (courseCount[''][1] > 3) return -1;
+      if (courseCount[''][0] >= 1) return 1;
+      return 0;
+    } else return 0;
 }
 
 const changesForUserID = (_device: any, unitplan: any, weekday: number): any[] => {
@@ -74,8 +121,8 @@ const changesForUserID = (_device: any, unitplan: any, weekday: number): any[] =
                     let isMy = -1;
                     if (Object.keys(device.unitplan).indexOf(identifier) >= 0) {
                         if (subject === getSelectedSubject(subjects, parseInt(unit), device.unitplan[identifier], day.replacementplan.for.weektype)) {
-                            if (change.exam && !change.rewriteExam && !device.exams[change.change.subject]) {
-                                isMy = isMyExam(unitplan, change);
+                            if (change.exam) {
+                                isMy = isMyExam(device, unitplan.data, change);
                             }
                             else if (!change.sure) isMy = -1;
                             else isMy = 1;
