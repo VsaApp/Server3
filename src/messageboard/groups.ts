@@ -3,7 +3,7 @@ import db from './db';
 import got from 'got';
 import config from '../config';
 import crypto from 'crypto';
-import {getDevicesWithTag, getTags} from '../tags/users';
+import {getDevicesWithTag} from '../tags/users';
 import {getDevices} from '../replacementplan/notifications';
 import {updateApp} from '../update_app';
 
@@ -310,7 +310,7 @@ groupsRouter.get('/delete/:username/:password', (req, res) => {
 const updateFollowers = async () => {
     let devices: any = JSON.parse(await getDevices());
     devices = devices.players.map((device: any) => {
-        const tags = getTags(device.id);
+        const tags = device.tags;
         return Object.keys(tags)
             .filter(key => key.startsWith('messageboard'))
             .reduce((obj: any, key) => {

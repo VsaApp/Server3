@@ -52,7 +52,7 @@ export const sendNotifications = async (isDev: Boolean, today: Boolean, data: an
                 const weekday = replacementplan1[0].for.weekday;
                 const dataString = {
                         app_id: config.appId,
-                        include_player_ids: [device.id],
+                        include_player_ids: [device.tags.onesignalId],
                         android_group: weekday.toString(),
                         contents: {
                             de: text,

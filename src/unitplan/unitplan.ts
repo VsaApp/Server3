@@ -154,7 +154,7 @@ export const sendNotifications = async (isDev: Boolean) => {
             try {
                 const dataString = {
                         app_id: config.appId,
-                        include_player_ids: [device.id],
+                        include_player_ids: [device.tags.onesignalId],
                         android_group: 'unitplan',
                         contents: {
                             de: 'Es gibt einen neuen Stundenplan',

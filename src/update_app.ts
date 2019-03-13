@@ -4,7 +4,7 @@ import {getUsers} from "./tags/users";
 
 export const updateApp = async (segment: string, data: any, dev?: Boolean) => {
     if (!dev) dev = false;
-    const ids = getUsers().filter((device: any) => !dev || device.tags.dev).map((device: any) => device.id);
+    const ids = getUsers().filter((device: any) => !dev || device.tags.dev).map((device: any) => device.tags.onesignalId);
     const dataString = {
         app_id: config.appId,
         include_player_ids: ids,
