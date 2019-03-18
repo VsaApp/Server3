@@ -112,6 +112,13 @@ export const setChangesInUnitplan = (grade: string, unitplan: any, replacementpl
             }
         };
 
+        replacementplan.unparsed.forEach((change: any) => {
+            const subjects = unitplan.data[weekdayToInt(replacementplan.for.weekday)].lessons[change.unit];
+            if (subjects !== undefined) {
+                subjects.forEach((subject: any) => subject.push(change));
+            };
+        });
+
         // Add new replacementplan changes
         replacementplan.data.forEach((change: any) => {
             // Get normal subjects in the lesson of the change
