@@ -253,7 +253,7 @@ export const extractData = async (data: any) => {
                                                         d.push({
                                                             unit: unit,
                                                             subject: original[k].split(' ')[2],
-                                                            course: original[k].split(' ')[3],
+                                                            course: original[k].split(' ')[3] || '',
                                                             room: '',
                                                             participant: original[k].split(' ')[1],
                                                             change: {

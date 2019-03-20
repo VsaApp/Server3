@@ -2,7 +2,7 @@ import db from './db';
 import {getUser} from './tags';
 
 export const getUsers = () => {
-    const devices = db.get('devices').filter((user: any) => user.id !== "null");
+    const devices = db.get('users').filter((user: any) => user.id !== "null");
     const users = db.get('users').filter((user: any) => user.id !== "null").map((user: any) => {
         return {"id": "123", "tags": Object.assign({"onesignalId": user.id}, user.tags)};
     });

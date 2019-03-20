@@ -102,7 +102,6 @@ const changesForUserID = (_device: any, unitplan: any, weekday: number): any[] =
     Object.keys(_device.tags).filter(key => key.startsWith('unitPlan')).forEach(key => {
         unitplanTags[key.split(_device.tags.grade + '-')[1]] = getUnitPlanTag(key, _device, unitplan.data);
     });
-    console.log(unitplanTags);
     const device = {
         id: _device.id,
         grade: _device.tags.grade,

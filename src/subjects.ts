@@ -32,6 +32,7 @@ export const subjects: any = {
     NW: 'NW',
     ORI: 'Ori',
     OR: 'Ori',
+    POW: 'PoWi',
     POWI: 'PoWi',
     PO: 'PoWi',
     PJD: 'Projektkurs Deutsch',
