@@ -259,7 +259,7 @@ const extractData = async (data: any) => {
                     line = line.split(': ')[1];
                     const day = line.split(' ')[1].replace('.', '');
                     const month = line.split(' ')[2];
-                    const year = line.split(' ')[3];
+                    const year = line.split(' ')[3].replace('.', '');
                     out.data.push({
                         name: description,
                         info: '',

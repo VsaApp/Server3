@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts" line="60" />
-    <bookmark url="file://$PROJECT_DIR$/src/replacementplan/connectWithUnitplan.ts" line="20" />
+    <bookmark url="file://$PROJECT_DIR$/src/replacementplan/replacementplan.ts" line="66" />
+    <bookmark url="file://$PROJECT_DIR$/src/replacementplan/connectWithUnitplan.ts" line="30" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4d3783b-a945-48d2-856f-8c33d2b55b9c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rooms.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/rooms.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/subjects.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/subjects.ts" afterDir="false" />
-    </list>
+    <list default="true" id="c4d3783b-a945-48d2-856f-8c33d2b55b9c" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -137,11 +133,6 @@
               <item name="Server3" type="b2602c69:ProjectViewProjectNode" />
               <item name="Server3" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="Server3" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Server3" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -210,6 +201,7 @@
       <workItem from="1549965672057" duration="294000" />
       <workItem from="1549973043429" duration="2808000" />
       <workItem from="1551111446478" duration="900000" />
+      <workItem from="1552581249567" duration="614000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed participants in unit plan">
       <created>1544305079874</created>
@@ -257,7 +249,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="63465000" />
+    <option name="totallyTimeSpent" value="64079000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1" y="25" width="1282" height="776" extended-state="6" />
