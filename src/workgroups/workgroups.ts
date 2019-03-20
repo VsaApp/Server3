@@ -14,7 +14,7 @@ const pdf_table_extractor = require('pdf-table-extractor');
 const fetchData = (file: string) => {
     return new Promise((async resolve => {
         const stream = fs.createWriteStream(file);
-        got.stream('https://viktoriaschule-aachen.de/dokumente/upload/80459_AG_Zeiten_Schuljahr_2018_2019_Stand_20180927.pdf').pipe(stream);
+        got.stream('https://viktoriaschule-aachen.de/dokumente/upload/8ccbc_AG_Zeiten_Schuljahr_2018_2019_Stand_20190319.pdf').pipe(stream);
         stream.on('finish', resolve);
     }));
 };
