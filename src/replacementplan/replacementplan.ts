@@ -6,7 +6,9 @@ import {extractData} from './createReplacementplan';
 import {getInjectedUnitplan} from './connectWithUnitplan';
 import {sendNotifications} from './notifications';
 import '../../downloadMyTags';
+import {initFirebase} from '../firebase';
 import downloadTags from '../../downloadMyTags';
+import { print } from 'util';
 
 const isCli = module.parent === null;
 const isDev = process.argv.length >= 3;
@@ -60,6 +62,7 @@ const doWork = async (today: boolean) => {
 const work = async () => {
     if (updateTags) await downloadTags();
     if (!isTest && isCli) {
+        await initFirebase();
         doWork(true);
         doWork(false);
     }

@@ -4,6 +4,8 @@ import changesForUserID from '../changes/changesForUserID';
 import {getUsers} from '../tags/users';
 import {weekdayToInt} from './utils';
 import {updateApp} from '../update_app';
+import '../notification';
+import {sendNotification} from '../notification';
 
 export const getDevices = async () => {
     let url = 'https://onesignal.com/api/v1/players?app_id=' + config.appId;
@@ -49,55 +51,29 @@ export const sendNotifications = async (isDev: Boolean, today: Boolean, data: an
                     text = 'Es gibt keine Änderungen';
                 }
                 const weekday = replacementplan1[0].for.weekday;
-                const dataString = {
-                        app_id: config.appId,
-                        include_player_ids: [device.tags.onesignalId],
-                        android_group: weekday.toString(),
-                        contents: {
-                            de: text,
-                            en: text
-                        },
-                        headings: {
-                            de: weekday,
-                            en: weekday
-                        },
-                        data: {
-                            type: 'replacementplan'
-                        }
+                await sendNotification({
+                    devices: [device],
+                    group: weekday.toString(),
+                    text: text,
+                    title: weekday,
+                    data: {
+                        type: 'replacementplan'
                     }
-                ;
-                let url = 'https://onesignal.com/api/v1/notifications';
-                try {
-                    const response = await got.post(
-                        url,
-                        {
-                            headers: {
-                                'Content-Type': 'application/json; charset=utf-8',
-                                'Authorization': 'Basic ' + config.appAuthKey
-                            },
-                            body: JSON.stringify(dataString)
-                        });
-                    if (JSON.parse(response.body).errors !== undefined) {
-                        if (JSON.parse(response.body).errors[0] === 'All included players are not subscribed') {
-                            return;
-                        }
-                    }
-                    console.log(response.body);
-                } catch (response) {
-                    console.log(response);
-                }
+                });
             } catch (e) {
                 console.error('Cannot send notification to device: ', device, e);
             }
         });
+        
         const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).replace('-Klassen-Vertretungsplan für ', '').replace('Januar', 'January').replace('Februar', 'February').replace('März', 'March').replace('Mai', 'May').replace('Juni', 'June').replace('Juli', 'July').replace('Oktober', 'October').replace('Dezember', 'December');
         const weekday = dateStr.split(', ')[0];
-        updateApp('All', {
+        await updateApp('All', {
             'type': 'replacementplan',
             'action': 'update',
             'day': (today ? 'today' : 'tomorrow'),
             'weekday': weekday
         }, isDev);
+        
     } catch (e) {
         console.error('Failed to send notifications', e);
     }

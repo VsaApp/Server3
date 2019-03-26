@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import {getDevicesWithTag} from '../tags/users';
 import {getDevices} from '../replacementplan/notifications';
 import {updateApp} from '../update_app';
+import {sendNotification} from '../notification';
 
 const groupsRouter = express.Router();
 const nodemailer = require('nodemailer');
@@ -89,50 +90,16 @@ groupsRouter.get('/activate/:id', async (req, res) => {
 
     const devices = getDevicesWithTag('messageboard-' + group.username.replace(/ /g, '-'), true);
     if (devices.length > 0) {
-        const dataString = {
-            app_id: config.appId,
-            include_player_ids: devices,
-            android_group: 'messageboard-' + group.username,
-            android_group_message: {
-                de: '$[notif_count] Gruppenbestätigungen',
-                en: '$[notif_count] Gruppenbestätigungen',
-            },
-            android_led_color: 'ff5bc638',
-            android_accent_color: 'ff5bc638',
-            contents: {
-                de: 'Die Gruppe "' + group.username + '" wurde aktiviert!',
-                en: 'Die Gruppe "' + group.username + '" wurde aktiviert!',
-            },
-            headings: {
-                de: 'Schwarzes Brett',
-                en: 'Schwarzes Brett'
-            },
+        sendNotification({
+            devices: devices,
+            group: 'messageboard-' + group.username,
+            title: 'Schwarzes Brett',
+            text: 'Die Gruppe "' + group.username + '" wurde aktiviert!',
             data: {
                 type: 'messageboard-confirm',
                 group: req.params.username
             }
-        };
-
-        let url = 'https://onesignal.com/api/v1/notifications';
-        const response = await got.post(
-            url,
-            {
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8',
-                    'Authorization': 'Basic ' + config.appAuthKey
-                },
-                body: JSON.stringify(dataString)
-            });
-        if (response.statusCode === 200) {
-            if (JSON.parse(response.body).errors !== undefined) {
-                if (JSON.parse(response.body).errors[0] === 'All included players are not subscribed') {
-                    return;
-                }
-            }
-            console.log(response.body);
-        } else {
-            console.log(response.body);
-        }
+        });
     }
 
     updateApp('ALL', {'type': 'messageboard-group', 'action': 'activate', 'group': group.username});
@@ -154,50 +121,16 @@ groupsRouter.get('/block/:id', async (req, res) => {
 
     const devices = getDevicesWithTag('messageboard-' + group.username.replace(/ /g, '-'), true);
     if (devices.length > 0) {
-        const dataString = {
-            app_id: config.appId,
-            include_player_ids: devices,
-            android_group: 'messageboard-' + group.username,
-            android_group_message: {
-                de: '$[notif_count] Gruppenbestätigungen',
-                en: '$[notif_count] Gruppenbestätigungen',
-            },
-            android_led_color: 'ff5bc638',
-            android_accent_color: 'ff5bc638',
-            contents: {
-                de: 'Die Gruppe "' + group.username + '" wurde blockiert!',
-                en: 'Die Gruppe "' + group.username + '" wurde blockiert!',
-            },
-            headings: {
-                de: 'Schwarzes Brett',
-                en: 'Schwarzes Brett'
-            },
+        sendNotification({
+            devices: devices,
+            group: 'messageboard-' + group.username,
+            title: 'Schwarzes Brett',
+            text: 'Die Gruppe "' + group.username + '" wurde blockiert!',
             data: {
                 type: 'messageboard-confirm',
                 group: req.params.username
             }
-        };
-
-        let url = 'https://onesignal.com/api/v1/notifications';
-        const response = await got.post(
-            url,
-            {
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8',
-                    'Authorization': 'Basic ' + config.appAuthKey
-                },
-                body: JSON.stringify(dataString)
-            });
-        if (response.statusCode === 200) {
-            if (JSON.parse(response.body).errors !== undefined) {
-                if (JSON.parse(response.body).errors[0] === 'All included players are not subscribed') {
-                    return;
-                }
-            }
-            console.log(response.body);
-        } else {
-            console.log(response.body);
-        }
+        });
     }
 
     updateApp('ALL', {'type': 'messageboard-group', 'action': 'block', 'group': group.username});

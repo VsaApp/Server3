@@ -5,6 +5,7 @@ import db from './db';
 import config from '../config';
 import {updateApp} from '../update_app';
 import {getDevicesWithTag} from '../tags/users';
+import {sendNotification} from '../notification';
 
 const postsRouter = express.Router();
 postsRouter.post('/add/:username/:password', async (req, res) => {
@@ -45,50 +46,16 @@ postsRouter.post('/add/:username/:password', async (req, res) => {
     res.json({ error: null, id, time });
     const devices = getDevicesWithTag('messageboard-' + req.params.username.replace(/ /g, '-'), true);
     if (devices.length > 0) {
-        const dataString = {
-            app_id: config.appId,
-            include_player_ids: devices,
-            android_group: 'messageboard',
-            android_group_message: {
-                de: '$[notif_count] neue Mitteilungen auf dem schwarzen Brett',
-                en: '$[notif_count] neue Mitteilungen auf dem schwarzen Brett',
-            },
-            android_led_color: 'ff5bc638',
-            android_accent_color: 'ff5bc638',
-            contents: {
-                de: req.body.title,
-                en: req.body.title
-            },
-            headings: {
-                de: req.params.username,
-                en: req.params.username
-            },
+        sendNotification({
+            devices: devices,
+            group: 'messageboard',
+            title: req.params.username,
+            text: req.body.title,
             data: {
                 type: 'messageboard',
                 group: req.params.username
             }
-        }
-            ;
-        let url = 'https://onesignal.com/api/v1/notifications';
-        const response = await got.post(
-            url,
-            {
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8',
-                    'Authorization': 'Basic ' + config.appAuthKey
-                },
-                body: JSON.stringify(dataString)
-            });
-        if (response.statusCode === 200) {
-            if (JSON.parse(response.body).errors !== undefined) {
-                if (JSON.parse(response.body).errors[0] === 'All included players are not subscribed') {
-                    return;
-                }
-            }
-            console.log(response.body);
-        } else {
-            console.log(response.body);
-        }
+        });
     }
 
     updateApp('ALL', {'type': 'messageboard-post', 'action': 'add', 'group': req.params.username});
