@@ -21,8 +21,11 @@ const isNew = (data: any) => {
         old = fs.readFileSync(file, 'utf-8').toString();
     }
     let n = data.querySelectorAll('div')[0].childNodes[0].rawText;
-    fs.writeFileSync(file, n);
-    return old !== n;
+    if (old !== n) {
+        fs.writeFileSync(file, n);
+        return true;
+    }
+    return false;
 };
 
 const fetchData = async (weekA = true) => {
@@ -200,7 +203,7 @@ export const sendNotifications = async (isDev: Boolean) => {
     } catch (e) {
         console.error('Failed to send notifications', e);
     }
-}
+};
 
 const getFreeLesson = (week: string, block: string) => {
     return {
@@ -212,7 +215,7 @@ const getFreeLesson = (week: string, block: string) => {
         changes: [],
         week: week
     }
-}
+};
 
 const concatWeeks = (dataA: any, dataB: any) => {
     const unitplan: any = [];
@@ -267,14 +270,14 @@ const concatWeeks = (dataA: any, dataB: any) => {
                         }
                         if (!found) {
                             subject1.week = lessonA.length >= lessonB.length ? 'A' : 'B';
-                            addFreeLesson[subject1.week == 'B' ?  0 : 1] = true;
+                            addFreeLesson[subject1.week == 'B' ? 0 : 1] = true;
                             grade.data[i].lessons[key].push(subject1);
                         }
                     }
                     if (listShort.length > 0) {
                         listShort.forEach((subject: any) => {
                             subject.week = lessonA.length >= lessonB.length ? 'B' : 'A';
-                            addFreeLesson[subject.week == 'B' ?  0 : 1] = true;
+                            addFreeLesson[subject.week == 'B' ? 0 : 1] = true;
                             grade.data[i].lessons[key].push(subject);
                         });
                     }

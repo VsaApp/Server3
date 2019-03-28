@@ -11,10 +11,25 @@ const pdf_table_extractor = require('pdf-table-extractor');
     return this;
 };
 
+const url = 'https://viktoriaschule-aachen.de/dokumente/upload/8ccbc_AG_Zeiten_Schuljahr_2018_2019_Stand_20190319.pdf';
+
+const isNew = (data: any) => {
+    let file = path.resolve(process.cwd(), 'out', 'workgroups', 'date.txt');
+    let old = '';
+    if (fs.existsSync(file)) {
+        old = fs.readFileSync(file, 'utf-8').toString();
+    }
+    if (old !== data) {
+        fs.writeFileSync(file, data);
+        return true;
+    }
+    return false;
+};
+
 const fetchData = (file: string) => {
     return new Promise((async resolve => {
         const stream = fs.createWriteStream(file);
-        got.stream('https://viktoriaschule-aachen.de/dokumente/upload/8ccbc_AG_Zeiten_Schuljahr_2018_2019_Stand_20190319.pdf').pipe(stream);
+        got.stream(url).pipe(stream);
         stream.on('finish', resolve);
     }));
 };
@@ -105,14 +120,12 @@ const extractData = async (data: any) => {
 
 (async () => {
     const file = path.resolve(process.cwd(), 'out', 'workgroups', 'list.pdf');
-    fetchData(file).then(() => {
-        console.log('Fetched work groups');
-        parseData(file).then(async data => {
-            console.log('Parsed work groups');
-            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'workgroups', 'workgroups.json'), JSON.stringify(await extractData(data), null, 2));
-            console.log('Saved work groups');
-        }).catch(e => {
-            console.log(e);
-        });
-    });
+    await fetchData(file);
+    console.log('Fetched work groups');
+    const data = await parseData(file);
+    console.log('Parsed work groups');
+    if (isNew(url)) {
+        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'workgroups', 'workgroups.json'), JSON.stringify(await extractData(data), null, 2));
+        console.log('Saved work groups');
+    }
 })();
