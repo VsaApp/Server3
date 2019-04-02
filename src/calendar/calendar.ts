@@ -1,12 +1,28 @@
 import got from 'got';
 import fs from 'fs';
 import path from 'path';
+
 const pdf_table_extractor = require('pdf-table-extractor');
+
+const url = 'https://viktoriaschule-aachen.de/dokumente/upload/9e15f_Terminplanung2018_19_SchuKo_Stand_20180906.pdf';
+
+const isNew = (data: any) => {
+    let file = path.resolve(process.cwd(), 'out', 'calendar', 'date.txt');
+    let old = '';
+    if (fs.existsSync(file)) {
+        old = fs.readFileSync(file, 'utf-8').toString();
+    }
+    if (old !== data) {
+        fs.writeFileSync(file, data);
+        return true;
+    }
+    return false;
+};
 
 const fetchData = (file: string) => {
     return new Promise((async resolve => {
         const stream = fs.createWriteStream(file);
-        got.stream('https://viktoriaschule-aachen.de/dokumente/upload/9e15f_Terminplanung2018_19_SchuKo_Stand_20180906.pdf').pipe(stream);
+        got.stream(url).pipe(stream);
         stream.on('finish', resolve);
     }));
 };
@@ -373,23 +389,21 @@ const extractExternalData = (data: any) => {
 const monthToInt = (month: string) => {
     const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
     return months.indexOf(month) + 1;
-}
+};
 
 (async () => {
     const file = path.resolve(process.cwd(), 'out', 'calendar', 'list.pdf');
-    fetchData(file).then(() => {
-        console.log('Fetched calendar');
-        parseData(file).then(data => {
-            console.log('Parsed calendar');
-            extractData(data).then((calendar1: any) => {
-                extractExternalData(calendar1).then(async calendar2 => {
-                    console.log('Fetched external calendar');
-                    console.log('Parsed external calendar');
-                    calendar1.data = calendar1.data.concat(calendar2);
-                    fs.writeFileSync(path.resolve(process.cwd(), 'out', 'calendar', 'calendar.json'), JSON.stringify(calendar1, null, 2));
-                    console.log('Saved calendar');
-                });
-            });
-        }).catch(console.error);
-    });
+    await fetchData(file);
+    console.log('Fetched calendar');
+    const data = await parseData(file);
+    console.log('Parsed calendar');
+    if (isNew(url)) {
+        const calendar1: any = await extractData(data);
+        const calendar2 = await extractExternalData(calendar1);
+        console.log('Fetched external calendar');
+        console.log('Parsed external calendar');
+        calendar1.data = calendar1.data.concat(calendar2);
+        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'calendar', 'calendar.json'), JSON.stringify(calendar1, null, 2));
+        console.log('Saved calendar');
+    }
 })();

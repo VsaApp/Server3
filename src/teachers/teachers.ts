@@ -8,6 +8,21 @@ import {getSubject} from '../subjects';
 
 const PDFParser = require('pdf2json');
 
+const url = 'https://viktoriaschule-aachen.de/dokumente/upload/3058d_Lehrer_Fakultenliste_20190307.pdf';
+
+const isNew = (data: any) => {
+    let file = path.resolve(process.cwd(), 'out', 'teachers', 'date.txt');
+    let old = '';
+    if (fs.existsSync(file)) {
+        old = fs.readFileSync(file, 'utf-8').toString();
+    }
+    if (old !== data) {
+        fs.writeFileSync(file, data);
+        return true;
+    }
+    return false;
+};
+
 const fetchData = (file: string) => {
     return new Promise((async resolve => {
         const cookieJar = new CookieJar();
@@ -18,7 +33,7 @@ const fetchData = (file: string) => {
             cookieJar, body: form
         });
         const stream = fs.createWriteStream(file);
-        got.stream('https://viktoriaschule-aachen.de/dokumente/upload/3058d_Lehrer_Fakultenliste_20190307.pdf', {
+        got.stream(url, {
             auth: config.username + ':' + config.password,
             cookieJar
         }).pipe(stream);
@@ -79,14 +94,12 @@ const extractData = async (data: any) => {
 
 (async () => {
     const file = path.resolve(process.cwd(), 'out', 'teachers', 'list.pdf');
-    fetchData(file).then(() => {
-        console.log('Fetched teachers');
-        parseData(file).then(async data => {
-            console.log('Parsed teachers');
-            fs.writeFileSync(path.resolve(process.cwd(), 'out', 'teachers', 'teachers.json'), JSON.stringify(await extractData(data), null, 2));
-            console.log('Saved teachers');
-        }).catch(e => {
-            console.log(e);
-        });
-    });
+    await fetchData(file);
+    console.log('Fetched teachers');
+    const data = await parseData(file);
+    console.log('Parsed teachers');
+    if (isNew(url)) {
+        fs.writeFileSync(path.resolve(process.cwd(), 'out', 'teachers', 'teachers.json'), JSON.stringify(await extractData(data), null, 2));
+        console.log('Saved teachers');
+    }
 })();
