@@ -29,11 +29,15 @@ bugsRouter.get('/html/', async (req, res) => {
     Object.keys(versions).forEach((version: string) => {
         htmlString += `<h3>${version}</h3>`;
         versions[version].forEach((bug: any) => {
-            htmlString += `<p><b>Thrown ${bug.count} times</b><br>Users: [${bug.ids.map((id: string) => `<a href="${config.apiEndpoint}/tags/${id}" target="_blank">${id}</a>`)}]<br>${bug.msg.split('\n').join('<br>')}</p>`;
+            htmlString += getHtml(bug);
         });
     });
     res.send(htmlString);
 });
+
+const getHtml = (bug: any) => {
+    return `<p><b>Thrown ${bug.count} times</b><br>Users: [${bug.ids.map((id: string) => `<a href="${config.apiEndpoint}/tags/${id}" target="_blank">${id}</a>`)}]<br>${bug.msg.split('\n').join('<br>')}</p>`;
+};
 
 bugsRouter.post('/report/', async (req, res) => {
     const filePath = path.resolve(process.cwd(), 'bugs.json');
@@ -90,8 +94,7 @@ bugsRouter.post('/report/', async (req, res) => {
         to: config.emailUser, // list of receivers
         subject: 'Ein Fehler ist aufgetreten!', // Subject line
         text: `Es ist ein neuer Fehler aufgetreten! \n\n App Version: ${version}\n\nFehlermeldung:\n${newText}`, // plain text body
-        html: `<p>Es ist ein neuer Fehler aufgetreten!</p><p>App Version: ${version}<br><b>${title}</b><br>${error}</p>` +
-                `<p><a href="${config.apiEndpoint}/bugs" target="_blank">Anschauen</a></p>`
+        html: `<p>Es ist ein neuer Fehler aufgetreten!</p><p><a href="${config.apiEndpoint}/bugs/html" target="_blank">Anschauen</a></p>` + getHtml(newBug)
     };
 
     // send mail with defined transport object
