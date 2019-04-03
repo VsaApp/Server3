@@ -8,6 +8,7 @@ import router from './messageboard/messageboard';
 import tagsRouter from './tags/tags';
 import changesRouter from './changes/changes';
 import historyRouter from './history/history';
+import bugsRouter from './bugs/bugs';
 import fs from 'fs';
 
 const app = express();
@@ -70,5 +71,6 @@ app.use('/messageboard', router);
 app.use('/tags', tagsRouter);
 app.use('/changes', changesRouter);
 app.use('/history', historyRouter);
+app.use('/bugs', bugsRouter);
 
 export default app;
