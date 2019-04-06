@@ -9,6 +9,7 @@ import tagsRouter from './tags/tags';
 import changesRouter from './changes/changes';
 import historyRouter from './history/history';
 import bugsRouter from './bugs/bugs';
+import versionsRouter from '../versions';
 import fs from 'fs';
 
 const app = express();
@@ -72,5 +73,6 @@ app.use('/tags', tagsRouter);
 app.use('/changes', changesRouter);
 app.use('/history', historyRouter);
 app.use('/bugs', bugsRouter);
+app.use('/versions', versionsRouter);
 
 export default app;
