@@ -110,11 +110,11 @@ historyRouter.get('/:directory/:year/:month/:day/:file', async (req, res) => {
 
     const filePath = path.resolve(process.cwd(), 'history', directory, year, month, day, file);
 
-    if (!fs.existsSync(filePath)) {
+    if (!fs.existsSync(filePath.replace('.json', '.html'))) {
         res.json({'error': 'Invalid path'});
         return;
     }
-    if (file.includes('.json')) {
+    if (filePath.endsWith('.json')) {
         res.json(await getCurrentJson(filePath.replace('.json', '.html')));
         return;
     }
