@@ -1,6 +1,9 @@
 import express from 'express';
 import db from './db';
 import bodyParser from 'body-parser';
+import fs from 'fs';
+import path from 'path';
+import { getUsers } from './users';
 
 const tagsRouter = express.Router();
 tagsRouter.use(bodyParser.json());
@@ -18,7 +21,6 @@ tagsRouter.get('/:id', (req, res) => {
 });
 
 tagsRouter.post('/:id/add', (req, res) => {
-    console.log(req.params.id, req.body);
     const isOneSignalId = req.params.id.split('-').length === 5 && req.params.id.length === 36;
     const devices = db.get('devices') || [];
     const users = db.get('users') || [];
@@ -49,10 +51,30 @@ tagsRouter.post('/:id/add', (req, res) => {
     Object.keys(req.body).forEach((key: string) => {
         user.tags[key] = req.body[key];
     });
+    updateStats(user, req.body);
     db.set('users', users.filter((user: any) => user !== undefined));
     db.set('devices', devices);
     res.json({'error': null});
 });
+
+const updateStats = async (user: any, newTags: any) => {
+    if (newTags.appVersion === undefined) return;
+    const file = path.resolve(process.cwd(), 'stats.json');
+    let data: any = {appStarts: {}, users: {}};
+    if (!fs.existsSync(file)) {
+        fs.writeFileSync(file, JSON.stringify(data, null, 2));
+    } else {
+        data = JSON.parse(fs.readFileSync(file).toString());
+        if (data.appStarts === undefined) data.appStarts = {};
+        if (data.users === undefined) data.users = {};
+    }
+    const today = new Date().toDateString();
+    if (data.appStarts[today] === undefined) data.appStarts[today] = 0;
+    if (data.users[today] === undefined) data.users[today] = [];
+    if (!data.users[today].includes(user.id)) data.users[today].push(user.id);
+    data.appStarts[today]++;
+    fs.writeFileSync(file, JSON.stringify(data, null, 2));
+}
 
 tagsRouter.post('/:id/remove', (req, res) => {
     const isOneSignalId = req.params.id.split('-').length === 5 && req.params.id.length === 36;
