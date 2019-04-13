@@ -33,6 +33,23 @@ versionsRouter.get('/', async (req, res) => {
     res.send(htmlString);
 });
 
+export const getVerionsList = () => {
+    const users = getUsers();
+    const appVersions: any = {};
+    users.forEach((user: any) => {
+        const version = user.tags.appVersion;
+        if (version !== undefined){
+            if (appVersions[version] === undefined) appVersions[version] = 0;
+            appVersions[version]++;
+        }
+    });
+    return Object.keys(appVersions).sort((v1: string, v2: string) => {
+        const v1Code = parseInt(v1.split('+')[1]);
+        const v2Code = parseInt(v2.split('+')[1]);
+        return v1Code < v2Code ? 1 : v1Code > v2Code ? -1 : 0;
+    });
+}
+
 const getVersions = (appVersions: any, length: number) => {
     let htmlString = '';
     Object.keys(appVersions).sort((v1: string, v2: string) => {

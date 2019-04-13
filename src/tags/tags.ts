@@ -3,6 +3,7 @@ import db from './db';
 import bodyParser from 'body-parser';
 import fs from 'fs';
 import path from 'path';
+import { getVerionsList } from '../../versions';
 import { getUsers } from './users';
 
 const tagsRouter = express.Router();
@@ -51,10 +52,11 @@ tagsRouter.post('/:id/add', (req, res) => {
     Object.keys(req.body).forEach((key: string) => {
         user.tags[key] = req.body[key];
     });
-    updateStats(user, req.body);
     db.set('users', users.filter((user: any) => user !== undefined));
     db.set('devices', devices);
     res.json({'error': null});
+
+    updateStats(user, req.body);
 });
 
 const updateStats = async (user: any, newTags: any) => {
@@ -67,12 +69,16 @@ const updateStats = async (user: any, newTags: any) => {
         data = JSON.parse(fs.readFileSync(file).toString());
         if (data.appStarts === undefined) data.appStarts = {};
         if (data.users === undefined) data.users = {};
+        if (data.useuserCountrs === undefined) data.userCount = {};
+        if (data.appVersions === undefined) data.appVersions = {};
     }
     const today = new Date().toDateString();
     if (data.appStarts[today] === undefined) data.appStarts[today] = 0;
     if (data.users[today] === undefined) data.users[today] = [];
     if (!data.users[today].includes(user.id)) data.users[today].push(user.id);
     data.appStarts[today]++;
+    data.userCount[today] = db.get('devices').length;
+    data.appVersions[today] = getVerionsList();
     fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
 
