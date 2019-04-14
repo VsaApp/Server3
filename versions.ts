@@ -43,11 +43,15 @@ export const getVerionsList = () => {
             appVersions[version]++;
         }
     });
-    return Object.keys(appVersions).sort((v1: string, v2: string) => {
+    const result: any = {};
+    Object.keys(appVersions).sort((v1: string, v2: string) => {
         const v1Code = parseInt(v1.split('+')[1]);
         const v2Code = parseInt(v2.split('+')[1]);
         return v1Code < v2Code ? 1 : v1Code > v2Code ? -1 : 0;
+    }).forEach((version) => {
+        result[version] = appVersions[version];
     });
+    return result;
 }
 
 const getVersions = (appVersions: any, length: number) => {
