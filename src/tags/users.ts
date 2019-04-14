@@ -6,7 +6,6 @@ export const getUsers = () => {
     const users = db.get('users').filter((user: any) => user.id !== "null").map((user: any) => {
         return {"id": "123", "tags": Object.assign({"onesignalId": user.id}, user.tags)};
     });
-    console.log(devices);
     return devices.concat(users).filter((user: any) => user.tags.onesignalId !== undefined || user.tags.firebaseId !== undefined);
 };
 
