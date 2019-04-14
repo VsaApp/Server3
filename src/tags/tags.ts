@@ -73,10 +73,12 @@ const updateStats = async (user: any, newTags: any) => {
         if (data.appVersions === undefined) data.appVersions = {};
     }
     const today = new Date().toDateString();
-    if (data.appStarts[today] === undefined) data.appStarts[today] = 0;
-    if (data.users[today] === undefined) data.users[today] = [];
-    if (!data.users[today].includes(user.id)) data.users[today].push(user.id);
-    data.appStarts[today]++;
+    if (user.tags.dev === undefined || !user.tags.dev) {
+        if (data.appStarts[today] === undefined) data.appStarts[today] = 0;
+        if (data.users[today] === undefined) data.users[today] = [];
+        if (!data.users[today].includes(user.id)) data.users[today].push(user.id);
+        data.appStarts[today]++;
+    }
     data.userCount[today] = db.get('devices').length;
     data.appVersions[today] = getVerionsList();
     fs.writeFileSync(file, JSON.stringify(data, null, 2));
