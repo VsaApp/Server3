@@ -69,7 +69,7 @@ const updateStats = async (user: any, newTags: any) => {
         data = JSON.parse(fs.readFileSync(file).toString());
         if (data.appStarts === undefined) data.appStarts = {};
         if (data.users === undefined) data.users = {};
-        if (data.useuserCountrs === undefined) data.userCount = {};
+        if (data.userCount === undefined) data.userCount = {};
         if (data.appVersions === undefined) data.appVersions = {};
     }
     const today = new Date().toDateString();
