@@ -38,9 +38,9 @@ app.get('/updates', (req, res) => {
     };
     const data: any = {
         'subjectsDef': '1',
-        'roomsDef': '1',
+        'roomsDef': '2',
         'teachersDef': '1',
-	'app': '10',
+        'app': '10',
     };
     Object.keys(files).forEach((file: string) => {
         data[files[file]] = fs.statSync(file).mtime;

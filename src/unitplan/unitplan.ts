@@ -73,6 +73,9 @@ const extractData = async (data: any) => {
                         });
                     } else {
                         for (let i = 1; i < a.length; i++) {
+                            if (a[i].split(' ').length < 3) {
+                                a[i] += ' a';
+                            }
                             d[day].lessons[unit].push({
                                 block: a[0].split(' ')[1],
                                 participant: a[i].split(' ')[1],
@@ -188,7 +191,6 @@ export const sendNotifications = async (isDev: Boolean) => {
                             return;
                         }
                     }
-                    console.log(response.body);
                 } catch (response) {
                     console.log(response);
                 }

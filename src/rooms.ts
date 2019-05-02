@@ -8,6 +8,9 @@ export const rooms: any = {
     KU2: 'Ku2',
     AULA: 'Aul',
     AUL: 'Aul',
+    SLZ: 'SLZ',
+    WR: 'WerkR',
+    TOI: 'Toi',
     112: '112',
     113: '113',
     114: '114',
@@ -57,7 +60,7 @@ export const rooms: any = {
 export const getRoom = (name: string) => {
     if (name === undefined) return undefined;
     name = name.trim().toUpperCase();
-    if (/^([ABCD])$/m.test(name)) {
+    if (/^([ABCDEF])$/m.test(name)) {
         return name;
     }
     if (rooms[name] === undefined) {
