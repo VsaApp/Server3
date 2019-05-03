@@ -75,7 +75,7 @@ app.get('/replacementplan/:day/:grade', (req, res) => {
 
 const publicDirectories = ['unitplan', 'cafetoria', 'calendar', 'teachers', 'workgroups'];
 publicDirectories.forEach((directory: string) => {
-    app.get('/unitplan/:file', (req, res) => {
+    app.get(`/${directory}/:file`, (req, res) => {
         res.json(JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', directory, req.params.file), 'utf-8')));
     });
 });
