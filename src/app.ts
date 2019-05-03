@@ -11,6 +11,7 @@ import historyRouter from './history/history';
 import bugsRouter from './bugs/bugs';
 import versionsRouter from '../versions';
 import fs from 'fs';
+import path from 'path';
 
 const app = express();
 app.use(cors());
@@ -66,6 +67,17 @@ app.get('/subjects', (req, res) => {
 
 app.get('/rooms', (req, res) => {
     res.json(rooms);
+});
+
+app.get('/replacementplan/:day/:grade', (req, res) => {
+    res.json(JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', req.params.day, req.params.grade), 'utf-8')));
+});
+
+const publicDirectories = ['unitplan', 'cafetoria', 'calendar', 'teachers', 'workgroups'];
+publicDirectories.forEach((directory: string) => {
+    app.get('/unitplan/:file', (req, res) => {
+        res.json(JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', directory, req.params.file), 'utf-8')));
+    });
 });
 
 app.use('/messageboard', router);
