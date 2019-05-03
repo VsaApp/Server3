@@ -9,8 +9,11 @@ import {getUsers} from '../tags/users';
 import {updateApp} from '../update_app';
 import {getRoom} from '../rooms';
 import {getSubject} from '../subjects';
+import {initFirebase} from '../firebase';
+import {sendNotification} from '../notification';
 
 const isDev = process.argv.length === 3;
+const untiPlanPath = process.argv.length === 4 ? process.argv[3] : undefined;
 const grades = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c', '9a', '9b', '9c', 'EF', 'Q1', 'Q2'];
 const weekdays = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
 
@@ -29,7 +32,10 @@ const isNew = (data: any) => {
 };
 
 const fetchData = async (weekA = true) => {
-    return (await got(`https://www.viktoriaschule-aachen.de/sundvplan/sps/${weekA ? 'left' : 'right'}.html`, {auth: config.username + ':' + config.password})).body;
+    const week = weekA ? 'A.html' : 'B.html';
+    const path = untiPlanPath || `https://www.viktoriaschule-aachen.de/sundvplan/sps/${weekA ? 'left' : 'right'}.html`;
+    if (path.startsWith('http')) return (await got(path, {auth: config.username + ':' + config.password})).body;
+    else return fs.readFileSync(path.replace('.html', week), 'utf-8').toString();
 };
 
 const parseData = async (raw: string) => {
@@ -154,51 +160,19 @@ const extractData = async (data: any) => {
 
 export const sendNotifications = async (isDev: Boolean) => {
     try {
-        const devices = getUsers().filter((device: any) => !isDev || device.tags.dev);
+        let devices = getUsers().filter((device: any) => (!isDev || device.tags.dev) && device.tags.grade !== undefined);
         console.log('Sending notifications to ' + devices.length + ' devices');
-        devices.forEach(async (device: any) => {
-            try {
-                const dataString = {
-                        app_id: config.appId,
-                        include_player_ids: [device.tags.onesignalId],
-                        android_group: 'unitplan',
-                        contents: {
-                            de: 'Es gibt einen neuen Stundenplan',
-                            en: 'Es gibt einen neuen Stundenplan'
-                        },
-                        headings: {
-                            de: 'Stundenplan',
-                            en: 'Stundenplan'
-                        },
-                        data: {
-                            type: 'unitplan'
-                        }
-                    }
-                ;
-                let url = 'https://onesignal.com/api/v1/notifications';
-                try {
-                    const response = await got.post(
-                        url,
-                        {
-                            headers: {
-                                'Content-Type': 'application/json; charset=utf-8',
-                                'Authorization': 'Basic ' + config.appAuthKey
-                            },
-                            body: JSON.stringify(dataString)
-                        });
-                    if (JSON.parse(response.body).errors !== undefined) {
-                        if (JSON.parse(response.body).errors[0] === 'All included players are not subscribed') {
-                            return;
-                        }
-                    }
-                } catch (response) {
-                    console.log(response);
-                }
-            } catch (e) {
-                console.error('Cannot send notification to device: ', device, e);
+        await sendNotification({
+            devices: devices,
+            group: 'unitplanChanged',
+            text: 'Es einen neuen Stundenplan!',
+            title: 'Stundenplan',
+            data: {
+                type: 'replacementplan'
             }
         });
-        updateApp('All', {
+
+        await updateApp('All', {
             'type': 'unitplan',
             'action': 'update'
         }, isDev);
@@ -304,6 +278,7 @@ const concatWeeks = (dataA: any, dataB: any) => {
     const dataB = await parseData(rawB);
     console.log('Parsed unit plan');
     if (isNew(dataA) || isDev) {
+        await initFirebase();
         saveNewUnitplan(rawA, rawB, []);
         const unitplanA = await extractData(dataA);
         const unitplanB = await extractData(dataB);

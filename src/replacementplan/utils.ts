@@ -18,8 +18,9 @@ export const saveData = (data: any, today: boolean) => {
     fs.writeFileSync(file, data);
 };
 
-export const fetchData = async (today: boolean) => {
-    return (await got('https://www.viktoriaschule-aachen.de/sundvplan/vps/' + (today ? 'left' : 'right') + '.html', {auth: config.username + ':' + config.password})).body;
+export const fetchData = async (today: boolean, url?: string) => {
+    const file = url || 'https://www.viktoriaschule-aachen.de/sundvplan/vps/' + (today ? 'left' : 'right') + '.html';
+    return (await got(file, {auth: config.username + ':' + config.password})).body;
 };
 
 export const parseData = async (raw: string) => {

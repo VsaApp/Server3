@@ -14,6 +14,7 @@ const isCli = module.parent === null;
 const isDev = process.argv.length >= 3;
 const isTest = process.argv.length === 4 && process.argv[3] == '--test';
 const updateTags = process.argv.length === 4 && process.argv[3] == '--update';
+const replacementPlanPath = process.argv.length === 4 && process.argv[3].endsWith('.html') ? process.argv[3] : undefined;
 
 export const getJson = async (raw: string) => {
     return await extractData(await parseData(raw));
@@ -21,8 +22,16 @@ export const getJson = async (raw: string) => {
 
 const doWork = async (today: boolean) => {
     const day = (today ? 'today' : 'tomorrow');
-    const raw = await fetchData(today);
-    console.log('Fetched replacement plan for ' + day);
+    let raw: any;
+    if (replacementPlanPath !== undefined) {
+        if (!replacementPlanPath.startsWith('http')) raw = fs.readFileSync(replacementPlanPath, 'utf-8').toString();
+        else raw = await fetchData(today, replacementPlanPath);
+        console.log('Fetched replacement plan for given file');
+    }
+    else {
+        raw = await fetchData(today);
+        console.log('Fetched replacement plan for ' + day);
+    }
     const data = await parseData(raw);
     console.log('Parsed replacement plan for ' + day);
     if (isNew(raw, today) || isDev) {
@@ -64,7 +73,7 @@ const work = async () => {
     if (!isTest && isCli) {
         await initFirebase();
         doWork(true);
-        doWork(false);
+        if (replacementPlanPath === undefined) doWork(false);
     }
 }
 
