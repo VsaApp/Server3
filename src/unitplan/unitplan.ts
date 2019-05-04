@@ -33,9 +33,10 @@ const isNew = (data: any) => {
 
 const fetchData = async (weekA = true) => {
     const week = weekA ? 'A.html' : 'B.html';
-    const path = untiPlanPath || `https://www.viktoriaschule-aachen.de/sundvplan/sps/${weekA ? 'left' : 'right'}.html`;
+    let path = untiPlanPath || `https://www.viktoriaschule-aachen.de/sundvplan/sps/${weekA ? 'left' : 'right'}.html`;
+    if (untiPlanPath !== undefined) path = path.replace('.html', week);
     if (path.startsWith('http')) return (await got(path, {auth: config.username + ':' + config.password})).body;
-    else return fs.readFileSync(path.replace('.html', week), 'utf-8').toString();
+    else return fs.readFileSync(path, 'utf-8').toString();
 };
 
 const parseData = async (raw: string) => {
