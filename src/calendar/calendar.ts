@@ -1,10 +1,10 @@
 import got from 'got';
 import fs from 'fs';
 import path from 'path';
+import {getUrl} from './calendar_url';
 
 const pdf_table_extractor = require('pdf-table-extractor');
-
-const url = 'https://viktoriaschule-aachen.de/dokumente/upload/9e15f_Terminplanung2018_19_SchuKo_Stand_20180906.pdf';
+let url: string;
 
 const isNew = (data: any) => {
     let file = path.resolve(process.cwd(), 'out', 'calendar', 'date.txt');
@@ -258,8 +258,10 @@ const extractData = async (data: any) => {
                 }
             });
             let lines2 = lines.join('\n').split('Pädagogischer Tag und Kollegiumstagung:')[1].split('\n').slice(1);
-            lines2.forEach((line: string) => {
-                if (line.startsWith(' ')) {
+            console.log('Lines:', lines2);
+            lines2.forEach((line: string, i:number) => {
+                if (line.startsWith(' ') && line.includes(':')) {
+                    
                     line = line.slice(2);
                     while (line.includes('  ')) {
                         line = line.replace('  ', ' ');
@@ -288,6 +290,9 @@ const extractData = async (data: any) => {
                             time: ''
                         }
                     });
+                }
+                else if (line.length === 1 && !isNaN(parseInt(line)) && lines2.length > i + 1) {
+                    lines2[i + 1] = lines2[i - 1] + lines2[i + 1];
                 }
             });
         }
@@ -392,12 +397,14 @@ const monthToInt = (month: string) => {
 };
 
 (async () => {
+    url = await getUrl();
+    console.log('Download calendar pdf from: ' + url);
     const file = path.resolve(process.cwd(), 'out', 'calendar', 'list.pdf');
     await fetchData(file);
     console.log('Fetched calendar');
     const data = await parseData(file);
     console.log('Parsed calendar');
-    if (isNew(url)) {
+    if (isNew(url) || true) {
         const calendar1: any = await extractData(data);
         const calendar2 = await extractExternalData(calendar1);
         console.log('Fetched external calendar');
