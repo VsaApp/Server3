@@ -27,6 +27,42 @@ const getJson = async (url: string) => {
     return JSON.parse((await got(url)).body)
 }
 
+const getPaths = async (url: string) => {
+    const raw = (await got(url)).body;
+    const paths: any = [];
+    raw.split('<a href="').filter((fragment: string, index: number) => {
+        if (!fragment.startsWith('..') && fragment.includes('</a>')) paths.push(fragment.split('>')[1].split('<')[0].replace('/', ''));
+    });
+    return paths;
+}
+
+export const downloadHistoryOld = async () => {
+    console.log('Download all files...');
+    const startTime = new Date();
+    const directories = await getPaths(`https://${auth}@history.vsa.2bad2c0.de`);
+    for (let h = 0; h < directories.length; h++){
+        console.log(`download ${directories[h]}`);
+        const years = await getPaths(`https://${auth}@history.vsa.2bad2c0.de/${directories[h]}`);
+        for (let i = 0; i < years.length; i++){
+            console.log(`   - download year ${years[i]}`);
+            const months = await getPaths(`https://${auth}@history.vsa.2bad2c0.de/${directories[h]}/${years[i]}`);
+            for (let j = 0; j < months.length; j++){
+                console.log(`      ~ download month ${months[j]}`);
+                const days = await getPaths(`https://${auth}@history.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}`);
+                for (let k = 0; k < days.length; k++){
+                    console.log(`         -- download day ${days[k]}`);
+                    const files = await getPaths(`https://${auth}@history.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}/${days[k]}`);
+                    for (let l = 0; l < files.length; l++){
+                        const fileName = `https://${auth}@history.vsa.2bad2c0.de/${directories[h]}/${years[i]}/${months[j]}/${days[k]}/${files[l]}`;
+                        saveNewVersion(directories[h], (await got(fileName)).body, years[i], months[j], days[k], files[l]);
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 export const downloadHistory = async () => {
     console.log('Download all files...');
     const startTime = new Date();
@@ -54,4 +90,4 @@ export const downloadHistory = async () => {
     console.log(`Finished downloading after ${((new Date()).getTime() - startTime.getTime()) / 1000} sec`);
 };
 
-if (isCli) downloadHistory();
+if (isCli) downloadHistoryOld();
