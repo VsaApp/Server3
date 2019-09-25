@@ -35,7 +35,7 @@ const fetchData = async (weekA = true) => {
     const week = weekA ? 'A.html' : 'B.html';
     let path = untiPlanPath || `https://www.viktoriaschule-aachen.de/sundvplan/sps/${weekA ? 'left' : 'right'}.html`;
     if (untiPlanPath !== undefined) path = path.replace('.html', week);
-    if (path.startsWith('http')) return (await got(path, {auth: config.username + ':' + config.password})).body;
+    if (path.startsWith('http')) return (await got(path, {auth: config.username + ':' + config.rpPassword})).body;
     else return fs.readFileSync(path, 'utf-8').toString();
 };
 
