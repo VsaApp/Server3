@@ -1,6 +1,7 @@
 {
     "username": "USERNAME",
     "password": "PASSWORD",
+    "rpPassword": "REPLACEMENTPLAN_PASSWORD",
     "appAuthKey": "ONESIGNAL_AUTH_KEY",
     "appId": "ONESIGNAL_APP_ID",
     "cafetoriaId": "YOUR_SERVICE_ID",

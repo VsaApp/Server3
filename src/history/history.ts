@@ -124,6 +124,7 @@ historyRouter.get('/:directory/:year/:month/:day/:file', async (req, res) => {
 });
 
 export const saveNewReplacementplan = async (raw: string, parsed: any) => {
+    
     try {
         if (parsed.length > 0) {
             const year = parsed[0].for.date.split('.')[2];
@@ -133,9 +134,11 @@ export const saveNewReplacementplan = async (raw: string, parsed: any) => {
             saveNewVersion('replacementplan', raw, parsed, year, month, day, getFileName());
         } else {
             const data = await parse(raw);
-            const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.substr(1).replace('-Klassen-Vertretungsplan für ', '').replace('Januar', 'January').replace('Februar', 'February').replace('März', 'March').replace('Mai', 'May').replace('Juni', 'June').replace('Juli', 'July').replace('Oktober', 'October').replace('Dezember', 'December');
-            const date = new Date(dateStr);
+            const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.split(' ')[0].split('.');
+            console.log(dateStr);
+            const date = new Date(`${dateStr[2]}-${dateStr[1]}-${dateStr[0]}`);
             date.setHours(date.getHours() + 1);
+            date.setDate(date.getDate() + 1);
             saveNewVersion('replacementplan', raw, parsed, date.getUTCFullYear().toString(), (date.getUTCMonth() + 1).toString(), date.getUTCDate().toString(), getFileName());
         }
     } catch (e) {

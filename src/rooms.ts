@@ -1,5 +1,7 @@
 export const rooms: any = {
     KLH: 'klH',
+    'KL SPH': 'klH',
+    'GR SPH': 'grH',
     GRH: 'grH',
     SB: 'schH',
     PC1: 'PC1',
