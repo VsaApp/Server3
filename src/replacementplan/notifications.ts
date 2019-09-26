@@ -61,7 +61,7 @@ export const sendNotifications = async (isDev: Boolean, today: Boolean, data: an
                     }
                 });
             } catch (e) {
-                console.error('Cannot send notification to device: ', device, e);
+                console.error('Cannot send notification to device: id:', device.id, e);
             }
         });
         

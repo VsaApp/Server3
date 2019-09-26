@@ -217,7 +217,7 @@ export const setChangesInUnitplan = (grade: string, unitplan: any, replacementpl
                 });
             });
             if (!change.sure && change.change.info !== 'Klausurnachschreiber') {
-                console.log(grade, change, subjects);
+                //console.log(grade, change, subjects);
             }
         });
     }
