@@ -22,7 +22,7 @@
     "node-html-parser": "^1.1.11",
     "nodemailer": "^5.0.0",
     "pdf-table-extractor": "^1.0.3",
-    "pdf2json": "^1.1.7",
+    "pdf2json": "git+https://github.com/modesty/pdf2json.git",
     "request": "^2.88.0",
     "tough-cookie": "^2.5.0"
   },
@@ -36,7 +36,7 @@
     "@types/node": "^10.12.11",
     "@types/request": "^2.48.1",
     "@types/supertest": "^2.0.7",
-    "jest": "^23.6.0",
+    "jest": "^25.0.0",
     "superagent": "^4.0.0",
     "supertest": "^3.3.0",
     "ts-jest": "^23.10.5",
