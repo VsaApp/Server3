@@ -17,7 +17,7 @@ const updateTags = process.argv.length === 4 && process.argv[3] == '--update';
 const replacementPlanPath = process.argv.length === 4 && process.argv[3].endsWith('.html') ? process.argv[3] : undefined;
 
 export const getJson = async (raw: string) => {
-    return await extractData(await parseData(raw));
+    return await extractData(await parseData(raw), isDev);
 };
 
 const doWork = async (today: boolean) => {
@@ -36,7 +36,7 @@ const doWork = async (today: boolean) => {
     console.log('Parsed replacement plan for ' + day);
     if (isNew(raw, today) || isDev) {
         saveNewReplacementplan(raw, []);
-        const replacementplan = await extractData(data);
+        const replacementplan = await extractData(data, isDev);
         console.log('Extracted replacement plan for ' + day);
         replacementplan.forEach(async (data) => {
             fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', day, data.participant + '.json'), JSON.stringify(data, null, 2));

@@ -5,7 +5,7 @@ import {getSubject} from "../subjects";
 const nodemailer = require('nodemailer');
 import config from'../config';
 
-export const extractData = async (raw: any) => {
+export const extractData = async (raw: any, isDev: boolean) => {
     const grades = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c', '9a', '9b', '9c', 'EF', 'Q1', 'Q2'];
     return await grades.map(grade => {
         const data: any = [];
@@ -155,9 +155,10 @@ export const extractData = async (raw: any) => {
                         
                     } catch (e) {
                         console.error('Cannot parse element:', i, grade, date, row, e);
-
-                        unparsed.push(row);
-                        sendMail(grade, date, update, i, e)
+                        
+                        const rawLine = row.childNodes.map((element: any) => element.rawText.replace('&nbsp;', ''));
+                        unparsed.push(rawLine);
+                        if (!isDev) sendMail(grade, date, update, i, e)
                     }
                 }
             });
