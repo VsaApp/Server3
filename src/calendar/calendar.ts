@@ -1,7 +1,7 @@
 import got from 'got';
 import fs from 'fs';
 import path from 'path';
-import {getUrl} from './calendar_url';
+import {getUrl} from '../downloads';
 
 const isDev = process.argv.length === 3;
 
@@ -398,7 +398,7 @@ const monthToInt = (month: string) => {
 };
 
 (async () => {
-    url = await getUrl();
+    url = await getUrl('Übersichtsplanung über die Termine im', 3);
     console.log('Download calendar pdf from: ' + url);
     const file = path.resolve(process.cwd(), 'out', 'calendar', 'list.pdf');
     await fetchData(file);

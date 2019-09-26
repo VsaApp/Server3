@@ -5,6 +5,7 @@ import entities from 'entities';
 import path from 'path';
 import fs from 'fs';
 
+const isDev = process.argv.length === 3;
 const cli: boolean = module.parent === null;
 
 const isNew = (data: any) => {
@@ -132,7 +133,7 @@ if (module.parent === null) {
             console.log('Fetched menues');
             parseData(raw).then((data: any) => {
                 console.log('Parsed menues');
-                if (isNew(data)) {
+                if (isNew(data) || isDev) {
                     extractData(data).then((menues: any) => {
                         console.log('Extracted menues');
                         fs.writeFileSync(path.resolve(process.cwd(), 'out', 'cafetoria', 'list.json'), JSON.stringify(menues, null, 2));

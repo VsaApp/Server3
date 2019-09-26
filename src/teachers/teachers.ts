@@ -5,8 +5,9 @@ import FormData from 'form-data';
 import path from 'path';
 import fs from 'fs';
 import {getSubject} from '../subjects';
-import {getUrl} from './teachers_url';
+import {getUrl} from '../downloads';
 
+const isDev = process.argv.length === 3;
 const PDFParser = require('pdf2json');
 
 let url;
@@ -34,7 +35,7 @@ const fetchData = (file: string) => {
             cookieJar, body: form
         });
         const stream = fs.createWriteStream(file);
-        url = await getUrl();
+        url = await getUrl('Kollegiumsliste mit Angabe', 41);
         got.stream(url, {
             auth: config.username + ':' + config.password,
             cookieJar
@@ -100,7 +101,7 @@ const extractData = async (data: any) => {
     console.log('Fetched teachers');
     const data = await parseData(file);
     console.log('Parsed teachers');
-    if (isNew(url)) {
+    if (isNew(url) || isDev) {
         fs.writeFileSync(path.resolve(process.cwd(), 'out', 'teachers', 'teachers.json'), JSON.stringify(await extractData(data), null, 2));
         console.log('Saved teachers');
     }

@@ -2,7 +2,9 @@ import got from 'got';
 import path from 'path';
 import fs from 'fs';
 import {getRoom} from '../rooms';
+import {getUrl} from '../downloads';
 
+const isDev = process.argv.length === 3;
 const pdf_table_extractor = require('pdf-table-extractor');
 
 (<any>Array.prototype).insert = function (index: number) {
@@ -11,7 +13,7 @@ const pdf_table_extractor = require('pdf-table-extractor');
     return this;
 };
 
-const url = 'https://viktoriaschule-aachen.de/dokumente/upload/8ccbc_AG_Zeiten_Schuljahr_2018_2019_Stand_20190319.pdf';
+let url = 'https://viktoriaschule-aachen.de/dokumente/upload/8ccbc_AG_Zeiten_Schuljahr_2018_2019_Stand_20190319.pdf';
 
 const isNew = (data: any) => {
     let file = path.resolve(process.cwd(), 'out', 'workgroups', 'date.txt');
@@ -120,11 +122,12 @@ const extractData = async (data: any) => {
 
 (async () => {
     const file = path.resolve(process.cwd(), 'out', 'workgroups', 'list.pdf');
+    url = await getUrl('Gesamtübersicht über die AGs im', 152)
     await fetchData(file);
     console.log('Fetched work groups');
     const data = await parseData(file);
     console.log('Parsed work groups');
-    if (isNew(url)) {
+    if (isNew(url) || isDev) {
         fs.writeFileSync(path.resolve(process.cwd(), 'out', 'workgroups', 'workgroups.json'), JSON.stringify(await extractData(data), null, 2));
         console.log('Saved work groups');
     }
