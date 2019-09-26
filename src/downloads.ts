@@ -12,7 +12,7 @@ const parseData = async (raw: string) => {
 };
 
 export const getUrl = async (text: string, menuid: number) => {
-    const data = await parseData(await fetchData(menuid));
+    const data: any = await parseData(await fetchData(menuid));
     const url: any = data.querySelectorAll('.downloadlink').filter((i: any) => i.childNodes[0].rawText.includes(text))[0];
     return 'https://viktoriaschule-aachen.de' + url.rawAttrs.split('href="')[1].split('"')[0].replace('&amp;', '&');
 }
