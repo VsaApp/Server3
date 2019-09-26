@@ -5,10 +5,11 @@ import FormData from 'form-data';
 import path from 'path';
 import fs from 'fs';
 import {getSubject} from '../subjects';
+import {getUrl} from './teachers_url';
 
 const PDFParser = require('pdf2json');
 
-const url = 'https://viktoriaschule-aachen.de/dokumente/upload/3058d_Lehrer_Fakultenliste_20190307.pdf';
+let url;
 
 const isNew = (data: any) => {
     let file = path.resolve(process.cwd(), 'out', 'teachers', 'date.txt');
@@ -33,6 +34,7 @@ const fetchData = (file: string) => {
             cookieJar, body: form
         });
         const stream = fs.createWriteStream(file);
+        url = await getUrl();
         got.stream(url, {
             auth: config.username + ':' + config.password,
             cookieJar
