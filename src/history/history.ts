@@ -133,7 +133,7 @@ export const saveNewReplacementplan = async (raw: string, parsed: any) => {
 
             saveNewVersion('replacementplan', raw, parsed, year, month, day, getFileName());
         } else {
-            const data = await parse(raw);
+            const data: any = await parse(raw);
             const dateStr = data.querySelectorAll('div')[0].childNodes[0].rawText.split(' ')[0].split('.');
             console.log(dateStr);
             const date = new Date(`${dateStr[2]}-${dateStr[1]}-${dateStr[0]}`);
@@ -159,7 +159,7 @@ export const saveNewUnitplan = async (rawA: string, rawB: string, parsed: any) =
             saveNewVersion('unitplan', rawB, [], year, month, day, fileName + 'B');
             saveNewVersion('unitplan', '', parsed, year, month, day, fileName);
         } else {
-            const data = await parse(rawA);
+            const data: any = await parse(rawA);
             const date = data.querySelector('div').childNodes[0].rawText.split(' den ')[1].trim()
             const year = date.split('.')[2].length < 4 ? '20' + date.split('.')[2] : date.split('.')[2];
             const fileName = getFileName();
