@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import {getUrl} from './calendar_url';
 
+const isDev = process.argv.length === 3;
+
 const pdf_table_extractor = require('pdf-table-extractor');
 let url: string;
 
@@ -89,10 +91,10 @@ const extractData = async (data: any) => {
                 if (/^[0-9]/m.test(line)) {
                     line = line.split('. ')[0];
                     let b = line.split(' und ')[0];
-                    const a = b.split('/')[0] + b.split('/')[1].split('.').slice(1).join('.');
+                    const a = b.split('/')[0] + b.split('/')[1].split('.').slice(b.split('/')[0].split('.').length - 1).join('.');
                     b = b.split('/')[1];
                     let d = line.split(' und ')[1];
-                    const c = d.split('/')[0] + d.split('/')[1].split('.').slice(1).join('.');
+                    const c = d.split('/')[0] + d.split('/')[1].split('.').slice(d.split('/')[0].split('.').length - 1).join('.');
                     d = d.split('/')[1];
                     const dates = [a, b, c, d];
                     dates.forEach(date => {
@@ -258,7 +260,6 @@ const extractData = async (data: any) => {
                 }
             });
             let lines2 = lines.join('\n').split('Pädagogischer Tag und Kollegiumstagung:')[1].split('\n').slice(1);
-            console.log('Lines:', lines2);
             lines2.forEach((line: string, i:number) => {
                 if (line.startsWith(' ') && line.includes(':')) {
                     
@@ -404,7 +405,7 @@ const monthToInt = (month: string) => {
     console.log('Fetched calendar');
     const data = await parseData(file);
     console.log('Parsed calendar');
-    if (isNew(url) || true) {
+    if (isNew(url) || isDev) {
         const calendar1: any = await extractData(data);
         const calendar2 = await extractExternalData(calendar1);
         console.log('Fetched external calendar');
