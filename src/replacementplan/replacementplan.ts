@@ -38,7 +38,7 @@ const doWork = async (today: boolean) => {
         saveNewReplacementplan(raw, []);
         const replacementplan = await extractData(data, isDev);
         console.log('Extracted replacement plan for ' + day);
-        replacementplan.forEach(async (data) => {
+        replacementplan.forEach(async (data: any) => {
             fs.writeFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', day, data.participant + '.json'), JSON.stringify(data, null, 2));
         });
         saveNewReplacementplan('', replacementplan);
