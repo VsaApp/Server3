@@ -29,7 +29,7 @@ const getUnitPlanTag = (key: string, device: any, unitplan: any) => {
 
 const getSelectedSubject = (subjects: any, unit: number, selected: string, week: string) => {
     if (unit === 5) return subjects[0];
-    if (selected === undefined) return undefined;
+    if (selected === undefined || selected === null) return undefined;
     week = week.toUpperCase();
     let index = selected.length === 1 ? 0 : week === 'A' ? 0 : 1;
     if (selected.length > 1 && subjects.filter((s: any) => s.week !== 'AB').length === 0) {
