@@ -50,6 +50,9 @@ export const sendNotifications = async (isDev: Boolean, today: Boolean, data: an
                 if (text.length === 0) {
                     text = 'Es gibt keine Änderungen';
                 }
+                //TODO: REMOVE WHEN UNTIPLAN WAS UPDATED
+                text = 'Vertretungsplan wurde aktualisiert!' 
+                
                 const weekday = replacementplan1[0].for.weekday;
                 await sendNotification({
                     devices: [device],
