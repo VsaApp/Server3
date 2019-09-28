@@ -101,6 +101,7 @@ export const extractData = async (raw: any, isDev: boolean) => {
                                 normalCourse = optimizeString(subjectCell.childNodes[0].childNodes[0].rawText).split(' ')[1];
                                 newSubject = '';
                                 newCourse = '';
+                                if (type === 'Trotz Absenz') type = 'Freistunde';
                             }
                             else {
                                 normalSubject = optimizeString(subjectCell.childNodes[0].rawText).split(' ')[0];
@@ -143,7 +144,6 @@ export const extractData = async (raw: any, isDev: boolean) => {
 
                         type = type.replace('Entfall', 'Freistunde');
                         type = type.replace('Betreuung', 'Vertretung');
-                        type = type.replace('Trotz Absenz', 'Vertretung');
 
                         data[grade].data.push({
                             unit: unit,
