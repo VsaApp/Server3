@@ -92,7 +92,7 @@ historyRouter.get('/:directory', async (req, res) => {
                 result[yearIndex].months[monthIndex].days[dayIndex].times = [];
                 for (let l = 0; l < files.length; l++) {
                     const file = files[l];
-                    const parsed = await getCurrentJson(path.resolve(process.cwd(), 'history', req.params.directory, year, month, day, file));
+                    const parsed: any = await getCurrentJson(path.resolve(process.cwd(), 'history', req.params.directory, year, month, day, file));
                     result[yearIndex].months[monthIndex].days[dayIndex].times.push(parsed[0].updated.time);
                 }
             }
