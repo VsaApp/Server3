@@ -157,7 +157,7 @@ export const extractData = async (raw: any, isDev: boolean) => {
                                 course: (newCourse || '').trim().toUpperCase(),
                                 teacher: newParticipant.trim().toUpperCase(),
                                 room: getRoom(newRoom),
-                                info: info
+                                info: (type + ' ' + info).trim()
                             }
                         });
                     });
@@ -179,7 +179,7 @@ export const extractData = async (raw: any, isDev: boolean) => {
 };
 
 const optimizeString = (text: string) => {
-    return text.replace( /\s\s+/g, ' ' );
+    return text.replace( /\s\s+/g, ' ' ).replace('→', '');
 }
 
 const getFullSubject = (subject: any) => {
