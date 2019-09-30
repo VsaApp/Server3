@@ -13,6 +13,8 @@ export const rooms: any = {
     SLZ: 'SLZ',
     WR: 'WerkR',
     TOI: 'Toi',
+    'PH 1': 'Ph1',
+    'PH 2': 'Ph2',
     112: '112',
     113: '113',
     114: '114',

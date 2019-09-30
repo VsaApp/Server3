@@ -54,120 +54,133 @@ export const extractData = async (raw: any, isDev: boolean) => {
         raw.querySelectorAll('tr').forEach((row: any, i: number) => {
             // Check if it's a data line of the current grade
             if ((row.classNames.includes('even') || row.classNames.includes('odd'))) {
-                const grade = row.childNodes[0].childNodes[0].rawText.trim();
-                if (!grades.includes(grade)) return;
                 try {
-                    const rawUnit = row.childNodes[1].childNodes[0].rawText.trim();
-                    rawUnit.split('-').forEach((cUnit: any) => {
-                        let unit = parseInt(cUnit.trim()) - 1;
-                        if (unit > 4) unit++;
-                                                
-                        let info = row.childNodes[6].childNodes[0].rawText.replace('&nbsp;', '').trim();
-                        let type = row.childNodes[3].childNodes[0].rawText.trim();
-                        let normalSubject = '';
-                        let normalCourse = '';
-                        let normalRoom = '';
-                        let normalParticipant = '';
-                        let newSubject = '';
-                        let newCourse = '';
-                        let newRoom = '';
-                        let newParticipant = '';
+                    let rawGrades = row.childNodes[0].childNodes[0].rawText.trim().split(', ');
+                    // Parse the line for each grade
+                    rawGrades.forEach((grade: string) => {
+                        grade = grade.trim();
+                        if (!grades.includes(grade)) return;
+                        try {
+                            const rawUnit = row.childNodes[1].childNodes[0].rawText.trim();
+                            rawUnit.split('-').forEach((cUnit: any) => {
+                                let unit = parseInt(cUnit.trim()) - 1;
+                                if (unit > 4) unit++;
+                                                        
+                                let info = row.childNodes[6].childNodes[0].rawText.replace('&nbsp;', '').trim();
+                                let type = row.childNodes[3].childNodes[0].rawText.trim();
+                                let normalSubject = '';
+                                let normalCourse = '';
+                                let normalRoom = '';
+                                let normalParticipant = '';
+                                let newSubject = '';
+                                let newCourse = '';
+                                let newRoom = '';
+                                let newParticipant = '';
 
-                        let participantCell = row.childNodes[4];
-                        if (participantCell.childNodes[0].tagName === 'span') participantCell = participantCell.childNodes[0];
-                        // No changed teacher
-                        if (participantCell.childNodes.length === 1) {
-                            if (participantCell.querySelectorAll('s').length === 1) {
-                                normalParticipant = optimizeString(participantCell.childNodes[0].childNodes[0].rawText);
-                                newParticipant = '';
-                            }
-                            else {
-                                normalParticipant = optimizeString(participantCell.childNodes[0].rawText);
-                                newParticipant = optimizeString(normalParticipant);
-                            }
-                        }
-                        // Teacher changed
-                        else if (participantCell.childNodes.length === 2) {
-                            normalParticipant = optimizeString(participantCell.childNodes[0].childNodes[0].rawText);
-                            newParticipant = optimizeString(participantCell.childNodes[1].rawText);
-                        }
-
-                        let subjectCell = row.childNodes[2];
-                        if (subjectCell.childNodes[0].tagName === 'span') subjectCell = subjectCell.childNodes[0];
-                        // No changed subject
-                        if (subjectCell.childNodes.length === 1) {
-                            if (subjectCell.querySelectorAll('s').length === 1) {
-                                normalSubject = optimizeString(subjectCell.childNodes[0].childNodes[0].rawText).split(' ')[0];
-                                normalCourse = optimizeString(subjectCell.childNodes[0].childNodes[0].rawText).split(' ')[1];
-                                newSubject = '';
-                                newCourse = '';
-                                if (type === 'Trotz Absenz') type = 'Freistunde';
-                            }
-                            else {
-                                normalSubject = optimizeString(subjectCell.childNodes[0].rawText).split(' ')[0];
-                                normalCourse = optimizeString(subjectCell.childNodes[0].rawText).split(' ')[1];
-                                newCourse = normalCourse;
-                                newSubject = normalSubject;
-                            }
-                        }
-                        // Subject changed
-                        else if (subjectCell.childNodes.length === 2) {
-                            normalSubject = optimizeString(subjectCell.childNodes[0].childNodes[0].rawText).split(' ')[0];
-                            normalCourse = optimizeString(subjectCell.childNodes[0].childNodes[0].rawText).split(' ')[1];
-                            newSubject = optimizeString(subjectCell.childNodes[1].rawText.replace('→', '')).split(' ')[0];
-                            newCourse = optimizeString(subjectCell.childNodes[1].rawText.replace('→', '')).split(' ')[1];
-                        }
-
-                        let roomCell = row.childNodes[5];
-                        if (roomCell.childNodes[0].tagName === 'span') roomCell = roomCell.childNodes[0];
-                        // No changed room
-                        if (roomCell.childNodes.length === 1) {
-                            if (roomCell.querySelectorAll('s').length === 1) {
-                                normalRoom = optimizeString(roomCell.childNodes[0].childNodes[0].rawText);
-                                newRoom = '';
-                            }
-                            else {
-                                normalRoom = optimizeString(roomCell.childNodes[0].rawText);
-                                newRoom = normalRoom;
-
-                                if (normalRoom === '---') {
-                                    normalRoom = '';
-                                    newRoom = '';
+                                let participantCell = row.childNodes[4];
+                                if (participantCell.childNodes[0].tagName === 'span') participantCell = participantCell.childNodes[0];
+                                // No changed teacher
+                                if (participantCell.childNodes.length === 1) {
+                                    if (participantCell.querySelectorAll('s').length === 1) {
+                                        normalParticipant = optimizeString(participantCell.childNodes[0].childNodes[0].rawText);
+                                        newParticipant = '';
+                                    }
+                                    else {
+                                        normalParticipant = optimizeString(participantCell.childNodes[0].rawText);
+                                        newParticipant = optimizeString(normalParticipant);
+                                    }
                                 }
-                            }
-                        }
-                        // room changed
-                        else if (roomCell.childNodes.length === 2) {
-                            normalRoom = optimizeString(roomCell.childNodes[0].childNodes[0].rawText);
-                            newRoom = optimizeString(roomCell.childNodes[1].rawText.replace('→', ''));
-                        }
+                                // Teacher changed
+                                else if (participantCell.childNodes.length === 2) {
+                                    normalParticipant = optimizeString(participantCell.childNodes[0].childNodes[0].rawText);
+                                    newParticipant = optimizeString(participantCell.childNodes[1].rawText);
+                                }
 
-                        type = type.replace('Entfall', 'Freistunde');
-                        type = type.replace('Betreuung', 'Vertretung');
+                                let subjectCell = row.childNodes[2];
+                                if (subjectCell.childNodes[0].tagName === 'span') subjectCell = subjectCell.childNodes[0];
+                                // No changed subject
+                                if (subjectCell.childNodes.length === 1) {
+                                    if (subjectCell.querySelectorAll('s').length === 1) {
+                                        normalSubject = optimizeString(subjectCell.childNodes[0].childNodes[0].rawText).split(' ')[0];
+                                        normalCourse = optimizeString(subjectCell.childNodes[0].childNodes[0].rawText).split(' ')[1];
+                                        newSubject = '';
+                                        newCourse = '';
+                                        if (type === 'Trotz Absenz') type = 'Freistunde';
+                                    }
+                                    else {
+                                        normalSubject = optimizeString(subjectCell.childNodes[0].rawText).split(' ')[0];
+                                        normalCourse = optimizeString(subjectCell.childNodes[0].rawText).split(' ')[1];
+                                        newCourse = normalCourse;
+                                        newSubject = normalSubject;
+                                    }
+                                }
+                                // Subject changed
+                                else if (subjectCell.childNodes.length === 2) {
+                                    normalSubject = optimizeString(subjectCell.childNodes[0].childNodes[0].rawText).split(' ')[0];
+                                    normalCourse = optimizeString(subjectCell.childNodes[0].childNodes[0].rawText).split(' ')[1];
+                                    newSubject = optimizeString(subjectCell.childNodes[1].rawText.replace('→', '')).split(' ')[0];
+                                    newCourse = optimizeString(subjectCell.childNodes[1].rawText.replace('→', '')).split(' ')[1];
+                                }
 
-                        data[grade].data.push({
-                            unit: unit,
-                            subject: getFullSubject(normalSubject),
-                            course: (normalCourse || '').trim().toUpperCase(),
-                            room: getRoom(normalRoom),
-                            participant: normalParticipant.trim().toUpperCase(),
-                            type: type,
-                            change: {
-                                subject: getFullSubject(newSubject),
-                                course: (newCourse || '').trim().toUpperCase(),
-                                teacher: newParticipant.trim().toUpperCase(),
-                                room: getRoom(newRoom),
-                                info: (type + ' ' + info).trim()
-                            }
-                        });
+                                let roomCell = row.childNodes[5];
+                                if (roomCell.childNodes[0].tagName === 'span') roomCell = roomCell.childNodes[0];
+                                // No changed room
+                                if (roomCell.childNodes.length === 1) {
+                                    if (roomCell.querySelectorAll('s').length === 1) {
+                                        normalRoom = optimizeString(roomCell.childNodes[0].childNodes[0].rawText);
+                                        newRoom = '';
+                                    }
+                                    else {
+                                        normalRoom = optimizeString(roomCell.childNodes[0].rawText);
+                                        newRoom = normalRoom;
+
+                                        if (normalRoom === '---') {
+                                            normalRoom = '';
+                                            newRoom = '';
+                                        }
+                                    }
+                                }
+                                // room changed
+                                else if (roomCell.childNodes.length === 2) {
+                                    normalRoom = optimizeString(roomCell.childNodes[0].childNodes[0].rawText);
+                                    newRoom = optimizeString(roomCell.childNodes[1].rawText.replace('→', ''));
+                                }
+
+                                type = type.replace('Entfall', 'Freistunde');
+                                type = type.replace('Betreuung', 'Vertretung');
+
+                                data[grade].data.push({
+                                    unit: unit,
+                                    subject: getFullSubject(normalSubject),
+                                    course: (normalCourse || '').trim().toUpperCase(),
+                                    room: getRoom(normalRoom),
+                                    participant: normalParticipant.trim().toUpperCase(),
+                                    type: type,
+                                    change: {
+                                        subject: getFullSubject(newSubject),
+                                        course: (newCourse || '').trim().toUpperCase(),
+                                        teacher: newParticipant.trim().toUpperCase(),
+                                        room: getRoom(newRoom),
+                                        info: (type + ' ' + info).trim()
+                                    }
+                                });
+                            });
+                            
+                        } catch (e) {
+                            console.error('Cannot parse element:', i, date, row, e);
+                            
+                            const rawLine = row.childNodes.map((element: any) => element.rawText.replace('&nbsp;', ''));
+                            data[grade].unparsed.push(rawLine);
+                            if (!isDev) sendMail(grade, date, update, i, e);
+                        }
                     });
-                    
                 } catch (e) {
-                    console.error('Cannot parse element:', i, date, row, e);
-                    
+                    console.error('Cannot parse grade:', i, data, row, e);
                     const rawLine = row.childNodes.map((element: any) => element.rawText.replace('&nbsp;', ''));
-                    data[grade].unparsed.push(rawLine);
-                    if (!isDev) sendMail(grade, date, update, i, e);
+                    Object.keys(data).forEach((grade: string) => {
+                        data[grade].unparsed.push(rawLine);
+                    });
+                    if (!isDev) sendMail('???', date, update, i, e);
                 }
             }
         });
@@ -179,7 +192,7 @@ export const extractData = async (raw: any, isDev: boolean) => {
 };
 
 const optimizeString = (text: string) => {
-    return text.replace( /\s\s+/g, ' ' ).replace('→', '');
+    return text.replace( /\s\s+/g, ' ' ).replace('→', '').replace('&nbsp;', '');
 }
 
 const getFullSubject = (subject: any) => {
