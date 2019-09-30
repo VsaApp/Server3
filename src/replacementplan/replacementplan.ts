@@ -8,7 +8,7 @@ import {sendNotifications} from './notifications';
 import '../../downloadMyTags';
 import {initFirebase} from '../firebase';
 import downloadTags from '../../downloadMyTags';
-import { print } from 'util';
+import {informViktoriaApp} from './informViktoriaApp';
 
 const isCli = module.parent === null;
 const isDev = process.argv.length >= 3;
@@ -65,15 +65,21 @@ const doWork = async (today: boolean) => {
         });
 
         await sendNotifications(isDev, today, data, replacementplan, unitplans);
+        return true;
     }
+    return false;
 };
+
+
 
 const work = async () => {
     if (updateTags) await downloadTags();
     if (!isTest && isCli) {
         await initFirebase();
-        doWork(true);
-        if (replacementPlanPath === undefined) doWork(false);
+        const updated1 = await doWork(true);
+        let updated2 = false;
+        if (replacementPlanPath === undefined) updated2 = await doWork(false);
+        if (!isDev && (updated1 || updated2)) informViktoriaApp()
     }
 }
 

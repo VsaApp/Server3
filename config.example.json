@@ -9,5 +9,7 @@
     "emailUser": "TEST@EXAMPLE.de",
     "emailKey": "EMAIL_KEY",
     "apiEndpoint": "https://api.vsa.2bad2c0.de/",
-    "isFirstQ": true
+    "isFirstQ": true,
+    "viktoriaAppUsername": "USERNAME",
+    "viktoriaAppPassword": "PASSWORD"
 }
