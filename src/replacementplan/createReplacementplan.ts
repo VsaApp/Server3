@@ -192,7 +192,7 @@ export const extractData = async (raw: any, isDev: boolean) => {
 };
 
 const optimizeString = (text: string) => {
-    return text.replace( /\s\s+/g, ' ' ).replace('→', '').replace('&nbsp;', '');
+    return text.replace( /\s\s+/g, ' ' ).replace('→', '').replace('&nbsp;', '').replace('---', '');
 }
 
 const getFullSubject = (subject: any) => {
