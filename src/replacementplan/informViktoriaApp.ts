@@ -41,7 +41,7 @@ const parseDay = (for_day: string) => {
     };
 
     const files = fs.readdirSync(path.resolve(process.cwd(), 'out', 'replacementplan', for_day));
-    files.map((file: string) => {
+    files.filter((file) => file.endsWith('.json')).map((file: string) => {
         const day = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', for_day, file)).toString());
         data.forDate = day.for.date;
         data.forDay = day.for.weekday;
