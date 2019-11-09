@@ -3,11 +3,14 @@ import express from 'express';
 import { UpdateData } from '../utils/interfaces';
 import { getSubstitutionPlanVersion } from '../substitution_plan/sp_butler';
 import { getTimetableVersion } from '../timetable/tt_butler';
+import { getGrade } from '../authentication/ldap';
+import getAuth from '../utils/auth';
 
 const updatesRouter = express.Router();
 
 // Sends the update data
 updatesRouter.get('/', (req, res) => {
+    const auth = getAuth(req);
     const updates: UpdateData = {
         timetable: getTimetableVersion(),
         cafetoria: fs.statSync('history/cafetoria/current.txt').mtime.toISOString(),
@@ -18,7 +21,8 @@ updatesRouter.get('/', (req, res) => {
         minAppLevel: 1,
         subjectsDef: 1,
         roomsDef: 2,
-        teachersDef: 1
+        teachersDef: 1,
+        grade: getGrade(auth.username, auth.password)
     };
     return res.json(updates);
 });

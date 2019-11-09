@@ -111,7 +111,7 @@ export interface UpdateData {
     subjectsDef: number;
     roomsDef: number;
     teachersDef: number;
-
+    grade: string;
 }
 
 export interface User {
