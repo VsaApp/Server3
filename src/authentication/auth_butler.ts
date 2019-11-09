@@ -3,6 +3,10 @@ import express from 'express';
 
 export const authRouter = express.Router();
 
+authRouter.get('/', (req, res) => {
+    return res.json({status: true});
+});
+
 authRouter.get('/:username/:password', (req, res) => {
     const status = checkLogin(req.params.username, req.params.password);
     return res.json({status: status});
