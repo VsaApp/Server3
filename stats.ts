@@ -1,4 +1,4 @@
-import got from 'got';
+/*import got from 'got';
 import fs from 'fs';
 import path from 'path';
 import {getCurrentJson} from './src/history/utils';
@@ -26,7 +26,7 @@ process.argv.forEach((arg: string, index: number) => {
     }
 });
 
-export const getPaths = async (url: string) => {
+export const getPaths = async (url: string): string[] => {
     const raw = (await got(url)).body;
     const paths: any = [];
     raw.split('<a href="').filter((fragment: string, index: number) => {
@@ -35,12 +35,12 @@ export const getPaths = async (url: string) => {
     return paths;
 }
 
-export const getJson = async (url: string) => {
+export const getJson = async (url: string): Promise<any> => {
     const raw = (await got(url)).body;
     return JSON.parse(raw);
 }
 
-export const getJsonFiles = async (startDate: Date, endDate: Date, onlyNewest: boolean) => {
+export const getJsonFiles = async (startDate: Date, endDate: Date, onlyNewest: boolean) => Promise<any[]> {
 
     console.log('Load all files...');
     const startTime = new Date();
@@ -75,7 +75,7 @@ export const getJsonFiles = async (startDate: Date, endDate: Date, onlyNewest: b
     return allFiles;
 };
 
-export const changesPerGrade = (allNewestFiles: any) => {
+export const changesPerGrade = (allNewestFiles: any): void => {
     console.log('\n\n--Changes per grade--');
     const grades: any = {};
     allNewestFiles.forEach((replacementplan: any) => {
@@ -102,3 +102,4 @@ const logStats = async () => {
 if (isCli) {
     logStats();
 }
+*/

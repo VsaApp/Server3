@@ -3,7 +3,10 @@ import app from '../app';
 
 describe('Misc', () => {
     test('API is up', () => {
-        return request(app).get('/').then((response: any) => {
+        return request(app).get('/').send({
+            username: 'SuS',
+            password: '753Rose*'
+          }).then((response: any) => {
             expect(response.statusCode).toBe(200);
         });
     });

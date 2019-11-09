@@ -1,90 +1,72 @@
 import express from 'express';
 import cors from 'cors';
-import config from './config';
-import {fetchDataForUser} from './cafetoria/cafetoria';
-import {subjects} from './subjects';
-import {rooms} from './rooms';
-import router from './messageboard/messageboard';
-import tagsRouter from './tags/tags';
-import changesRouter from './changes/changes';
-import historyRouter from './history/history';
-import bugsRouter from './bugs/bugs';
-import versionsRouter from '../versions';
-import fs from 'fs';
-import path from 'path';
+import basicAuth from 'express-basic-auth';
+import authorizer from './authentication/auth_butler';
+import { roomsRouter } from './rooms/rooms_butler';
+import { subjectsRouter } from './subjects/subjects_butler';
+import historyRouter from './history/history_butler';
+import updateRouter from './updates/update_butler';
+import {substitutionPlanRouter, updateSubstitutionPlan} from './substitution_plan/sp_butler';
+import {timetableRouter, updateTimetable} from './timetable/tt_butler';
+import {cafetoriaRouter, updateCafetoriaMenus} from './cafetoria/cafetoria_butler';
+import {calendarRouter, updateCalendar} from './calendar/calendar_butler';
+import {teachersRouter, updateTeachers} from './teachers/teachers_butler';
+import tagsRouter from './tags/tags_butler';
+import { authRouter } from './authentication/auth_butler';
+import bugsRouter from './bugs/bugs_router';
+import versionsRouter from './versions/versions_butler';
+import { updateWorkgroups, workgroupsRouter } from './workgroups/workgroups_butler';
+import { initFirebase } from './utils/firebase';
 
 const app = express();
 app.use(cors());
+app.use(basicAuth({authorizer: authorizer, challenge: true}));
 
 app.get('/', (req, res) => {
     res.send('Hello world!');
 });
 
-app.get('/login/:username/:password', (req, res) => {
-    if (req.params.username.toLowerCase() === config.usernamesha && req.params.password.toLowerCase() === config.passwordsha) {
-        return res.json({status: true});
-    }
-    res.json({status: false});
-});
-
-app.get('/updates', (req, res) => {
-    const files: any = {
-        'out/cafetoria/date.txt': 'cafetoria',
-        'out/calendar/date.txt': 'calendar',
-        'out/replacementplan/today.html': 'replacementplantoday',
-        'out/replacementplan/tomorrow.html': 'replacementplantomorrow',
-        'out/teachers/date.txt': 'teachers',
-        'out/unitplan/date.txt': 'unitplan',
-        'out/workgroups/date.txt': 'workgroups',
-    };
-    const data: any = {
-        'subjectsDef': '1',
-        'roomsDef': '2',
-        'teachersDef': '1',
-        'app': '10',
-    };
-    Object.keys(files).forEach((file: string) => {
-        data[files[file]] = fs.statSync(file).mtime;
-    });
-    res.send(data);
-});
-
-app.get('/cafetoria/login/:id/:pin', async (req, res) => {
-    if (req.params.id === 'null' || req.params.pin === 'null' || req.params.id === undefined || req.params.pin === undefined) {
-        req.params.id = '';
-        req.params.pin = '';
-    }
-    try {
-        res.json(await fetchDataForUser(req.params.id, req.params.pin));
-    } catch (e) {
-        res.json(e);
-    }
-});
-
-app.get('/subjects', (req, res) => {
-    res.json(subjects);
-});
-
-app.get('/rooms', (req, res) => {
-    res.json(rooms);
-});
-
-app.get('/replacementplan/:day/:grade', (req, res) => {
-    res.json(JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'replacementplan', req.params.day, req.params.grade), 'utf-8')));
-});
-
-const publicDirectories = ['unitplan', 'cafetoria', 'calendar', 'teachers', 'workgroups'];
-publicDirectories.forEach((directory: string) => {
-    app.get(`/${directory}/:file`, (req, res) => {
-        res.json(JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', directory, req.params.file), 'utf-8')));
-    });
-});
-
-app.use('/messageboard', router);
-app.use('/tags', tagsRouter);
-app.use('/changes', changesRouter);
+app.use('/login', authRouter);
+app.use('/updates', updateRouter);
 app.use('/history', historyRouter);
+app.use('/timetable', timetableRouter);
+app.use('/substitutionplan', substitutionPlanRouter);
+app.use('/cafetoria', cafetoriaRouter);
+app.use('/calendar', calendarRouter);
+app.use('/tags', tagsRouter);
+app.use('/teachers', teachersRouter);
+app.use('/rooms', roomsRouter);
+app.use('/subjects', subjectsRouter);
 app.use('/bugs', bugsRouter);
 app.use('/versions', versionsRouter);
+app.use('/workgroups', workgroupsRouter);
+
+// Init firebase for sending notifications
+initFirebase();
+
+/**
+ * Downloads every minute the substitutionPlan
+ */ 
+const minutely = async (): Promise<void> => {
+    await updateSubstitutionPlan();
+    setTimeout(minutely, 60000);
+};
+/**
+ * Downloads every 24 hours the substitutionPlan
+ */ 
+const daily = async (): Promise<void> => {
+    await updateTeachers();
+    await updateTimetable();
+    await updateCalendar();
+    await updateCafetoriaMenus();
+    await updateWorkgroups();
+    setTimeout(minutely, 60000 * 60 * 24);
+};
+
+// Start download process
+(async () => {
+    await daily();
+    await minutely();
+})();
 
 export default app;

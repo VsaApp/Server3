@@ -74,3 +74,6 @@ bugs.json
 stats.json
 daily.bat
 minutely.bat
+
+/js/
+/ldap.json

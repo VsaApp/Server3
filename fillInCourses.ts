@@ -1,4 +1,4 @@
-import fs from 'fs';
+/*import fs from 'fs';
 import path from 'path';
 import {resetOldChanges, setChangesInUnitplan} from './src/replacementplan/connectWithUnitplan';
 import {getCurrentJson} from './src/history/utils';
@@ -93,3 +93,4 @@ const doWork = async () => {
 };
 
 doWork();
+*/
