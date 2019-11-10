@@ -34,28 +34,34 @@ export const extractData = (week: number, data: any): Timetables => {
                         };
                     }
                     if (a.length === 1 && !a[0].includes('*')) {
+                        const teacherID = a[0].split(' ')[0];
+                        const subjectID = getSubject(a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''));
                         days[day].units[unit].subjects.push({
                             unit: unit,
-                            id: `${grade}-${day}-${unit}-${days[day].units[unit].subjects.length}`,
-                            teacherID: a[0].split(' ')[0],
-                            subjectID: getSubject(a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, '')),
+                            id: `${grade}-${week}-${day}-${unit}-${days[day].units[unit].subjects.length}`,
+                            teacherID: teacherID,
+                            subjectID: subjectID,
                             roomID: getRoomID(a[0].split(' ')[2].toUpperCase()),
-                            courseID: '',
-                            week: week
+                            courseID: `${grade}-${teacherID}-${subjectID}`,
+                            week: week,
+                            block: ''
                         });
                     } else {
                         for (let i = 1; i < a.length; i++) {
                             if (a[i].split(' ').length < 3) {
                                 a[i] += ' a';
                             }
+                            const teacherID = a[i].split(' ')[1];
+                            const subjectID = getSubject(a[i].split(' ')[0].toUpperCase().replace(/[0-9]/g, ''));
                             days[day].units[unit].subjects.push({
                                 unit: unit,
-                                id: `${grade}-${day}-${unit}-${days[day].units[unit].subjects.length}`,
-                                teacherID: a[i].split(' ')[1],
-                                subjectID: getSubject(a[i].split(' ')[0].toUpperCase().replace(/[0-9]/g, '')),
+                                id: `${grade}-${week}-${day}-${unit}-${days[day].units[unit].subjects.length}`,
+                                teacherID: teacherID,
+                                subjectID: subjectID,
                                 roomID: getRoomID(a[i].split(' ')[2].toUpperCase()),
-                                courseID: a[0].split(' ')[1],
-                                week: week
+                                courseID: `${grade}-${a[0].split(' ')[1]}${teacherID}-${subjectID}`,
+                                week: week,
+                                block: a[0].split(' ')[1]
                             });
                         }
                     }
@@ -69,22 +75,24 @@ export const extractData = (week: number, data: any): Timetables => {
                     subjects: [
                         {   
                             unit: 5,
-                            id: `${grade}-${day}-5-0`,
+                            id: `${grade}-${week}-${day}-5-0`,
                             teacherID: '',
                             subjectID: 'Mittagspause',
                             roomID: '',
-                            courseID: '',
+                            courseID: `${grade}--`,
+                            block: '',
                             week: week
                         }
                     ]
                 };
             }
             a.units.forEach((unit: Unit) => {
-                if (unit.subjects.length > 1 || unit.subjects[0].courseID !== '') {
+                if (unit.subjects.length > 1 || unit.subjects[0].block !== '') {
                     unit.subjects.push({
-                        id: `${grade}-${day}-${unit.unit}-${unit.subjects.length}`,
+                        id: `${grade}-${week}-${day}-${unit.unit}-${unit.subjects.length}`,
                         unit: unit.unit,
-                        courseID: unit.subjects[0].courseID,
+                        block: unit.subjects[0].block,
+                        courseID: `${grade}-${unit.subjects[0].block}-`,
                         teacherID: '',
                         subjectID: 'Freistunde',
                         roomID: '',
@@ -175,13 +183,13 @@ export const concatWeeks = (dataA: Timetables, dataB: Timetables): Timetables =>
                 // The unit only exists in week b
                 if (unitA === undefined && unitB !== undefined) {
                     grade.data.days[day].units[unit] = unitB;
-                    grade.data.days[day].units[unit].subjects.forEach((subject: Subject) => subject.week = 1);
+                    grade.data.days[day].units[unit].subjects.forEach((subject: Subject) => setWeekOfSubject(subject, 1));
                     if (unit !== 5) addFreeLesson[0] = true;
                 } 
                 // The unit only exists in week a
                 else if (unitA !== undefined && unitB === undefined) {
                     grade.data.days[day].units[unit] = unitA;
-                    grade.data.days[day].units[unit].subjects.forEach((subject: Subject) => subject.week = 0);
+                    grade.data.days[day].units[unit].subjects.forEach((subject: Subject) => setWeekOfSubject(subject, 0));
                     if (unit !== 5) addFreeLesson[1] = true;
                 }
                 // If the unit exists in both weeks, compare them 
@@ -198,7 +206,7 @@ export const concatWeeks = (dataA: Timetables, dataB: Timetables): Timetables =>
                         for (let l = 0; l < listShort.subjects.length; l++) {
                             const subject2 = listShort.subjects[l];
                             if (subject1.subjectID === subject2.subjectID && subject1.teacherID === subject2.teacherID && subject1.roomID === subject2.roomID) {
-                                subject1.week = 2;
+                                setWeekOfSubject(subject1, 2);
                                 grade.data.days[day].units[unit].subjects.push(subject1);
                                 listShort.subjects.splice(l, 1);
                                 found = true;
@@ -206,7 +214,7 @@ export const concatWeeks = (dataA: Timetables, dataB: Timetables): Timetables =>
                             }
                         }
                         if (!found) {
-                            subject1.week = unitA.subjects.length >= unitB.subjects.length ? 0 : 1;
+                            setWeekOfSubject(subject1, unitA.subjects.length >= unitB.subjects.length ? 0 : 1);
                             addFreeLesson[subject1.week == 1 ? 0 : 1] = true;
                             grade.data.days[day].units[unit].subjects.push(subject1);
                         }
@@ -214,7 +222,7 @@ export const concatWeeks = (dataA: Timetables, dataB: Timetables): Timetables =>
                     if (listShort.subjects.length > 0) {
                         listShort.subjects.forEach((subject: Subject) => {
                             if (unitA !== undefined && unitB !== undefined) {
-                                subject.week = unitA.subjects.length >= unitB.subjects.length ? 1 : 0;
+                                setWeekOfSubject(subject, unitA.subjects.length >= unitB.subjects.length ? 1 : 0);
                                 addFreeLesson[subject.week == 1 ? 0 : 1] = true;
                                 grade.data.days[day].units[unit].subjects.push(subject);
                             }
@@ -222,18 +230,19 @@ export const concatWeeks = (dataA: Timetables, dataB: Timetables): Timetables =>
                     }
                 }
                 addFreeLesson.forEach((j, index) => {
-                    var courseID;
-                    if (unitA) unitA.subjects[0].courseID;
-                    else if (unitB) unitB.subjects[0].courseID;
+                    var block;
+                    if (unitA) block = unitA.subjects[0].block;
+                    else if (unitB) block = unitB.subjects[0].block;
                     if (unitA !== undefined || unitB !== undefined) {
                         if (j) grade.data.days[day].units[unit].subjects.push({
                             unit: unit,
-                            id: `${grade.grade}-${day}-${unit}-${grade.data.days[day].units[unit].subjects.length}`,
+                            id: `${grade.grade}-${index == 0 ? 0 : 1}-${day}-${unit}-${grade.data.days[day].units[unit].subjects.length}`,
                             teacherID: '',
-                            courseID: courseID || '',
+                            courseID: `${grade}-${block}-`,
                             subjectID: 'Freistunde',
                             roomID: '',
-                            week: index == 0 ? 0 : 1
+                            week: index == 0 ? 0 : 1,
+                            block: block || ''
                         });
                     }
                 });
@@ -245,3 +254,9 @@ export const concatWeeks = (dataA: Timetables, dataB: Timetables): Timetables =>
 
     return timetable;
 };
+
+const setWeekOfSubject = (subject: Subject, week: number): void => {
+    subject.week = week;
+    const values = subject.id.split('-');
+    subject.id = `${values[0]}-${week}-${values.slice(2).join('-')}`;
+}

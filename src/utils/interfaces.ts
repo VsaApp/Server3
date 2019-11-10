@@ -25,12 +25,13 @@ export interface Unit {
 
 export interface Subject {
     unit: number; // starts with 0; 6. unit is the lunch break
-    id: string; // Format: GRADE-DAY-UNIT-SUBJECTINDEX (lowercase)
-    courseID: string; // Format: GRADE-COURSE-SUBJECT (lowercase)
+    id: string; // Format: GRADE-WEEK-DAY-UNIT-SUBJECTINDEX (lowercase)
+    courseID: string; // Format: GRADE-COURSE(BLOCK|TEACHER)-SUBJECT (lowercase)
     subjectID: string; // subject shorthand for example "E"; "S"
     teacherID: string; // teacher shorthand (lowercase)
     roomID: string;
     week: number; // 0 => A; 1 => B; 2 => AB
+    block: string;
 }
 
 
@@ -89,6 +90,7 @@ export interface Substitution {
     type: number; // 0 => substitution; 1 => free lesson; 2 => exam
     info: string;
     id: string | undefined;
+    courseID: string | undefined;
     original: SubstitutionDetails;
     changed: SubstitutionDetails;
 }
@@ -119,8 +121,15 @@ export interface User {
     grade: string;
     group: number; // 1 (pupil); 2 (teacher); 4 (developer); 8 (other)
     devices: Device[];
-    selected: string[]; // Subject id list
+    selected: Course[]; // course list
+    exams: Course[]; // course list
     timestamp: string; // iso date
+    lastActive: string; // iso date
+}
+
+export interface Course {
+    courseID: string;
+    subjectIDs: string[]
 }
 
 export interface Device {

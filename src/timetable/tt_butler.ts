@@ -43,6 +43,19 @@ export const getTimetable = async (): Promise<Timetables | undefined> => {
     return undefined;
 }
 
+export const getSubjectIDsFromCourseID = (grade: string, courseID: string): string[] => {
+    const timetable = timetables.grades.get(grade);
+    if (!timetable) throw `Timetable for ${grade} is undefined!`;
+    const subjectIDs = timetable.data.days
+        .map((day) => day.units
+            .map((unit) => unit.subjects
+                .filter((subject) => subject.courseID === courseID)))
+        .reduce((i1, i2) => i1.concat(i2))
+        .reduce((i1, i2) => i1.concat(i2))
+        .map((subject) => subject.id);
+    return subjectIDs;
+}
+
 export const sendNotifications = async (isDev: Boolean): Promise<void> => {
     try {
         let users = getUsers().filter((user: User) => (!isDev || isDeveloper(user.username)) && user.grade !== undefined);

@@ -7,6 +7,7 @@ import { getVersionsList } from '../versions/versions_butler';
 import { User, Device } from '../utils/interfaces';
 import getAuth, { isDeveloper } from '../utils/auth';
 import { getGrade } from '../authentication/ldap';
+import { getSubjectIDsFromCourseID } from '../timetable/tt_butler';
 
 const tagsRouter = express.Router();
 tagsRouter.use(bodyParser.json());
@@ -17,11 +18,19 @@ export const getUser = (username: string): User => {
     return user;
 }
 
+export const requestHandler = (req: any) => {
+    const auth = getAuth(req);
+    const users = db.get('users') || [];
+    const user: User = users.filter((user: User) => user.username == auth.username)[0];
+    if (user) user.lastActive = new Date().toISOString();
+    db.set('users', users);
+}
+
 tagsRouter.get('/:username', (req, res) => {
     const isDev = isDeveloper(getAuth(req).username);
     if (!isDev) {
         res.status(401);
-        res.json({error: 'unauthorized'});
+        res.json({ error: 'unauthorized' });
         return;
     }
     const user = getUser(req.params.username);
@@ -33,10 +42,11 @@ tagsRouter.get('/', (req, res) => {
         const user = getUser(getAuth(req).username);
         return res.json(user !== undefined ? user : {});
     }
-    return res.status(401);
+    res.status(401)
+    return res.json({ error: 'unauthorized' });
 });
 
-tagsRouter.post('/add', (req, res) => {
+tagsRouter.post('/', (req, res) => {
     const users: User[] = db.get('users') || [];
     const auth = getAuth(req);
     let user = users.filter((user: User) => user.username == auth.username)[0];
@@ -47,12 +57,14 @@ tagsRouter.post('/add', (req, res) => {
             group: isDeveloper(auth.username) ? 5 : 1,
             devices: [],
             selected: [],
-            timestamp: new Date().toISOString()
+            exams: [],
+            timestamp: new Date().toISOString(),
+            lastActive: new Date().toISOString()
         });
         user = users.filter((user: User) => user.username == auth.username)[0];
     }
     user.timestamp = new Date().toISOString();
-    
+
     // If the device is updated, update it
     if (req.body.device) {
         const newDevice = req.body.device;
@@ -74,25 +86,62 @@ tagsRouter.post('/add', (req, res) => {
             device.appVersion = newDevice.appVersion || device.appVersion;
             device.notifications = newDevice.notifications || device.notifications;
         }
-    } 
+    }
 
     // If the selection is updated, update it
     if (req.body.selected) {
         const selected: string[] = req.body.selected;
-        selected.forEach((id) => {
-            const unit = id.split('-').slice(0, -1).join('-');
-            const current = user.selected.filter((_id) => _id.startsWith(unit))[0];
+        selected.forEach((courseID) => {
+            const subjectIDs = getSubjectIDsFromCourseID(user.grade, courseID);
+            const units = subjectIDs.map((id) => id.split('-').slice(0, -1).join('-'));
+            const current = user.selected
+                .filter((course) => {
+                    return course.subjectIDs
+                        .map((id) => units.includes(id.split('-').slice(0, -1).join('-')))
+                        .reduce((v1, v2) => v1 || v2);
+                })[0];
             // If there is already a selection for this unit, replace it
             if (current) {
-                user.selected[user.selected.indexOf(current)] = id;
+                user.selected[user.selected.indexOf(current)] = {
+                    courseID: courseID,
+                    subjectIDs: subjectIDs
+                };
             } else {
-                user.selected.push(id);
+                user.selected.push({
+                    courseID: courseID,
+                    subjectIDs: subjectIDs
+                });
+            }
+        });
+    }
+    if (req.body.exams) {
+        const exams: string[] = req.body.exams;
+        exams.forEach((courseID) => {
+            const subjectIDs = getSubjectIDsFromCourseID(user.grade, courseID);
+            const units = subjectIDs.map((id) => id.split('-').slice(0, -1).join('-'));
+            const current = user.selected
+                .filter((course) => {
+                    return course.subjectIDs
+                        .map((id) => units.includes(id.split('-').slice(0, -1).join('-')))
+                        .reduce((v1, v2) => v1 || v2);
+                })[0];
+            // If there is already a selection for this unit, replace it
+            if (current) {
+                user.exams[user.exams.indexOf(current)] = {
+                    courseID: courseID,
+                    subjectIDs: subjectIDs
+                };
+            } else {
+                user.exams.push({
+                    courseID: courseID,
+                    subjectIDs: subjectIDs
+                });
             }
         });
     }
 
     db.set('users', users);
-    res.json({'error': null});
+    res.json({ 'error': null });
 
     updateStats(user, req.body);
 });
@@ -100,7 +149,7 @@ tagsRouter.post('/add', (req, res) => {
 const updateStats = (user: User, newTags: any): void => {
     if (newTags.appVersion === undefined) return;
     const file = path.resolve(process.cwd(), 'stats.json');
-    let data: any = {appStarts: {}, users: {}};
+    let data: any = { appStarts: {}, users: {} };
     if (!fs.existsSync(file)) {
         fs.writeFileSync(file, JSON.stringify(data, null, 2));
     } else {
@@ -122,21 +171,44 @@ const updateStats = (user: User, newTags: any): void => {
     fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
 
-tagsRouter.post('/remove', (req, res) => {
+tagsRouter.delete('/', (req, res) => {
     const auth = getAuth(req);
     const users: User[] = db.get('users') || [];
     const user = users.filter((user: User) => user.username == auth.username)[0];
     if (user === undefined) {
-        res.json({'error': 'Invalid user'});
+        res.json({ 'error': 'Invalid user' });
         return;
     }
 
-    req.body.forEach((key: string) => {
-        user.selected.splice(user.selected.indexOf(key), 1);
-    });
+    user.timestamp = new Date().toISOString();
+
+    if (req.body.selected !== undefined) {
+        req.body.selected.forEach((courseID: string) => {
+            try {
+                user.selected.splice(
+                    user.selected.indexOf(user.selected.filter((course) => course.courseID === courseID)[0]),
+                    1,
+                );
+            } catch (_) {
+                res.status(400);
+            }
+        });
+    }
+    if (req.body.exams !== undefined) {
+        req.body.exams.forEach((courseID: string) => {
+            try {
+                user.exams.splice(
+                    user.exams.indexOf(user.exams.filter((course) => course.courseID === courseID)[0]),
+                    1,
+                );
+            } catch (_) {
+                res.status(400);
+            }
+        });
+    }
 
     db.set('users', users);
-    res.json({'error': null});
+    res.json({ 'error': null });
 });
 
 export default tagsRouter;

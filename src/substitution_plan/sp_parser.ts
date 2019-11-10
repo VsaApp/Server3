@@ -172,6 +172,7 @@ const parseSubstitutionPlan = async (raw: any, isDev: boolean): Promise<Substitu
                                     type: type,
                                     info: info,
                                     id: undefined,
+                                    courseID: undefined,
                                     original: {
                                         subjectID: normalSubject.toLowerCase().replace(/[0-9]/g, ''),
                                         teacherID: normalTeacher.toLowerCase(),

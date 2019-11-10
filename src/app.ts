@@ -6,12 +6,12 @@ import { roomsRouter } from './rooms/rooms_butler';
 import { subjectsRouter } from './subjects/subjects_butler';
 import historyRouter from './history/history_butler';
 import updateRouter from './updates/update_butler';
-import {substitutionPlanRouter, updateSubstitutionPlan} from './substitution_plan/sp_butler';
-import {timetableRouter, updateTimetable} from './timetable/tt_butler';
-import {cafetoriaRouter, updateCafetoriaMenus} from './cafetoria/cafetoria_butler';
-import {calendarRouter, updateCalendar} from './calendar/calendar_butler';
-import {teachersRouter, updateTeachers} from './teachers/teachers_butler';
-import tagsRouter from './tags/tags_butler';
+import { substitutionPlanRouter, updateSubstitutionPlan } from './substitution_plan/sp_butler';
+import { timetableRouter, updateTimetable } from './timetable/tt_butler';
+import { cafetoriaRouter, updateCafetoriaMenus } from './cafetoria/cafetoria_butler';
+import { calendarRouter, updateCalendar } from './calendar/calendar_butler';
+import { teachersRouter, updateTeachers } from './teachers/teachers_butler';
+import tagsRouter, { requestHandler } from './tags/tags_butler';
 import { authRouter } from './authentication/auth_butler';
 import bugsRouter from './bugs/bugs_router';
 import versionsRouter from './versions/versions_butler';
@@ -20,7 +20,11 @@ import { initFirebase } from './utils/firebase';
 
 const app = express();
 app.use(cors());
-app.use(basicAuth({authorizer: authorizer, challenge: true}));
+app.use(basicAuth({ authorizer: authorizer, challenge: true }));
+app.use((req, res, next) => {
+    requestHandler(req);
+    next();
+});
 
 app.get('/', (req, res) => {
     res.send('Hello world!');
@@ -46,14 +50,14 @@ initFirebase();
 
 /**
  * Downloads every minute the substitutionPlan
- */ 
+ */
 const minutely = async (): Promise<void> => {
     await updateSubstitutionPlan();
     setTimeout(minutely, 60000);
 };
 /**
  * Downloads every 24 hours the substitutionPlan
- */ 
+ */
 const daily = async (): Promise<void> => {
     await updateTeachers();
     await updateTimetable();
