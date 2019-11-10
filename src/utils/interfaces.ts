@@ -120,6 +120,7 @@ export interface User {
     group: number; // 1 (pupil); 2 (teacher); 4 (developer); 8 (other)
     devices: Device[];
     selected: string[]; // Subject id list
+    timestamp: string; // iso date
 }
 
 export interface Device {
@@ -129,7 +130,6 @@ export interface Device {
     notifications: boolean;
     firebaseId: string;
     language: string;
-    timestamp: string; // iso date
 }
 
 export interface Cafetoria {
