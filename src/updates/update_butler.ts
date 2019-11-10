@@ -18,7 +18,7 @@ updatesRouter.get('/', (req, res) => {
         workgroups: fs.statSync('history/workgroups/current.txt').mtime.toISOString(),
         teachers: fs.statSync('history/teachers/current.txt').mtime.toISOString(),
         substitutionPlan: getSubstitutionPlanVersion(),
-        minAppLevel: 1,
+        minAppLevel: 27,
         subjectsDef: 1,
         roomsDef: 2,
         teachersDef: 1,
