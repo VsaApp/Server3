@@ -129,6 +129,7 @@ export interface Device {
     notifications: boolean;
     firebaseId: string;
     language: string;
+    timestamp: string; // iso date
 }
 
 export interface Cafetoria {

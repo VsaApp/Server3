@@ -44,7 +44,7 @@ tagsRouter.post('/add', (req, res) => {
         users.push({
             username: auth.username,
             grade: getGrade(auth.username, auth.password),
-            group: 1,
+            group: isDeveloper(auth.username) ? 5 : 1,
             devices: [],
             selected: []
         });
@@ -63,6 +63,7 @@ tagsRouter.post('/add', (req, res) => {
                 firebaseId: newDevice.firebaseId,
                 appVersion: newDevice.appVersion,
                 notifications: newDevice.notifications,
+                timestamp: new Date().toISOString()
             });
         } else {
             device.os = newDevice.os || device.os;
@@ -71,6 +72,7 @@ tagsRouter.post('/add', (req, res) => {
             device.firebaseId = newDevice.firebaseId || device.firebaseId;
             device.appVersion = newDevice.appVersion || device.appVersion;
             device.notifications = newDevice.notifications || device.notifications;
+            device.timestamp = new Date().toISOString();
         }
     } 
 
