@@ -35,7 +35,7 @@ export const extractData = (week: number, data: any): Timetables => {
                     }
                     if (a.length === 1 && !a[0].includes('*')) {
                         const teacherID = a[0].split(' ')[0];
-                        const subjectID = getSubject(a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, ''));
+                        const subjectID = a[0].split(' ')[1].toUpperCase().replace(/[0-9]/g, '');
                         days[day].units[unit].subjects.push({
                             unit: unit,
                             id: `${grade}-${week}-${day}-${unit}-${days[day].units[unit].subjects.length}`,
@@ -52,7 +52,7 @@ export const extractData = (week: number, data: any): Timetables => {
                                 a[i] += ' a';
                             }
                             const teacherID = a[i].split(' ')[1];
-                            const subjectID = getSubject(a[i].split(' ')[0].toUpperCase().replace(/[0-9]/g, ''));
+                            const subjectID = a[i].split(' ')[0].toUpperCase().replace(/[0-9]/g, '');
                             days[day].units[unit].subjects.push({
                                 unit: unit,
                                 id: `${grade}-${week}-${day}-${unit}-${days[day].units[unit].subjects.length}`,
