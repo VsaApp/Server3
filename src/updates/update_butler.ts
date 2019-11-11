@@ -5,6 +5,8 @@ import { getSubstitutionPlanVersion } from '../substitution_plan/sp_butler';
 import { getTimetableVersion } from '../timetable/tt_butler';
 import { getGrade } from '../authentication/ldap';
 import getAuth from '../utils/auth';
+import { subjectsDate } from '../utils/subjects';
+import { roomsDate } from '../utils/rooms';
 
 const updatesRouter = express.Router();
 
@@ -18,10 +20,9 @@ updatesRouter.get('/', (req, res) => {
         workgroups: fs.statSync('history/workgroups/current.txt').mtime.toISOString(),
         teachers: fs.statSync('history/teachers/current.txt').mtime.toISOString(),
         substitutionPlan: getSubstitutionPlanVersion(),
+        subjects: subjectsDate,
+        rooms: roomsDate,
         minAppLevel: 27,
-        subjectsDef: 1,
-        roomsDef: 2,
-        teachersDef: 1,
         grade: getGrade(auth.username, auth.password)
     };
     return res.json(updates);

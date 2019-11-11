@@ -12,7 +12,7 @@ export const getRoomID = (name: string): string => {
     }
     return rooms[name];
 };
-
+export const roomsDate: string = '2019-11-11T17:48:38.290Z';
 export const rooms: any = {
     KLH: 'klH',
     'KL SPH': 'klH',

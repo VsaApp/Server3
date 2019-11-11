@@ -1,3 +1,4 @@
+export const subjectsDate: string = '2019-11-11T17:49:34.781Z';
 export const subjects: any = {
     BI: 'Bio',
     CH: 'Chemie',

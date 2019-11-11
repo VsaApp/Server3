@@ -109,10 +109,9 @@ export interface UpdateData {
     calendar: string; // ISO 8601
     teachers: string; // ISO 8601
     workgroups: string; // ISO 8601
+    subjects: string; // ISO 8601
+    rooms: string; // ISO 8601
     minAppLevel: number; 
-    subjectsDef: number;
-    roomsDef: number;
-    teachersDef: number;
     grade: string;
 }
 
