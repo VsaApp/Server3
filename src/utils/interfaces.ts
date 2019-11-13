@@ -121,7 +121,7 @@ export interface User {
     group: number; // 1 (pupil); 2 (teacher); 4 (developer); 8 (other)
     devices: Device[];
     selected: Course[]; // course list
-    exams: Course[]; // course list
+    exams: String[]; // course list
     timestamp: string; // iso date
     lastActive: string; // iso date
 }

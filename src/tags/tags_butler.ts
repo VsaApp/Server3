@@ -90,6 +90,7 @@ tagsRouter.post('/', (req, res) => {
 
     // If the selection is updated, update it
     if (req.body.selected) {
+        // TODO: AB weeks
         const selected: string[] = req.body.selected;
         selected.forEach((courseID) => {
             const subjectIDs = getSubjectIDsFromCourseID(user.grade, courseID);
@@ -117,25 +118,8 @@ tagsRouter.post('/', (req, res) => {
     if (req.body.exams) {
         const exams: string[] = req.body.exams;
         exams.forEach((courseID) => {
-            const subjectIDs = getSubjectIDsFromCourseID(user.grade, courseID);
-            const units = subjectIDs.map((id) => id.split('-').slice(0, -1).join('-'));
-            const current = user.selected
-                .filter((course) => {
-                    return course.subjectIDs
-                        .map((id) => units.includes(id.split('-').slice(0, -1).join('-')))
-                        .reduce((v1, v2) => v1 || v2);
-                })[0];
-            // If there is already a selection for this unit, replace it
-            if (current) {
-                user.exams[user.exams.indexOf(current)] = {
-                    courseID: courseID,
-                    subjectIDs: subjectIDs
-                };
-            } else {
-                user.exams.push({
-                    courseID: courseID,
-                    subjectIDs: subjectIDs
-                });
+            if (!user.exams.includes(courseID)) {
+                user.exams.push(courseID);
             }
         });
     }
@@ -182,7 +166,7 @@ tagsRouter.delete('/', (req, res) => {
 
     user.timestamp = new Date().toISOString();
 
-    if (req.body.selected !== undefined) {
+    if (req.body.selected) {
         req.body.selected.forEach((courseID: string) => {
             try {
                 user.selected.splice(
@@ -190,19 +174,17 @@ tagsRouter.delete('/', (req, res) => {
                     1,
                 );
             } catch (_) {
-                res.status(400);
             }
         });
     }
-    if (req.body.exams !== undefined) {
+    if (req.body.exams) {
         req.body.exams.forEach((courseID: string) => {
             try {
                 user.exams.splice(
-                    user.exams.indexOf(user.exams.filter((course) => course.courseID === courseID)[0]),
+                    user.exams.indexOf(courseID),
                     1,
                 );
             } catch (_) {
-                res.status(400);
             }
         });
     }
