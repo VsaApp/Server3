@@ -47,6 +47,10 @@ tagsRouter.get('/', (req, res) => {
 });
 
 tagsRouter.post('/', (req, res) => {
+    if (req.body.timestamp === undefined) {
+        res.json({ 'error': 'Timestamp must not be null' });
+        return;
+    }
     const users: User[] = db.get('users') || [];
     const auth = getAuth(req);
     let user = users.filter((user: User) => user.username == auth.username)[0];
@@ -63,7 +67,6 @@ tagsRouter.post('/', (req, res) => {
         });
         user = users.filter((user: User) => user.username == auth.username)[0];
     }
-    user.timestamp = new Date().toISOString();
 
     // If the device is updated, update it
     if (req.body.device) {
@@ -92,6 +95,7 @@ tagsRouter.post('/', (req, res) => {
     if (req.body.selected) {
         // TODO: AB weeks
         const selected: string[] = req.body.selected;
+        if (selected.length > 0) user.timestamp = req.body.timestamp;
         selected.forEach((courseID) => {
             const subjectIDs = getSubjectIDsFromCourseID(user.grade, courseID);
             const units = subjectIDs.map((id) => id.split('-').slice(0, -1).join('-'));
@@ -117,6 +121,7 @@ tagsRouter.post('/', (req, res) => {
     }
     if (req.body.exams) {
         const exams: string[] = req.body.exams;
+        if (exams.length > 0) user.timestamp = req.body.timestamp;
         exams.forEach((courseID) => {
             if (!user.exams.includes(courseID)) {
                 user.exams.push(courseID);
@@ -156,6 +161,10 @@ const updateStats = (user: User, newTags: any): void => {
 }
 
 tagsRouter.delete('/', (req, res) => {
+    if (req.body.timestamp === undefined) {
+        res.json({ 'error': 'Timestamp must not be null' });
+        return;
+    }
     const auth = getAuth(req);
     const users: User[] = db.get('users') || [];
     const user = users.filter((user: User) => user.username == auth.username)[0];
@@ -164,9 +173,8 @@ tagsRouter.delete('/', (req, res) => {
         return;
     }
 
-    user.timestamp = new Date().toISOString();
-
     if (req.body.selected) {
+        if (req.body.selected.length > 0) user.timestamp = req.body.timestamp;
         req.body.selected.forEach((courseID: string) => {
             try {
                 user.selected.splice(
@@ -178,6 +186,7 @@ tagsRouter.delete('/', (req, res) => {
         });
     }
     if (req.body.exams) {
+        if (req.body.exams.length > 0) user.timestamp = req.body.timestamp;
         req.body.exams.forEach((courseID: string) => {
             try {
                 user.exams.splice(
