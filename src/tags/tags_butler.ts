@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import fs from 'fs';
 import path from 'path';
 import { getVersionsList } from '../versions/versions_butler';
-import { User, Device } from '../utils/interfaces';
+import { User, Device, Tags } from '../utils/interfaces';
 import getAuth, { isDeveloper } from '../utils/auth';
 import { getGrade } from '../authentication/ldap';
 import { getSubjectIDsFromCourseID } from '../timetable/tt_butler';
@@ -26,28 +26,28 @@ export const requestHandler = (req: any) => {
     db.set('users', users);
 }
 
-tagsRouter.get('/:username', (req, res) => {
-    const isDev = isDeveloper(getAuth(req).username);
-    if (!isDev) {
-        res.status(401);
-        res.json({ error: 'unauthorized' });
-        return;
-    }
-    const user = getUser(req.params.username);
-    return res.json(user !== undefined ? user : {});
-});
-
 tagsRouter.get('/', (req, res) => {
     if (req.headers.authorization) {
         const user = getUser(getAuth(req).username);
-        return res.json(user !== undefined ? user : {});
+        if (user) {
+            const tags: Tags = {
+                grade: user.grade,
+                group: user.group,
+                selected: user.selected.map((course) => course.courseID),
+                exams: user.exams,
+                timestamp: user.timestamp
+            }
+            return res.json(tags);
+        }
+        return res.json({});
     }
-    res.status(401)
+    res.status(401);
     return res.json({ error: 'unauthorized' });
 });
 
 tagsRouter.post('/', (req, res) => {
     if (req.body.timestamp === undefined) {
+        res.status(400);
         res.json({ 'error': 'Timestamp must not be null' });
         return;
     }
@@ -162,6 +162,7 @@ const updateStats = (user: User, newTags: any): void => {
 
 tagsRouter.delete('/', (req, res) => {
     if (req.body.timestamp === undefined) {
+        res.status(400);
         res.json({ 'error': 'Timestamp must not be null' });
         return;
     }

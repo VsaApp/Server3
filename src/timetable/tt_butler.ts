@@ -17,17 +17,6 @@ timetableRouter.get('/', (req, res) => {
     return res.json(timetables.grades.get(grade));
 });
 
-timetableRouter.get('/:grade', (req, res) => {
-    const isDev = isDeveloper(getAuth(req).username);
-    if (!isDev) {
-        res.status(401)
-        res.json({error: 'unauthorized'});
-        return;
-    }
-    const grade: string = req.params.grade;
-    return res.json(timetables.grades.get(grade));
-});
-
 export const updateTimetable = async (): Promise<void> => {
     timetablePromise = download(timetables !== undefined)
     timetables = await timetablePromise || timetables;

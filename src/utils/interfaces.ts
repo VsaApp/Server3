@@ -115,13 +115,21 @@ export interface UpdateData {
     grade: string;
 }
 
+export interface Tags {
+    grade: string;
+    group: number; // 1 (pupil); 2 (teacher); 4 (developer); 8 (other)
+    selected: string[]; // course list
+    exams: string[]; // course list
+    timestamp: string; // iso date
+}
+
 export interface User {
     username: string;
     grade: string;
     group: number; // 1 (pupil); 2 (teacher); 4 (developer); 8 (other)
     devices: Device[];
     selected: Course[]; // course list
-    exams: String[]; // course list
+    exams: string[]; // course list
     timestamp: string; // iso date
     lastActive: string; // iso date
 }
