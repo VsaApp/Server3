@@ -1,5 +1,5 @@
-const admin = require('firebase-admin');
-const path = require('path');
+import admin from 'firebase-admin';
+import path from 'path';
 
 export const initFirebase = () => { 
     console.log("Init firebase");
@@ -14,7 +14,7 @@ export const initFirebase = () => {
 export const send = async (tokens: string[], data: any, options?: any): Promise<void> => {
     return new Promise((resolve, reject) => {
         admin.messaging().sendToDevice(tokens, data, options)
-            .then(resolve)
+            .then(() => resolve())
             .catch(function(error: any) {
                 console.error('Error sending message:', error);
                 resolve();

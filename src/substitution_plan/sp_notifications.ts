@@ -20,7 +20,7 @@ export const sendNotifications = async (isDev: Boolean, day: number, substitutio
                             'Vertretungsplan wurde aktualisiert!' :
                             'There is a new substitution plan!';
                         await sendNotification({
-                            users: [user],
+                            devices: [device],
                             group: weekday.toString(),
                             text: text,
                             title: getWeekday(weekday, device.language),
