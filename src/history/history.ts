@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import {parse} from 'node-html-parser';
 import { parseDates as sp_parseDates} from '../substitution_plan/sp_parser';
-import { parseDate as tt_parseDate } from '../timetable/tt_parser';
 
 /**
  * Saves a file in the history
@@ -54,42 +53,6 @@ export const getLatestSubstitutionPlan = (day: number): string => {
     return '';
 };
 
-/**
- * Saves the html string in the history folder
- * @param day number of the day
- * @param data raw html string
- */
-export const setLatestTimetable = (dataA: string, dataB: string): void => {
-    const dir = path.resolve(process.cwd(), 'history', 'timetable');
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, {recursive: true});
-    } 
-
-    // Save current timetable
-    const fileAPath = path.join(dir, `timetableA.html`);
-    const fileBPath = path.join(dir, `timetableB.html`);
-    fs.writeFileSync(fileAPath, dataA);
-    fs.writeFileSync(fileBPath, dataB);
-
-    // Save timetable
-    const dateA = tt_parseDate(parse(dataA));
-    save(dataA, 'timetable', 'A.html', dateA);
-    const dateB = tt_parseDate(parse(dataB));
-    save(dataB, 'timetable', 'B.html', dateB);
-};
-
-/**
- * Returns the raw html string
- * @returns the html string for both weeks
- */
-export const getLatestTimetable = (): [string, string] => {
-    const fileAPath = path.resolve(process.cwd(), 'history', 'timetable', `timetableA.html`);
-    const fileBPath = path.resolve(process.cwd(), 'history', 'timetable', `timetableB.html`);
-    if (fs.existsSync(fileAPath) && fs.existsSync(fileBPath)) {
-        return [fs.readFileSync(fileAPath).toString(), fs.readFileSync(fileBPath).toString()];
-    }
-    return ['', ''];
-};
 
 const getLatest = (folder: string): string | undefined => {
     const filePath = path.resolve(process.cwd(), 'history', folder, `current.txt`);
@@ -119,3 +82,6 @@ export const getLatestTeachers = (): string => getLatest('teachers') || '';
 
 export const setLatestWorkgroups = (url: string): void => setLatest('workgroups', url);
 export const getLatestWorkgroups = (): string => getLatest('workgroups') || '';
+
+export const setLatestTimetable = (data: string): void => setLatest('timetable', data);
+export const getLatestTimetable = (): string => getLatest('timetable') || '';
