@@ -54,7 +54,7 @@ const download = async (checkIfUpdated = true): Promise<Timetables | undefined> 
         console.log('Extracted timetable');
         
         // Send notifications
-        if (_isNew || isDev) sendNotifications(isDev);
+        if (_isNew || isDev) await sendNotifications(isDev);
         return timetable;
     }
     return undefined

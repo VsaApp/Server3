@@ -12,6 +12,7 @@ export const sendNotifications = async (isDev: Boolean, day: number, substitutio
 
         let users = getUsers().filter((user: User) => (!isDev || isDeveloper(user.username)) && user.grade !== undefined);
         console.log('Sending notifications to ' + users.length + ' users');
+        const notifications = new Map<string, Device[]>(); 
         for (let user of users) {
             try {
                 for (let device of user.devices) {
@@ -20,15 +21,15 @@ export const sendNotifications = async (isDev: Boolean, day: number, substitutio
                         const text = device.language === 'de' ? 
                             'Vertretungsplan wurde aktualisiert!' :
                             'There is a new substitution plan!';
-                        await sendNotification({
-                            devices: [device],
-                            group: weekday.toString(),
-                            text: text,
-                            title: getWeekday(weekday, device.language),
-                            data: {
-                                type: 'substitution plan'
-                            }
-                        });
+                        const title = getWeekday(weekday, device.language);
+                        const notification = `${title}||${text}`;
+                        if (!notifications.get(notification)) {
+                            notifications.set(notification, []);
+                        }
+                        const devices = notifications.get(notification);
+                        if (devices) {
+                            devices.push(device);
+                        }
                     }
                     catch (e) { 
                         console.error(`Cannot send notification to ${user.username}'s device: ${device.firebaseId}:`, e);
@@ -36,6 +37,25 @@ export const sendNotifications = async (isDev: Boolean, day: number, substitutio
                 }
             } catch (e) {
                 console.error('Cannot send notification to user: ', user.username, e);
+            }
+        }
+        
+        // Send all notifications
+        console.log(`Send ${notifications.size} different notifications`)
+        for (var notification of Array.from(notifications.keys())) {
+            try {
+                await sendNotification({
+                    devices: notifications.get(notification) || [],
+                    group: weekday.toString(),
+                    text: notification.split('||')[1],
+                    title: notification.split('||')[0],
+                    data: {
+                        type: 'substitution plan'
+                    }
+                });
+            }
+            catch (e) {
+                console.error(`Cannot send notification:`, e);
             }
         }
         
