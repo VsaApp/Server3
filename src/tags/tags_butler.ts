@@ -35,6 +35,7 @@ tagsRouter.get('/', (req, res) => {
                 group: user.group,
                 selected: user.selected.map((course) => course.courseID),
                 exams: user.exams,
+                cafetoria: user.cafetoria,
                 timestamp: user.timestamp
             }
             return res.json(tags);
@@ -88,6 +89,18 @@ tagsRouter.post('/', (req, res) => {
             device.firebaseId = newDevice.firebaseId || device.firebaseId;
             device.appVersion = newDevice.appVersion || device.appVersion;
             device.notifications = newDevice.notifications || device.notifications;
+        }
+    }
+
+    if (req.body.cafetoria) {
+        const cafetoria = req.body.cafetoria;
+        if (!cafetoria.timestamp || !cafetoria.id || !cafetoria.password) res.status(400);
+        else if (!user.cafetoria || Date.parse(cafetoria.timestamp) > Date.parse(user.cafetoria.timestamp)) {
+            user.cafetoria = {
+                id: cafetoria.id,
+                password: cafetoria.password,
+                timestamp: cafetoria.timestamp
+            };
         }
     }
 
@@ -172,6 +185,14 @@ tagsRouter.delete('/', (req, res) => {
     if (user === undefined) {
         res.json({ 'error': 'Invalid user' });
         return;
+    }
+
+    if (req.body.cafetoria) {
+        const cafetoria = req.body.cafetoria;
+        if (!cafetoria.timestamp) res.status(400);
+        else if (user.cafetoria && Date.parse(cafetoria.timestamp) > Date.parse(user.cafetoria.timestamp)) {
+            user.cafetoria = undefined;
+        }
     }
 
     if (req.body.selected) {
