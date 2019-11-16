@@ -6,6 +6,10 @@ export const getUsers = (): User[] => {
     return db.get('users');
 };
 
+export const setUsers = (users: User[]): void => {
+    db.set('users', users);
+};
+
 export const getSelected = (username: string): Course[] => {
     const user = getUser(username);
     return user !== undefined ? user.selected : [];
