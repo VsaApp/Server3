@@ -11,7 +11,7 @@ import { roomsDate } from '../utils/rooms';
 const updatesRouter = express.Router();
 
 // Sends the update data
-updatesRouter.get('/', (req, res) => {
+updatesRouter.get('/', async (req, res) => {
     const auth = getAuth(req);
     const updates: UpdateData = {
         timetable: getTimetableVersion(),
@@ -23,7 +23,7 @@ updatesRouter.get('/', (req, res) => {
         subjects: subjectsDate,
         rooms: roomsDate,
         minAppLevel: 27,
-        grade: getGrade(auth.username, auth.password)
+        grade: await getGrade(auth.username, auth.password)
     };
     return res.json(updates);
 });

@@ -7,8 +7,8 @@ authRouter.get('/', (req, res) => {
     return res.json({status: true});
 });
 
-authRouter.get('/:username/:password', (req, res) => {
-    const status = checkLogin(req.params.username, req.params.password);
+authRouter.get('/:username/:password', async (req, res) => {
+    const status = await checkLogin(req.params.username, req.params.password);
     return res.json({status: status});
 });
 

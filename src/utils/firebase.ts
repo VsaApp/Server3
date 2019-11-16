@@ -42,19 +42,21 @@ export const removeOldDevices = async () => {
     }
     console.log(`Removed ${count} devices`);
     const usersCount = users.length;
-    users = users.filter((user) => {
+    for (var i = usersCount - 1; i >= 0; i--) {
+        const user = users[i];
         const threeMonthsAgo = new Date();
         threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
         // Delete the user if he do not has any device and it was since three month not active
         if (user.devices.length === 0 && Date.parse(user.lastActive) < threeMonthsAgo.getTime()) {
-            return false;
+            users.splice(i, 1);
+            continue;
         }
         // Delete a user if he do not exists in the ldap system
-        else if (!checkUsername(user.username)) {
-            return false;
+        else if (!await checkUsername(user.username)) {
+            users.splice(i, 0);
+            continue;
         }
-        return true;
-    });
+    }
     console.log(`Removed ${usersCount - users.length} users`);
     setUsers(users);
 }

@@ -17,10 +17,15 @@ import bugsRouter from './bugs/bugs_router';
 import versionsRouter from './versions/versions_butler';
 import { updateWorkgroups, workgroupsRouter } from './workgroups/workgroups_butler';
 import { initFirebase, removeOldDevices } from './utils/firebase';
+import { initLdap } from './authentication/ldap';
 
 const app = express();
 app.use(cors());
-app.use(basicAuth({ authorizer: authorizer, challenge: true }));
+
+// Add an authorizer for each request
+app.use(basicAuth({ authorizer: authorizer, challenge: true, authorizeAsync: true }));
+
+// Set the last active attribute for a user request
 app.use((req, res, next) => {
     requestHandler(req);
     next();
@@ -30,6 +35,7 @@ app.get('/', (req, res) => {
     res.send('Hello world!');
 });
 
+// Define all paths
 app.use('/login', authRouter);
 app.use('/updates', updateRouter);
 app.use('/history', historyRouter);
@@ -47,6 +53,9 @@ app.use('/workgroups', workgroupsRouter);
 
 // Init firebase for sending notifications
 initFirebase();
+
+// Init ldap for users authentications
+initLdap();
 
 /**
  * Downloads every minute the substitutionPlan

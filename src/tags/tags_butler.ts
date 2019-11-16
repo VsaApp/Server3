@@ -45,7 +45,7 @@ tagsRouter.get('/', (req, res) => {
     return res.json({ error: 'unauthorized' });
 });
 
-tagsRouter.post('/', (req, res) => {
+tagsRouter.post('/', async (req, res) => {
     if (req.body.timestamp === undefined) {
         res.status(400);
         res.json({ 'error': 'Timestamp must not be null' });
@@ -57,7 +57,7 @@ tagsRouter.post('/', (req, res) => {
     if (!user) {
         users.push({
             username: auth.username,
-            grade: getGrade(auth.username, auth.password),
+            grade: await getGrade(auth.username, auth.password),
             group: isDeveloper(auth.username) ? 5 : 1,
             devices: [],
             selected: [],

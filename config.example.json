@@ -12,5 +12,6 @@
     "isFirstQ": true,
     "viktoriaAppUsername": "USERNAME",
     "viktoriaAppPassword": "PASSWORD",
-    "developers": ["USERNAME", "USERNAME"]
+    "developers": ["USERNAME", "USERNAME"],
+    "ldapUrl": "URL_TO_LDAP_SERVER"
 }
