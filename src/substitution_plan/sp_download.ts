@@ -5,6 +5,7 @@ import parseSubstitutionPlan from './sp_parser';
 import { SubstitutionPlan } from '../utils/interfaces';
 import { sendNotifications } from './sp_notifications';
 import { initFirebase } from '../utils/firebase';
+import filterSubstitutionPlan from './sp_filter';
 
 const isDev = process.argv.length >= 3 && process.argv[2].trim() === '--dev';
 
@@ -29,7 +30,8 @@ const downloadDay = async (day: number, checkIfUpdated?: boolean): Promise<Subst
         console.log('Parsed substitution plan for day ' + day);
 
         // Parse html to json
-        const substitutionPlan = await parseSubstitutionPlan(data, isDev);
+        let substitutionPlan = await parseSubstitutionPlan(data, isDev);
+        substitutionPlan = await filterSubstitutionPlan(substitutionPlan);
         console.log('Extracted substitution plan for day ' + day);
         
         setLatestSubstitutionPlan(day, raw);

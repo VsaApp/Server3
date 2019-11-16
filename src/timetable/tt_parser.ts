@@ -97,6 +97,25 @@ export const extractData = (data: string[][]): Timetables => {
                     ]
                 };
             }
+            for (var i = 0; i < day.units.length; i++) {
+                const unit = day.units[i];
+                if (!unit) {
+                    console.log(grade, day.day, i);
+                    day.units[i] = {
+                        unit: i,
+                        subjects: [{
+                            id: `${grade}-2-${day.day}-${i}-0`,
+                            unit: i,
+                            block: '',
+                            courseID: `${grade}--`,
+                            teacherID: '',
+                            subjectID: 'Freistunde',
+                            roomID: '',
+                            week: 2
+                        }]
+                    };
+                }
+            };
         });
     });
 
