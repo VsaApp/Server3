@@ -8,7 +8,7 @@ import { isDeveloper } from '../utils/auth';
 export const sendNotifications = async (isDev: Boolean, day: number, substitutionplanDay: SubstitutionPlan) => {
     try {
         if (substitutionplanDay === undefined) throw 'Substitution plan is undefined'
-        const weekday = new Date(substitutionplanDay.date).getDay();
+        const weekday = new Date(substitutionplanDay.date).getDay() - 1;
 
         let users = getUsers().filter((user: User) => (!isDev || isDeveloper(user.username)) && user.grade !== undefined);
         console.log('Sending notifications to ' + users.length + ' users');
@@ -16,6 +16,7 @@ export const sendNotifications = async (isDev: Boolean, day: number, substitutio
             try {
                 for (let device of user.devices) {
                     try {
+                        if (!device.notifications) return;
                         const text = device.language === 'de' ? 
                             'Vertretungsplan wurde aktualisiert!' :
                             'There is a new substitution plan!';
@@ -53,5 +54,5 @@ export const sendNotifications = async (isDev: Boolean, day: number, substitutio
 const getWeekday = (day: number, locals: string): string => {
     const de = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
     const en = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-    return locals === 'de' ? de[day - 1] : en[day - 1];
+    return locals === 'de' ? de[day] : en[day];
 }
