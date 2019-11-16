@@ -11,10 +11,12 @@ export const extractData = (data: string[][]): Timetables => {
     };
 
     data.forEach((line: string[]) => {
+        if (line.length === 0 || line[0].length === 0) return;
         try {
             let unit = parseInt(line[6]) - 1;
             if (unit >= 5) unit++;
             const grade = line[1].toLowerCase();
+            if (grade.length === 0 || grade === 'ag') return;
             const teacherID = line[2].toLowerCase();
             const block = line[0];
             line[3] = line[3].replace(/  +/g, ' ');
