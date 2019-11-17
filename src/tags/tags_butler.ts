@@ -88,7 +88,7 @@ tagsRouter.post('/', (req, res) => {
             device.language = newDevice.language || device.language;
             device.firebaseId = newDevice.firebaseId || device.firebaseId;
             device.appVersion = newDevice.appVersion || device.appVersion;
-            device.notifications = newDevice.notifications || device.notifications;
+            device.notifications = newDevice.notifications === undefined ? device.notifications : newDevice.notifications;
         }
     }
 
