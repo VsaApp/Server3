@@ -108,13 +108,13 @@ export interface Tags {
     group: number; // 1 (pupil); 2 (teacher); 4 (developer); 8 (other)
     selected: string[]; // course list
     exams: string[]; // course list
-    cafetoria?: CafetoriaLogin;
+    cafetoria: CafetoriaLogin;
     timestamp: string; // iso date
 }
 
 export interface CafetoriaLogin {
-    id: string;
-    password: string;
+    id: string | undefined;
+    password: string | undefined;
     timestamp: string;
 }
 
@@ -125,7 +125,7 @@ export interface User {
     devices: Device[];
     selected: Course[]; // course list
     exams: string[]; // course list
-    cafetoria?: CafetoriaLogin;
+    cafetoria: CafetoriaLogin;
     timestamp: string; // iso date
     lastActive: string; // iso date
 }

@@ -63,6 +63,11 @@ tagsRouter.post('/', (req, res) => {
             devices: [],
             selected: [],
             exams: [],
+            cafetoria: {
+                id: undefined,
+                password: undefined,
+                timestamp: new Date().toISOString()
+            },
             timestamp: new Date().toISOString(),
             lastActive: new Date().toISOString()
         });
@@ -190,8 +195,10 @@ tagsRouter.delete('/', (req, res) => {
     if (req.body.cafetoria) {
         const cafetoria = req.body.cafetoria;
         if (!cafetoria.timestamp) res.status(400);
-        else if (user.cafetoria && Date.parse(cafetoria.timestamp) > Date.parse(user.cafetoria.timestamp)) {
-            user.cafetoria = undefined;
+        else if (Date.parse(cafetoria.timestamp) > Date.parse(user.cafetoria.timestamp)) {
+            user.cafetoria.id = undefined;
+            user.cafetoria.password = undefined;
+            user.cafetoria.timestamp = cafetoria.timestamp;
         }
     }
 
