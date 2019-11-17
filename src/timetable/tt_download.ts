@@ -7,6 +7,7 @@ import {initFirebase} from '../utils/firebase';
 import {extractData} from './tt_parser';
 import {sendNotifications} from './tt_butler';
 import { Timetables } from '../utils/interfaces';
+import { clearSelections } from '../tags/users';
 
 const isDev = process.argv.length === 3;
 const timetablePath = process.argv.length === 4 ? process.argv[3] : undefined;
@@ -54,6 +55,7 @@ const download = async (checkIfUpdated = true): Promise<Timetables | undefined> 
         console.log('Extracted timetable');
         
         // Send notifications
+        if (_isNew) clearSelections();
         if (_isNew || isDev) await sendNotifications(isDev);
         return timetable;
     }
