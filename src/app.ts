@@ -65,7 +65,14 @@ const daily = async (): Promise<void> => {
     await updateCafetoriaMenus();
     await updateWorkgroups();
     await removeOldDevices();
-    setTimeout(minutely, 60000 * 60 * 24);
+    const now = Date.now();
+    const tomorrow = new Date();
+    tomorrow.setHours(18, 0, 0);
+    while (tomorrow.getTime() <= now + 60000) {
+        tomorrow.setDate(tomorrow.getDate() + 1);
+    }
+    const difInMillis = tomorrow.getTime() - now;
+    setTimeout(daily, difInMillis);
 };
 
 // Start download process

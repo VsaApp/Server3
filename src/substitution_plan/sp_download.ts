@@ -18,7 +18,7 @@ const downloadDay = async (day: number, checkIfUpdated?: boolean): Promise<Subst
     // Download the raw html
     const url = `https://www.viktoriaschule-aachen.de/sundvplan/vps/f${day + 1}/subst_001.htm`;
     const raw = await fetchData(url, true);
-    console.log('Fetched substitution plan for day ' + day);
+    if (isDev) console.log('Fetched substitution plan for day ' + day);
 
     // Get the old html
     const old = getLatestSubstitutionPlan(day);
