@@ -15,7 +15,8 @@ const isDev = process.argv.length === 3;
  */
 const isNew = (data: any): boolean => {
     const oldDate = getLatestCafetoria();
-    const newDate = new Date(data.querySelector('.MPDatum').childNodes[0].childNodes[0].rawText.replace(/\./g, ' '));
+    const rawDate = data.querySelector('.MPDatum').childNodes[0].childNodes[0].rawText.split('.');
+    const newDate = new Date(`${rawDate[1]} ${rawDate[0]} ${rawDate[2]}`);
     if (oldDate.getTime() !== newDate.getTime()) {
         setLatestCafetoria(newDate);
         return true;
