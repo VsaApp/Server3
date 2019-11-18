@@ -6,6 +6,10 @@ export const getUsers = (): User[] => {
     return db.get('users');
 };
 
+export const setUsers = (users: User[]): void => {
+    db.set('users', users);
+};
+
 export const getSelected = (username: string): Course[] => {
     const user = getUser(username);
     return user !== undefined ? user.selected : [];
@@ -25,3 +29,13 @@ export const getDevicesWithTag = (tag: string, value?: any): string[] => {
         .map((user: User) => user.devices.map((d) => d.firebaseId))
         .reduce((i1, i2) => i1.concat(i2));
 };
+
+export const clearSelections = (): void => {
+    console.log('Reset user selections');
+    const date = new Date().toISOString();
+    getUsers().forEach((user) => {
+        user.selected = [];
+        user.exams = [];
+        user.timestamp = date;
+    });
+}

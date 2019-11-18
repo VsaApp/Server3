@@ -76,4 +76,5 @@ daily.bat
 minutely.bat
 
 /js/
-/ldap.json
+timetable.txt
+ldap.json

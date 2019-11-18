@@ -16,7 +16,7 @@ import { authRouter } from './authentication/auth_butler';
 import bugsRouter from './bugs/bugs_router';
 import versionsRouter from './versions/versions_butler';
 import { updateWorkgroups, workgroupsRouter } from './workgroups/workgroups_butler';
-import { initFirebase } from './utils/firebase';
+import { initFirebase, removeOldDevices } from './utils/firebase';
 
 const app = express();
 app.use(cors());
@@ -64,7 +64,15 @@ const daily = async (): Promise<void> => {
     await updateCalendar();
     await updateCafetoriaMenus();
     await updateWorkgroups();
-    setTimeout(minutely, 60000 * 60 * 24);
+    await removeOldDevices();
+    const now = Date.now();
+    const tomorrow = new Date();
+    tomorrow.setHours(18, 0, 0);
+    while (tomorrow.getTime() <= now + 60000) {
+        tomorrow.setDate(tomorrow.getDate() + 1);
+    }
+    const difInMillis = tomorrow.getTime() - now;
+    setTimeout(daily, difInMillis);
 };
 
 // Start download process

@@ -1,4 +1,4 @@
-import { SubstitutionPlan, Substitution } from '../utils/interfaces';
+import { SubstitutionPlan, Substitution, SubstitutionPlanGrades } from '../utils/interfaces';
 
 /**
  * Parses the week (A/B), date and update in ISO-8601 string
@@ -49,8 +49,9 @@ const parseSubstitutionPlan = async (raw: any, isDev: boolean): Promise<Substitu
 
     // Create the data and unparsed objects
     const grades = ['5a', '5b', '5c', '6a', '6b', '6c', '7a', '7b', '7c', '8a', '8b', '8c', '9a', '9b', '9c', 'ef', 'q1', 'q2']
-    const unparsed: any = {};
-    const data: any = {};
+    const unparsed: SubstitutionPlanGrades = {};
+    const data: SubstitutionPlanGrades = {};
+    
     unparsed.other = [];
     grades.forEach((grade: string) => {
         unparsed[grade] = [];
@@ -85,7 +86,7 @@ const parseSubstitutionPlan = async (raw: any, isDev: boolean): Promise<Substitu
                                 const info = removeUnusedCharacters(row.childNodes[6].rawText);
                                 
                                 let normalSubject = '';
-                                // let normalCourse = '';
+                                let normalCourse;
                                 let normalRoom = '';
                                 let normalTeacher = '';
                                 let newSubject = '';
@@ -117,7 +118,7 @@ const parseSubstitutionPlan = async (raw: any, isDev: boolean): Promise<Substitu
                                 if (subjectCell.childNodes.length === 1) {
                                     if (subjectCell.querySelectorAll('s').length === 1) {
                                         normalSubject = removeUnusedCharacters(subjectCell.childNodes[0].rawText).split(' ')[0];
-                                        // normalCourse = removeUnusedCharacters(subjectCell.childNodes[0].rawText).split(' ')[1];
+                                        normalCourse = removeUnusedCharacters(subjectCell.childNodes[0].rawText).split(' ')[1];
                                         newSubject = '';
                                         // newCourse = '';
                                         if (typeText === 'Trotz Absenz') {
@@ -126,7 +127,7 @@ const parseSubstitutionPlan = async (raw: any, isDev: boolean): Promise<Substitu
                                     }
                                     else {
                                         normalSubject = removeUnusedCharacters(subjectCell.childNodes[0].rawText).split(' ')[0];
-                                        // normalCourse = removeUnusedCharacters(subjectCell.childNodes[0].rawText).split(' ')[1];
+                                        normalCourse = removeUnusedCharacters(subjectCell.childNodes[0].rawText).split(' ')[1];
                                         // newCourse = normalCourse;
                                         newSubject = normalSubject;
                                     }
@@ -134,7 +135,7 @@ const parseSubstitutionPlan = async (raw: any, isDev: boolean): Promise<Substitu
                                 // Subject changed
                                 else if (subjectCell.childNodes.length === 2) {
                                     normalSubject = removeUnusedCharacters(subjectCell.childNodes[0].rawText).split(' ')[0];
-                                    // normalCourse = removeUnusedCharacters(subjectCell.childNodes[0].rawText).split(' ')[1];
+                                    normalCourse = removeUnusedCharacters(subjectCell.childNodes[0].rawText).split(' ')[1];
                                     newSubject = removeUnusedCharacters(subjectCell.childNodes[1].rawText.replace('→', '')).split(' ')[0];
                                     // newCourse = removeUnusedCharacters(subjectCell.childNodes[1].rawText.replace('→', '')).split(' ')[1];
                                 }
@@ -164,8 +165,6 @@ const parseSubstitutionPlan = async (raw: any, isDev: boolean): Promise<Substitu
                                     normalRoom = removeUnusedCharacters(roomCell.childNodes[0].rawText);
                                     newRoom = removeUnusedCharacters(roomCell.childNodes[1].rawText.replace('→', ''));
                                 }
-
-                                //const id = getID(grade, new Date(parsedDates.date).getDay() - 1, unit, normalCourse, normalSubject , normalTeacher);
                                 
                                 const substitution: Substitution = {
                                     unit: unit,
@@ -176,7 +175,8 @@ const parseSubstitutionPlan = async (raw: any, isDev: boolean): Promise<Substitu
                                     original: {
                                         subjectID: normalSubject.toLowerCase().replace(/[0-9]/g, ''),
                                         teacherID: normalTeacher.toLowerCase(),
-                                        roomID: normalRoom.toLowerCase().replace(' ', '')
+                                        roomID: normalRoom.toLowerCase().replace(' ', ''),
+                                        course: normalCourse ? normalCourse.toLowerCase() : undefined
                                     },
                                     changed: {
                                         subjectID: newSubject.toLowerCase().replace(/[0-9]/g, ''),

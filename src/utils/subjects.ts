@@ -53,7 +53,7 @@ export const subjects: any = {
 };
 
 export const getSubject = (name: string): string => {
-    name = name.trim().toUpperCase();
+    name = name.trim().toUpperCase().replace(/\d/g, '');
     if (subjects[name] === undefined) {
         if (name !== '') {
             console.log(`Unknown subject ${name}`);
