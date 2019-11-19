@@ -12,10 +12,23 @@ const filterSubstitutionPlan = async (substitutionPlan: SubstitutionPlan): Promi
                     try {
                         if (substitution.type != 2) {
                             const ttUnit = ttDay.units[substitution.unit];
-                            const subjects = ttUnit.subjects.filter((subject) => {
-                                return subject.subjectID === substitution.original.subjectID &&
-                                    subject.teacherID === substitution.original.teacherID;
+                            // Filter with teacher
+                            let subjects = ttUnit.subjects.filter((subject) => {
+                                return subject.teacherID === substitution.original.teacherID;
                             });
+                            // Filter with subject
+                            if (subjects.length !== 1) {
+                                subjects = ttUnit.subjects.filter((subject) => {
+                                    return subject.subjectID === substitution.original.subjectID;
+                                });
+                            }
+                            // Filter with both
+                            if (subjects.length !== 1) {
+                                subjects = ttUnit.subjects.filter((subject) => {
+                                    return subject.subjectID === substitution.original.subjectID &&
+                                        subject.teacherID === substitution.original.teacherID;
+                                });
+                            }
                             if (subjects.length === 1) {
                                 substitution.id = subjects[0].id;
                                 substitution.courseID = subjects[0].courseID;
