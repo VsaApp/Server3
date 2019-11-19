@@ -69,7 +69,8 @@ tagsRouter.post('/', (req, res) => {
                 timestamp: new Date().toISOString()
             },
             timestamp: new Date().toISOString(),
-            lastActive: new Date().toISOString()
+            lastActive: new Date().toISOString(),
+            lastNotifications: []
         });
         user = users.filter((user: User) => user.username == auth.username)[0];
     }

@@ -6,10 +6,24 @@ import { isDeveloper } from '../utils/auth';
 import { getSubstitutionsForUser } from './sp_filter';
 import { getSubject } from '../utils/subjects';
 
-
+/**
+ * Sends substitution plan notifications to all devices
+ * @param isDev Only send notifications to developers
+ * @param day The substitution plan day index
+ * @param substitutionplanDay The substitution plan day
+ */
 export const sendNotifications = async (isDev: Boolean, day: number, substitutionplanDay: SubstitutionPlan) => {
     try {
-        if (substitutionplanDay === undefined) throw 'Substitution plan is undefined'
+        if (substitutionplanDay === undefined) throw 'Substitution plan is undefined';
+        const date = new Date(substitutionplanDay.date);
+        const current = new Date();
+        // Stop sending notifications if the substitution plan day is already passed
+        if (date.getTime() < current.getTime() && !(date.getDate() === current.getDate()
+            && date.getMonth() === current.getMonth()
+            && date.getFullYear() === current.getFullYear())) {
+            console.log('The day has passed, do not send notifications');
+            return;
+        }
         const weekday = new Date(substitutionplanDay.date).getDay() - 1;
 
         let users = getUsers().filter((user: User) => (!isDev || isDeveloper(user.username)) && user.grade !== undefined);
@@ -85,6 +99,11 @@ export const sendNotifications = async (isDev: Boolean, day: number, substitutio
     }
 }
 
+/**
+ * Returns the weekday string of the given index ind the given language
+ * @param day index
+ * @param locals the language
+ */
 const getWeekday = (day: number, locals: string): string => {
     const de = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
     const en = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
