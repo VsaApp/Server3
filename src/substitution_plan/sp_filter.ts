@@ -1,4 +1,4 @@
-import { SubstitutionPlan } from "../utils/interfaces";
+import { SubstitutionPlan, Substitution, Timetable, Subject } from "../utils/interfaces";
 import { getTimetable } from "../timetable/tt_butler";
 
 const filterSubstitutionPlan = async (substitutionPlan: SubstitutionPlan): Promise<SubstitutionPlan> => {
@@ -32,6 +32,9 @@ const filterSubstitutionPlan = async (substitutionPlan: SubstitutionPlan): Promi
                             if (subjects.length === 1) {
                                 substitution.id = subjects[0].id;
                                 substitution.courseID = subjects[0].courseID;
+
+                                // Auto fill a substitution the fix for example empty subjects or rooms
+                                autoFillSubstitution(substitution, subjects[0]);
                             } else {
                                 console.error(`Cannot filter grade: ${grade} unit: ${substitution.unit}`);
                             }
@@ -47,6 +50,20 @@ const filterSubstitutionPlan = async (substitutionPlan: SubstitutionPlan): Promi
         });
     }
     return substitutionPlan;
+}
+
+/**
+ * Fills all missing original info to an substitution
+ * @param substitution The [substitution] to fill
+ * @param subject The [subject] with the [subjectID] of the [substitution]
+ */
+const autoFillSubstitution = (substitution: Substitution, subject: Subject) => {
+    if (substitution.original.subjectID.length === 0) {
+        substitution.original.subjectID = subject.subjectID;
+    }
+    if (substitution.original.roomID.length === 0) {
+        substitution.original.roomID = subject.roomID;
+    }
 }
 
 export default filterSubstitutionPlan;
