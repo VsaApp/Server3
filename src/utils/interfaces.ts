@@ -1,6 +1,10 @@
 export interface Timetables {
     date: string;
-    grades: Map<string, Timetable>
+    grades: TimetableGrades
+}
+
+export interface TimetableGrades {
+    [grade: string]: Timetable
 }
 
 // Timetable
@@ -28,7 +32,7 @@ export interface Unit {
 export interface Subject {
     /** starts with 0; 6. unit is the lunch break */
     unit: number;  
-    /** Format: GRADE-WEEK-DAY-UNIT-SUBJECTINDEX (lowercase) */
+    /** Format: GRADE-WEEK-DAY-UNIT-SUBJECT_INDEX (lowercase) */
     id: string;  
     /** Format: GRADE-COURSE(BLOCK|TEACHER)-SUBJECT (lowercase) */
     courseID: string;  

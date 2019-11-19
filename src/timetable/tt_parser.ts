@@ -7,7 +7,7 @@ export const extractData = (data: string[][]): Timetables => {
     const date: Date = new Date();
     const timetables: Timetables = {
         date: date.toISOString(),
-        grades: new Map<string, Timetable>()
+        grades: {}
     };
 
     data.forEach((line: string[]) => {
@@ -25,7 +25,7 @@ export const extractData = (data: string[][]): Timetables => {
             const roomID = getRoomID(line[4]);
             const day = parseInt(line[5]) - 1;
 
-            if (!timetables.grades.get(grade)) {
+            if (!timetables.grades[grade]) {
                 const _grade: Timetable = {
                     grade: grade,
                     date: timetables.date,
@@ -40,10 +40,10 @@ export const extractData = (data: string[][]): Timetables => {
                         units: []
                     });
                 }
-                timetables.grades.set(grade, _grade);
+                timetables.grades[grade] = _grade;
             }
 
-            const _grade = timetables.grades.get(grade);
+            const _grade = timetables.grades[grade];
             if (_grade) {
                 if (!_grade.data.days[day].units[unit]) {
                     _grade.data.days[day].units[unit] = {
@@ -78,8 +78,8 @@ export const extractData = (data: string[][]): Timetables => {
     });
 
     // Add lunch breaks
-    timetables.grades.forEach((timetable: Timetable, grade: string) => {
-        timetable.data.days.forEach((day: Day) => {
+    Object.keys(timetables.grades).forEach((grade: string) => {
+        timetables.grades[grade].data.days.forEach((day: Day) => {
             if (day.units.length > 5) {
                 day.units[5] = {
                     unit: 5,

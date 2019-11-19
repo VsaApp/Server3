@@ -14,7 +14,7 @@ var timetablePromise: Promise<Timetables | undefined> | undefined;
 timetableRouter.get('/', (req, res) => {
     const auth = getAuth(req);
     const grade = getGrade(auth.username, auth.password);
-    return res.json(timetables.grades.get(grade));
+    return res.json(timetables.grades[grade]);
 });
 
 /**
@@ -47,7 +47,7 @@ export const getTimetable = async (): Promise<Timetables | undefined> => {
  * @param courseID searched [courseID]
  */
 export const getSubjectIDsFromCourseID = (grade: string, courseID: string): string[] => {
-    const timetable = timetables.grades.get(grade);
+    const timetable = timetables.grades[grade];
     if (!timetable) throw `Timetable for ${grade} is undefined!`;
     const subjectIDs = timetable.data.days
         .map((day) => day.units

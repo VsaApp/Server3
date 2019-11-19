@@ -5,7 +5,7 @@ const filterSubstitutionPlan = async (substitutionPlan: SubstitutionPlan): Promi
     const timetable = await getTimetable();
     if (timetable) {
         Object.keys(substitutionPlan.data).forEach((grade: string) => {
-            const ttGrade = timetable.grades.get(grade);
+            const ttGrade = timetable.grades[grade];
             if (ttGrade) {
                 const ttDay = ttGrade.data.days[new Date(substitutionPlan.date).getDay() - 1];
                 substitutionPlan.data[grade].forEach((substitution) => {
