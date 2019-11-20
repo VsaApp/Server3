@@ -21,7 +21,7 @@ export const extractData = (data: string[][]): Timetables => {
             const block = line[0];
             line[3] = line[3].replace(/  +/g, ' ');
             const subjectID = line[3].split(' ')[0].replace(/\d/g, '').toLowerCase();
-            const courseID = `${grade}-${line[3].split(' ').length > 1 ? line[3].split(' ')[1].toLowerCase() : `${block}|${teacherID}`}-${subjectID}`;
+            const courseID = `${grade}-${line[3].split(' ').length > 1 ? line[3].split(' ')[1].toLowerCase() : `${block}+${teacherID}`}-${subjectID}`;
             const roomID = getRoomID(line[4]);
             const day = parseInt(line[5]) - 1;
 
