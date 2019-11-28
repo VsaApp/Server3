@@ -148,7 +148,7 @@ export interface Device {
     firebaseId: string;
     language: string;
     /** day index list with notification UPDATED_DAY-DATE_SINCE_EPOCHE-TEXT_HASH
-     * example: 21-‭18228-
+     * example: 28-18229-d8345b3416426541733f126ade0de8b7
      */
     lastNotifications: string[]
 }
