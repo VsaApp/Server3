@@ -132,8 +132,6 @@ export interface User {
     cafetoria: CafetoriaLogin;
     timestamp: string; // iso date
     lastActive: string; // iso date
-    /** The notification texts in an array for one week (day 0 to 5) */
-    lastNotifications: string[]
 }
 
 
@@ -149,6 +147,10 @@ export interface Device {
     notifications: boolean;
     firebaseId: string;
     language: string;
+    /** day index list with notification UPDATED_DAY-DATE_SINCE_EPOCHE-TEXT_HASH
+     * example: 21-‭18228-
+     */
+    lastNotifications: string[]
 }
 
 export interface Cafetoria {

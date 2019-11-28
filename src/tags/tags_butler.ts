@@ -69,8 +69,7 @@ tagsRouter.post('/', (req, res) => {
                 timestamp: new Date().toISOString()
             },
             timestamp: new Date().toISOString(),
-            lastActive: new Date().toISOString(),
-            lastNotifications: []
+            lastActive: new Date().toISOString()
         });
         user = users.filter((user: User) => user.username == auth.username)[0];
     }
@@ -87,6 +86,7 @@ tagsRouter.post('/', (req, res) => {
                 firebaseId: newDevice.firebaseId,
                 appVersion: newDevice.appVersion,
                 notifications: newDevice.notifications,
+                lastNotifications: []
             });
         } else {
             device.os = newDevice.os || device.os;

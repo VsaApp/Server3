@@ -1,4 +1,5 @@
-import { getUsers } from '../tags/users';
+import crypto from 'crypto';
+import { getUsers, setUsers } from '../tags/users';
 import { updateApp } from '../utils/update_app';
 import { sendNotification } from '../utils/notification';
 import { User, Device, SubstitutionPlan } from '../utils/interfaces';
@@ -34,7 +35,7 @@ export const sendNotifications = async (isDev: Boolean, day: number, substitutio
                 const substitutions = getSubstitutionsForUser(user, substitutionplanDay);
                 for (let device of user.devices) {
                     try {
-                        if (!device.notifications) return;
+                        if (!device.notifications) continue;
                         var text = substitutions.map((s) => {
                             const unsure = s.courseID === undefined && s.id === undefined;
                             let text = ''
@@ -49,6 +50,18 @@ export const sendNotifications = async (isDev: Boolean, day: number, substitutio
                             return text;
                         }).join('\n');
                         if (text.length === 0) text = 'Es gibt keine Änderungen für dich';
+
+                        /// Check if notification changed to last time
+                        const newNotification = crypto.createHash('md5').update(text).digest('hex');
+                        const notificationKey = `${new Date().getDate()}-${Math.floor(date.getTime() / 86400000)}-${newNotification}`;
+                        const lastNotification = device.lastNotifications[day];
+                        if (!lastNotification || lastNotification !== notificationKey) {
+                            device.lastNotifications[day] = notificationKey;
+                        } else {
+                            console.log(`Notification not changed for user ${user.username}`);
+                            continue;
+                        }
+
                         const title = getWeekday(weekday, device.language);
                         const notification = `${title}||${text}`;
                         if (!notifications.get(notification)) {
@@ -67,6 +80,8 @@ export const sendNotifications = async (isDev: Boolean, day: number, substitutio
                 console.error('Cannot send notification to user: ', user.username, e);
             }
         }
+
+        setUsers(users);
 
         // Send all notifications
         console.log(`Send ${notifications.size} different notifications`)
