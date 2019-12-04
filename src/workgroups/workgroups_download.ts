@@ -59,7 +59,7 @@ const download = async (alwaysDownload = false): Promise<WorkgroupsDay[] | undef
     const file = path.join(folder, 'workgroups.pdf');
 
     // Get url
-    url = await getUrl('Gesamtübersicht über die AGs im', 152)
+    url = await getUrl('AG-Gesamtübersicht', 152)
 
     // Fetch and parse pdf
     await fetchData(file);
