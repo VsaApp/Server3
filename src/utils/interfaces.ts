@@ -1,14 +1,17 @@
 export interface Timetables {
     date: string;
+    /** Grades in lowercase */
     grades: TimetableGrades
 }
 
 export interface TimetableGrades {
+    /** Grades in lowercase */
     [grade: string]: Timetable
 }
 
 // Timetable
 export interface Timetable {
+    /** Grade in lowercase */
     grade: string;
     /** ISO 8601 */
     date: string;
@@ -60,6 +63,7 @@ export interface SubstitutionPlan {
 }
 
 export interface SubstitutionPlanGrades {
+    /** Grades in lowercase */
     [grade: string]: Substitution[]
 }
 
@@ -105,10 +109,12 @@ export interface UpdateData {
     /** ISO 8601 */
     rooms: string;
     minAppLevel: number;
+    /** Grade in lowercase */
     grade: string;
 }
 
 export interface Tags {
+    /** Grade in lowercase */
     grade: string;
     group: number; // 1 (pupil); 2 (teacher); 4 (developer); 8 (other)
     selected: string[]; // course list
@@ -125,6 +131,7 @@ export interface CafetoriaLogin {
 
 export interface User {
     username: string;
+    /** Grade in lowercase */ 
     grade: string;
     group: number; // 1 (pupil); 2 (teacher); 4 (developer); 8 (other)
     devices: Device[];

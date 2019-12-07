@@ -1,6 +1,6 @@
 import config from '../utils/config';
-import {getRoomID} from '../utils/rooms';
-import {getSubject} from '../utils/subjects';
+import { getRoomID } from '../utils/rooms';
+import { getSubject } from '../utils/subjects';
 import { Timetables, Timetable, Day, Unit, Subject } from '../utils/interfaces';
 
 export const extractData = (data: string[][]): Timetables => {
@@ -10,9 +10,9 @@ export const extractData = (data: string[][]): Timetables => {
         grades: {}
     };
 
-   const lines = data
-    .map((line: string[]) => line[0])
-    .filter((line: string) => line.length > 0 && line.startsWith("U"));
+    const lines = data
+        .map((line: string[]) => line[0])
+        .filter((line: string) => line.length > 0 && line.startsWith("U"));
 
     for (let i = 0; i < lines.length; i++) {
         let definingLines: any[] = [lines[i]];
@@ -23,10 +23,10 @@ export const extractData = (data: string[][]): Timetables => {
             }
             definingLines.push(lines[j]);
         }
-        definingLines = definingLines.map((line: string) => line.split(";")).sort((a ,b) => parseInt(a[0].split("")[1]) - parseInt(b[0].split("")[1]));
+        definingLines = definingLines.map((line: string) => line.split(";")).sort((a, b) => parseInt(a[0].split("")[1]) - parseInt(b[0].split("")[1]));
         if (definingLines.length > 1) {
             let subject = definingLines[0][6];
-            const grade: string = definingLines[0][2];
+            const grade: string = definingLines[0][2].toLowerCase();
             if (subject === 'BER' || subject === 'KOOR' || grade == 'AG') {
                 continue;
             }
