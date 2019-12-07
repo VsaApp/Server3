@@ -25,7 +25,7 @@ export const extractData = (data: string[][]): Timetables => {
         }
         definingLines = definingLines.map((line: string) => line.split(";")).sort((a, b) => parseInt(a[0].split("")[1]) - parseInt(b[0].split("")[1]));
         if (definingLines.length > 1) {
-            let subject = definingLines[0][6];
+            let subject = definingLines[0][6].replace(/ {2,}/g, ' ');
             const grade: string = definingLines[0][2].toLowerCase();
             if (subject === 'BER' || subject === 'KOOR' || grade == 'AG') {
                 continue;
