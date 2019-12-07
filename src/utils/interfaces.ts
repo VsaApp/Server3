@@ -34,12 +34,13 @@ export interface Subject {
     unit: number;  
     /** Format: GRADE-WEEK-DAY-UNIT-SUBJECT_INDEX (lowercase) */
     id: string;  
-    /** Format: GRADE-COURSE(BLOCK|TEACHER)-SUBJECT (lowercase) */
+    /** Format: GRADE-COURSE(BLOCK+TEACHER)-SUBJECT (lowercase) */
     courseID: string;  
     /** subject shorthand for example "e"; "s" */
     subjectID: string; 
     /** teacher shorthand (lowercase) */
-    teacherID: string; 
+    teacherID: string;
+    /** lowercase */
     roomID: string;
     /** 0 => A; 1 => B; 2 => AB */
     week: number; 

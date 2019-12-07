@@ -1,7 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import config from '../utils/config';
-import got from 'got';
 import {setLatestTimetable, getLatestTimetable} from '../history/history';
 import {initFirebase} from '../utils/firebase';
 import {extractData} from './tt_parser';
@@ -10,7 +8,6 @@ import { Timetables } from '../utils/interfaces';
 import { clearSelections } from '../tags/users';
 
 const isDev = process.argv.length === 3;
-const timetablePath = process.argv.length === 4 ? process.argv[3] : undefined;
 
 const isNew = (data: string): boolean => {
     const oldFile = getLatestTimetable();
@@ -22,7 +19,7 @@ const isNew = (data: string): boolean => {
  * @param weekA fetches either week a or week b
  */
 const fetchData = async (): Promise<string> => {
-    return fs.readFileSync(path.resolve(process.cwd(), 'timetable.txt'), 'utf-8').toString();
+    return fs.readFileSync(path.resolve(process.cwd(), 'unstf.txt'), 'utf-8').toString();
 };
 
 const parse = (raw: string): string[][] => {
