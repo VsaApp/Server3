@@ -31,13 +31,6 @@ export const extractData = (data: string[][]): Timetables => {
             subject = subject.split(" ")[0];
             const block: string = definingLines[0][1];
             const numberOfLessons: number = parseInt(definingLines[1][2]);
-            let count = definingLines[0][8];
-            definingLines[1].forEach((i: string) => {
-                if (i === 'f') count--;
-            });
-            if (count != 0) {
-                console.log(250 + i, grade);
-            }
             if (!timetables.grades[grade]) {
                 const _grade: Timetable = {
                     grade: grade,
@@ -55,14 +48,14 @@ export const extractData = (data: string[][]): Timetables => {
                 }
                 timetables.grades[grade] = _grade;
             }
+            const dataLine = definingLines[1].slice(3);
             for (let k = 0; k < numberOfLessons; k++) {
-                const day: number = parseInt(definingLines[1][k * 6 + 3]) - 1;
-                let unit: number = parseInt(definingLines[1][k * 6 + 4]);
-                if (unit <= 5) {
-                    unit--;
-                }
-                const room: string = definingLines[1][k * 6 + 6];
-                const teacher: string = definingLines[1][k * 6 + 7];
+                const dataElement = dataLine.slice(k * 6, (k + 1) * 6);
+                const day: number = parseInt(dataElement[0]) - 1;
+                const unitCount: number = parseInt(dataElement[2]);
+                let startUnit: number = parseInt(dataElement[1]);
+                const room: string = dataElement[3];
+                const teacher: string = dataElement[4];
                 /*
                 if (subject === '' || block === '' || grade === '' || teacher === '') {
                     console.log(grade, day, unit, subject, teacher);
@@ -71,32 +64,38 @@ export const extractData = (data: string[][]): Timetables => {
                 */
                 const _grade = timetables.grades[grade];
                 if (_grade) {
-                    if (!_grade.data.days[day].units[unit]) {
-                        _grade.data.days[day].units[unit] = {
-                            unit: unit,
-                            subjects: [{
-                                id: `${grade}-2-${day}-${unit}-0`,
-                                unit: unit,
-                                block: block,
-                                courseID: `${grade}-${block}-`,
-                                teacherID: '',
-                                subjectID: 'Freistunde',
-                                roomID: '',
-                                week: 2
-                            }]
+                    for (var j = 0; j < unitCount; j++) {
+                        let unit = startUnit + j;
+                        if (unit <= 5) {
+                            unit--;
                         }
+                        if (!_grade.data.days[day].units[unit]) {
+                            _grade.data.days[day].units[unit] = {
+                                unit: unit,
+                                subjects: [{
+                                    id: `${grade}-2-${day}-${unit}-0`,
+                                    unit: unit,
+                                    block: block,
+                                    courseID: `${grade}-${block}-`,
+                                    teacherID: '',
+                                    subjectID: 'Freistunde',
+                                    roomID: '',
+                                    week: 2
+                                }]
+                            }
+                        }
+                        const _unit = _grade.data.days[day].units[unit];
+                        _unit.subjects.push({
+                            unit: unit,
+                            id: `${grade}-2-${day}-${unit}-${_unit.subjects.length}`,
+                            courseID: `${grade}-${course != null ? course : `${block}+${teacher}`}-${subject}`.toLowerCase(),
+                            subjectID: subject.replace(/[0-9]/g, ''),
+                            block: block,
+                            teacherID: teacher.toLowerCase(),
+                            roomID: room.toLowerCase(),
+                            week: 2
+                        });
                     }
-                    const _unit = _grade.data.days[day].units[unit];
-                    _unit.subjects.push({
-                        unit: unit,
-                        id: `${grade}-2-${day}-${unit}-${_unit.subjects.length}`,
-                        courseID: `${grade}-${course != null ? course : `${block}+${teacher}`}-${subject}`.toLowerCase(),
-                        subjectID: subject.replace(/[0-9]/g, ''),
-                        block: block,
-                        teacherID: teacher.toLowerCase(),
-                        roomID: room.toLowerCase(),
-                        week: 2
-                    });
                 }
             }
         }
