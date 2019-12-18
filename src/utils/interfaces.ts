@@ -224,3 +224,7 @@ export interface Workgroup {
     time: string;
     place: string;
 }
+
+export interface Subjects {
+    [id: string]: string;
+}

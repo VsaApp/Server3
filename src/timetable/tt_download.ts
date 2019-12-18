@@ -22,8 +22,8 @@ const fetchData = async (): Promise<string> => {
     return fs.readFileSync(path.resolve(process.cwd(), 'unstf.txt'), 'utf-8').toString();
 };
 
-const parse = (raw: string): string[][] => {
-    return raw.replace(/\"/g, '').split('\n').map((line) => line.split(','));
+const parse = (raw: string): string[] => {
+    return raw.replace(/\"/g, '').split('\n');
 }
 
 /**

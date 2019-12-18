@@ -1,6 +1,6 @@
 import { Timetables, Timetable, Day } from '../utils/interfaces';
 
-export const extractData = (data: string[][]): Timetables => {
+export const extractData = (data: string[]): Timetables => {
     const date: Date = new Date();
     const timetables: Timetables = {
         date: date.toISOString(),
@@ -8,7 +8,6 @@ export const extractData = (data: string[][]): Timetables => {
     };
 
     const lines = data
-        .map((line: string[]) => line[0])
         .filter((line: string) => line.length > 0 && line.startsWith("U"));
 
     for (let i = 0; i < lines.length; i++) {

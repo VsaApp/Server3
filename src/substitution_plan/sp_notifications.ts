@@ -4,9 +4,9 @@ import { sendNotification } from '../utils/notification';
 import { User, Device, SubstitutionPlan } from '../utils/interfaces';
 import { isDeveloper } from '../utils/auth';
 import { getSubstitutionsForUser } from './sp_filter';
-import { getSubject } from '../utils/subjects';
 import { getUsers, getDevices, getPreference, getNotification, setNotification } from '../tags/tags_db';
 import localizations from '../utils/localizations';
+import { getSubject } from '../subjects/subjects_butler';
 
 /**
  * Sends substitution plan notifications to all devices
