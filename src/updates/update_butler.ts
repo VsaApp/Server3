@@ -16,7 +16,7 @@ updatesRouter.get('/', async (req, res) => {
         cafetoria: allUpdates.get('cafetoria') || '',
         calendar: allUpdates.get('calendar') || '',
         workgroups: allUpdates.get('workgroups') || '',
-        substitutionPlan: allUpdates.get('substitution_plan') || '',
+        substitutionPlan: allUpdates.get('substitution_plan_0') || '',
         subjects: allUpdates.get('subjects') || '',
         minAppLevel: 27,
         grade: getGrade(auth.username, auth.password)
