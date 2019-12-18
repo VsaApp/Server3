@@ -16,8 +16,8 @@ export const compareUpdate = async (name: string, newValue: string): Promise<boo
 }
 
 /** Returns the updates value for the given name */
-export const getUpdates = async (): Promise<Map<String, String>> => {
-    const updates = new Map<String, String>();
+export const getUpdates = async (): Promise<Map<string, string>> => {
+    const updates = new Map<string, string>();
     (await getDbResults(`SELECT * FROM data_updates;`)).forEach(update => {
         updates.set(update.name, update.value);
     });

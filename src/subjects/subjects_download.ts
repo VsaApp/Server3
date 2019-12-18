@@ -2,16 +2,25 @@ import fs from 'fs';
 import path from 'path';
 import { extractData } from './subjects_parser';
 import { Subjects } from '../utils/interfaces';
+import { compareLatestSubjects, setLatestSubjects } from '../history/history';
+
+const setUpdate = async (data: string): Promise<boolean> => {
+    const _isNew = await compareLatestSubjects(data);
+    if (_isNew) {
+        setLatestSubjects(data);
+    }
+    return _isNew;
+};
 
 /**
  * Fetches the schuldatentransfer file
  */
-const fetchData = async (): Promise<string> => {
+const fetchData = (): string => {
     return fs.readFileSync(path.resolve(process.cwd(), 'unstf.txt'), 'utf-8').toString();
 };
 
 const parse = (raw: string): string[] => {
-    return raw.replace(/\"/g, '').split('\n');
+    return raw.replace(/\"/g, '').split('\n').filter((line) => line.startsWith('F'));
 }
 
 /**
@@ -19,14 +28,13 @@ const parse = (raw: string): string[] => {
  * @returns the [Subject]
  */
 const download = async (): Promise<Subjects | undefined> => {
-    const raw = await fetchData();
-
-    // Check if the subjects are new
+    const raw = fetchData();
     console.log('Fetched subjects');
 
     // Clean the raw string
     const data = parse(raw);
-    console.log('Parsed timetable');
+    await setUpdate(data.join('\n'));
+    console.log('Parsed subjects');
 
     // Parse the subjects
     const subjects = extractData(data);

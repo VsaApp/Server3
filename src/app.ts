@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import basicAuth from 'express-basic-auth';
 import authorizer from './authentication/auth_butler';
-import { subjectsRouter } from './subjects/subjects_butler';
+import { subjectsRouter, updateSubjects } from './subjects/subjects_butler';
 import historyRouter from './history/history_butler';
 import updateRouter from './updates/update_butler';
 import { substitutionPlanRouter, updateSubstitutionPlan } from './substitution_plan/sp_butler';
@@ -57,6 +57,7 @@ const minutely = async (): Promise<void> => {
  * Downloads every 24 hours the substitutionPlan
  */
 const daily = async (): Promise<void> => {
+    await updateSubjects();
     await updateTeachers();
     await updateTimetable();
     await updateCalendar();

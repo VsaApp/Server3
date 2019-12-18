@@ -30,6 +30,9 @@ export const compareLatestTeachers = async (url: string): Promise<boolean> => aw
 export const setLatestWorkgroups = (url: string): void => setUpdated('workgroups', url);
 export const compareLatestWorkgroups = async (url: string): Promise<boolean> => await compareUpdate('workgroups', url);
 
+export const setLatestSubjects = (data: string): void => setUpdated('subjects', data);
+export const compareLatestSubjects = async (data: string): Promise<boolean> => await compareUpdate('subjects', data);
+
 export const setLatestTimetable = (data: string): void => setUpdated('timetable', data);
 export const compareLatestTimetable = async (data: string): Promise<boolean> => await compareUpdate('timetable', data);
 
