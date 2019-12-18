@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import {getUrl} from '../utils/downloads';
 import {extractData, extractExternalData} from './calendar_parser';
-import {setLatestCalendar, getLatestCalendar} from '../history/history';
+import {setLatestCalendar, compareLatestCalendar} from '../history/history';
 import { Calendar, Event } from '../utils/interfaces';
 
 const isDev = process.argv.length === 3;
@@ -15,9 +15,8 @@ let url: string;
  * Compares the new [url] with the latest url
  * @param url new download url
  */
-const isNew = (url: string): boolean => {
-    let oldUlr = getLatestCalendar();
-    if (oldUlr !== url) {
+const isNew = async (url: string): Promise<boolean> => {
+    if (await compareLatestCalendar(url)) {
         setLatestCalendar(url);
         return true;
     }
@@ -54,21 +53,21 @@ export const download = async (alwaysUpdate = false): Promise<Calendar | undefin
     // Get the download url
     url = await getUrl('Übersichtsplanung über die Termine im', 3);
 
-    // Get the path for the pdf file
-    const folder = path.resolve(process.cwd(), 'history', 'calendar');
-    if (!fs.existsSync(folder)) {
-        fs.mkdirSync(folder, {recursive: true});
-    }
-    const file = path.join(folder, 'calendar.pdf');
-
-    // Fetches and patches data
-    await fetchData(file);
-    console.log('Fetched calendar');
-    const data = await parseData(file);
-    console.log('Parsed calendar');
-
     // Extract data
-    if (isNew(url) || isDev || alwaysUpdate) {
+    if (await isNew(url) || isDev || alwaysUpdate) {
+        // Get the path for the pdf file
+        const folder = path.resolve(process.cwd(), 'tmp');
+        if (!fs.existsSync(folder)) {
+            fs.mkdirSync(folder);
+        }
+        const file = path.join(folder, 'calendar.pdf');
+
+        // Fetches and patches data
+        await fetchData(file);
+        console.log('Fetched calendar');
+        const data = await parseData(file);
+        console.log('Parsed calendar');
+
         const calendar: Calendar = await extractData(data);
         const calendarExtern: Event[] = await extractExternalData(calendar.years);
         console.log('Fetched external calendar');

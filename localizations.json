@@ -1,0 +1,33 @@
+{
+    "weekdays": [
+        "Montag",
+        "Dienstag",
+        "Mittwoch",
+        "Donnerstag",
+        "Freitag"
+    ],
+    "months": [
+        "Januar",
+        "Februar",
+        "März",
+        "April",
+        "Mai",
+        "Juni",
+        "Juli",
+        "August",
+        "September",
+        "Oktober",
+        "November",
+        "Dezember"
+    ],
+    "openDoorDay": "Tag der Offenen Tür",
+    "openDorDayReplacement": "Ersatz für Tag der Offenen Tür",
+    "holidays": "Ferien", 
+    "newTimetable": "Es gibt einen neuen Stundenplan",
+    "timetable": "Stundenplan",
+    "noChanges": "Es gibt keine Änderungen für dich",
+    "exam": "Klausur",
+    "change": "Änderung",
+    "freeLesson": "Freistunde",
+    "hour": "Stunde"
+}

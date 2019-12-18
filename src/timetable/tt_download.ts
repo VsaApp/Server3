@@ -1,17 +1,17 @@
 import fs from 'fs';
 import path from 'path';
-import {setLatestTimetable, getLatestTimetable} from '../history/history';
-import {initFirebase} from '../utils/firebase';
-import {extractData} from './tt_parser';
-import {sendNotifications} from './tt_butler';
+import { setLatestTimetable, compareLatestTimetable } from '../history/history';
+import { initFirebase } from '../utils/firebase';
+import { extractData } from './tt_parser';
+import { sendNotifications } from './tt_butler';
 import { Timetables } from '../utils/interfaces';
-import { clearSelections } from '../tags/users';
+import { clearAllSelections } from '../tags/tags_db';
+import { initDatabase } from '../utils/database';
 
 const isDev = process.argv.length === 3;
 
-const isNew = (data: string): boolean => {
-    const oldFile = getLatestTimetable();
-    return data.replace(/\"|\\n|\\r/g, '').trim() !== oldFile.replace(/\"|\\n|\\r/g, '').trim();
+const isNew = async (data: string): Promise<boolean> => {
+    return await compareLatestTimetable(data.replace(/\"|\\n|\\r/g, '').trim());
 };
 
 /**
@@ -24,7 +24,7 @@ const fetchData = async (): Promise<string> => {
 
 const parse = (raw: string): string[][] => {
     return raw.replace(/\"/g, '').split('\n').map((line) => line.split(','));
-} 
+}
 
 /**
  * Downloads and parses the timetable
@@ -37,11 +37,11 @@ const download = async (checkIfUpdated = true): Promise<Timetables | undefined> 
 
     // Check if the timetable is new
     console.log('Fetched timetable');
-    const _isNew = isNew(raw);
+    const _isNew = await isNew(raw);
     if (_isNew || isDev || !checkIfUpdated) {
 
         // Save the new version
-        setLatestTimetable(raw);
+        setLatestTimetable(raw.replace(/\"|\\n|\\r/g, '').trim());
 
         // Parse the html strings to html objects
         const data = parse(raw);
@@ -50,9 +50,11 @@ const download = async (checkIfUpdated = true): Promise<Timetables | undefined> 
         // Parse the timetables and combine them to one
         const timetable = extractData(data);
         console.log('Extracted timetable');
-        
+
         // Send notifications
-        if (_isNew) clearSelections();
+        if (_isNew) {
+            clearAllSelections();
+        };
         if (_isNew || isDev) await sendNotifications(isDev);
         return timetable;
     }
@@ -62,6 +64,7 @@ const download = async (checkIfUpdated = true): Promise<Timetables | undefined> 
 // If this file is started direct from the command line and was not imported
 if (module.parent === null) {
     initFirebase();
+    initDatabase();
     download(false);
 }
 

@@ -60,21 +60,11 @@ typings/
 # next.js build output
 .next
 
-out
+/tmp
+/js
+ldap.json
+bugs.json
 config.json
 firebase.json
-unparsed.txt
-.idea
-messageboard.json
-
-/history/
 tags.json
-viktoriaflutter-firebase-adminsdk-22dzs-ced3d40a2f.json
-bugs.json
-stats.json
-daily.bat
-minutely.bat
-
-/js/
 unstf.txt
-ldap.json

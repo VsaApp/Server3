@@ -7,18 +7,21 @@ import { getGrade } from '../authentication/ldap';
 import getAuth from '../utils/auth';
 import { subjectsDate } from '../utils/subjects';
 import { roomsDate } from '../utils/rooms';
+import { getUpdates } from './update_db';
+import crypto from 'crypto';
 
 const updatesRouter = express.Router();
 
 // Sends the update data
-updatesRouter.get('/', (req, res) => {
+updatesRouter.get('/', async (req, res) => {
+    const allUpdates = await getUpdates();
     const auth = getAuth(req);
     const updates: UpdateData = {
         timetable: getTimetableVersion(),
-        cafetoria: fs.statSync('history/cafetoria/current.txt').mtime.toISOString(),
-        calendar: fs.statSync('history/calendar/current.txt').mtime.toISOString(),
-        workgroups: fs.statSync('history/workgroups/current.txt').mtime.toISOString(),
-        teachers: fs.statSync('history/teachers/current.txt').mtime.toISOString(),
+        cafetoria: crypto.createHash('sha1').update((allUpdates.get('cafetoria') || '').toString()).digest('hex'),
+        calendar: crypto.createHash('sha1').update((allUpdates.get('calendar') || '').toString()).digest('hex'),
+        workgroups: crypto.createHash('sha1').update((allUpdates.get('workgroups') || '').toString()).digest('hex'),
+        teachers: crypto.createHash('sha1').update((allUpdates.get('teachers') || '').toString()).digest('hex'),
         substitutionPlan: getSubstitutionPlanVersion(),
         subjects: subjectsDate,
         rooms: roomsDate,

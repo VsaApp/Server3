@@ -1,5 +1,6 @@
 import { SubstitutionPlan, Substitution, Timetable, Subject, User } from "../utils/interfaces";
 import { getTimetable } from "../timetable/tt_butler";
+import { getSelections } from "../tags/tags_db";
 
 const filterSubstitutionPlan = async (substitutionPlan: SubstitutionPlan): Promise<SubstitutionPlan> => {
     const timetable = await getTimetable();
@@ -71,10 +72,13 @@ const autoFillSubstitution = (substitution: Substitution, subject: Subject): voi
  * @param user The user to filter for
  * @param day to search for
  */
-export const getSubstitutionsForUser = (user: User, substitutionPlan: SubstitutionPlan): Substitution[] => {
+export const getSubstitutionsForUser = async (user: User, substitutionPlan: SubstitutionPlan): Promise<Substitution[]> => {
 
     // Reduces the ids to string arrays
-    const selectedCourses = user.selected.map((course) => course.courseID);
+    const selections = await getSelections(user.username) || [];
+    const selectedCourses = selections.map((course) => course.courseID);
+    //TODO: Write filter with database
+    /*
     const selectedSubjectsIDs = user.selected.map((course) => course.subjectIDs).reduce((i1, i2) => Array.from(i1).concat(i2));
 
     return substitutionPlan.data[user.grade].filter((substitution) => {
@@ -90,6 +94,8 @@ export const getSubstitutionsForUser = (user: User, substitutionPlan: Substituti
         }
         return selected;
     });
+    */
+    return [];
 }
 
 export default filterSubstitutionPlan;

@@ -1,8 +1,7 @@
 import admin from 'firebase-admin';
 import path from 'path';
-import { getUsers, setUsers } from '../tags/users';
-import { User, Device } from './interfaces';
-import { checkUsername } from '../authentication/ldap';
+import { Device } from './interfaces';
+import { getAllDevices, rmvDevice } from '../tags/tags_db';
 
 export const initFirebase = () => {
     console.log("Init firebase");
@@ -15,6 +14,7 @@ export const initFirebase = () => {
 };
 
 export const send = async (tokens: string[], data: any, options?: any): Promise<boolean> => {
+    if (tokens.length === 0) return false;
     return new Promise((resolve, reject) => {
         admin.messaging().sendToDevice(tokens, data, options)
             .then((response) => {
@@ -27,20 +27,21 @@ export const send = async (tokens: string[], data: any, options?: any): Promise<
     });
 };
 
+//TODO: test function
 export const removeOldDevices = async () => {
     let count = 0;
-    let users: User[] = getUsers();
-    for (var user of users) {
-        for (var i = user.devices.length - 1; i >= 0; i--) {
-            const device = user.devices[i];
-            const success = await send([device.firebaseId], { data: { 'type': 'device check' } });
-            if (!success) {
-                user.devices.splice(i, 1);
-                count++;
-            }
+    let devices: Device[] = await getAllDevices();
+    for (var device of devices) {
+        const success = await send([device.firebaseId], { data: { 'type': 'device check' } });
+        if (!success) {
+            rmvDevice(device);
+            count++;
         }
     }
     console.log(`Removed ${count} devices`);
+
+    // TODO: Last active for each device
+    /*
     const usersCount = users.length;
     users = users.filter((user) => {
         const threeMonthsAgo = new Date();
@@ -56,5 +57,5 @@ export const removeOldDevices = async () => {
         return true;
     });
     console.log(`Removed ${usersCount - users.length} users`);
-    setUsers(users);
+    */
 }

@@ -116,11 +116,11 @@ export interface UpdateData {
 export interface Tags {
     /** Grade in lowercase */
     grade: string;
-    group: number; // 1 (pupil); 2 (teacher); 4 (developer); 8 (other)
-    selected: string[]; // course list
-    exams: string[]; // course list
+    /** 1 (pupil); 2 (teacher); 4 (developer); 8 (other) */
+    group: number; 
+    selected: Selection[]; // course list
+    exams: Exam[]; // course list
     cafetoria: CafetoriaLogin;
-    timestamp: string; // iso date
 }
 
 export interface CafetoriaLogin {
@@ -133,32 +133,50 @@ export interface User {
     username: string;
     /** Grade in lowercase */ 
     grade: string;
-    group: number; // 1 (pupil); 2 (teacher); 4 (developer); 8 (other)
-    devices: Device[];
-    selected: Course[]; // course list
-    exams: string[]; // course list
-    cafetoria: CafetoriaLogin;
-    timestamp: string; // iso date
-    lastActive: string; // iso date
+    /** 1 (pupil); 2 (teacher); 4 (developer); 8 (other) */
+    group: number; 
+    /** ISO date */
+    lastActive: string;
 }
 
+export interface Selection {
+    block: string;
+    courseID: string | undefined;
+    timestamp: string;
+}
+
+export interface Exam {
+    subject: string;
+    writing: boolean | undefined;
+    timestamp: string;
+}
 
 export interface Course {
     courseID: string;
-    subjectIDs: string[]
+    subjectIDs: string[];
+    /** ISO Date */
+    timestamp: string;
 }
 
 export interface Device {
     os: string;
     name: string;
     appVersion: string;
-    notifications: boolean;
     firebaseId: string;
-    language: string;
-    /** day index list with notification UPDATED_DAY-DATE_SINCE_EPOCHE-TEXT_HASH
-     * example: 28-18229-d8345b3416426541733f126ade0de8b7
-     */
-    lastNotifications: string[]
+}
+
+/** day index list with notification UPDATED_DAY-DATE_SINCE_EPOCHE-TEXT_HASH
+ * 
+ *   example: 28-18229-d8345b3416426541733f126ade0de8b7
+ */
+export interface LastNotifications {
+    username: string;
+    day1: string;
+    day2: string;
+}
+
+export interface Settings {
+    spNotifications: boolean;
 }
 
 export interface Cafetoria {

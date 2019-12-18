@@ -5,7 +5,7 @@ import extractData from './cafetoria_parser';
 import path from 'path';
 import fs from 'fs';
 import { Cafetoria } from '../utils/interfaces';
-import { getLatestCafetoria, setLatestCafetoria } from '../history/history';
+import { compareLatestCafetoria, setLatestCafetoria } from '../history/history';
 
 const isDev = process.argv.length === 3;
 
@@ -13,11 +13,10 @@ const isDev = process.argv.length === 3;
  * Compares the dates of the old and given data
  * @param data html [data] of the cafetoria website
  */
-const isNew = (data: any): boolean => {
-    const oldDate = getLatestCafetoria();
+const isNew = async (data: any): Promise<boolean> => {
     const rawDate = data.querySelector('.MPDatum').childNodes[0].childNodes[0].rawText.split('.');
     const newDate = new Date(`${rawDate[1]} ${rawDate[0]} ${rawDate[2]}`);
-    if (oldDate.getTime() !== newDate.getTime()) {
+    if (await compareLatestCafetoria(newDate)) {
         setLatestCafetoria(newDate);
         return true;
     }
@@ -86,11 +85,11 @@ export const fetchDataForUser = async (id: string, pin: string): Promise<Cafetor
  */
 export const download = (checkIfNew = true): Promise<Cafetoria | undefined> => {
     return new Promise((resolve, reject) => {
-        fetchData(config.cafetoriaId, config.cafetoriaPin).then((raw: string) => {
+        fetchData(config.cafetoriaId, config.cafetoriaPin).then(async (raw: string) => {
             console.log('Fetched menus');
             const data = parse(raw);
             console.log('Parsed menus');
-            if (isNew(data) || isDev || !checkIfNew) {
+            if (await isNew(data) || isDev || !checkIfNew) {
                 const menus = extractData(data, true);
                 console.log('Extracted menus');
                 resolve(menus);

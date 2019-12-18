@@ -1,7 +1,4 @@
-import config from '../utils/config';
-import { getRoomID } from '../utils/rooms';
-import { getSubject } from '../utils/subjects';
-import { Timetables, Timetable, Day, Unit, Subject } from '../utils/interfaces';
+import { Timetables, Timetable, Day } from '../utils/interfaces';
 
 export const extractData = (data: string[][]): Timetables => {
     const date: Date = new Date();
@@ -34,6 +31,13 @@ export const extractData = (data: string[][]): Timetables => {
             subject = subject.split(" ")[0];
             const block: string = definingLines[0][1];
             const numberOfLessons: number = parseInt(definingLines[1][2]);
+            let count = definingLines[0][8];
+            definingLines[1].forEach((i: string) => {
+                if (i === 'f') count--;
+            });
+            if (count != 0) {
+                console.log(250 + i, grade);
+            }
             if (!timetables.grades[grade]) {
                 const _grade: Timetable = {
                     grade: grade,
@@ -121,7 +125,9 @@ export const extractData = (data: string[][]): Timetables => {
             for (var i = 0; i < day.units.length; i++) {
                 const unit = day.units[i];
                 if (!unit) {
-                    console.log(grade, day.day, i);
+                    if (grade != 'ag') {
+                        console.log(grade, day.day, i);
+                    }
                     day.units[i] = {
                         unit: i,
                         subjects: [{

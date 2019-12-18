@@ -10,5 +10,10 @@
     "isFirstQ": true,
     "viktoriaAppUsername": "USERNAME",
     "viktoriaAppPassword": "PASSWORD",
-    "developers": ["USERNAME", "USERNAME"]
+    "developers": ["USERNAME", "USERNAME"],
+    "dbHost": "HOST_URL",
+    "dnName": "DATABASE",
+    "dbUser": "USERNAME",
+    "dbPassword": "PASSWORD",
+    "dbPort": 3306
 }

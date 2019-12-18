@@ -6,7 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import { getUrl } from '../utils/downloads';
 import extractData from './teachers_parser';
-import { getLatestTeachers, setLatestTeachers } from '../history/history';
+import { compareLatestTeachers, setLatestTeachers } from '../history/history';
 import { Teacher } from '../utils/interfaces';
 
 const isDev = process.argv.length === 3;
@@ -18,9 +18,8 @@ let url: string;
  * Checks if the pdf was updated
  * @param url current url
  */
-const isNew = (url: string): boolean => {
-    let oldUrl = getLatestTeachers();
-    if (url !== oldUrl) {
+const isNew = async (url: string): Promise<boolean> => {
+    if (await compareLatestTeachers(url)) {
         setLatestTeachers(url);
         return true;
     }
@@ -41,7 +40,6 @@ const fetchData = (file: string): Promise<void> => {
             cookieJar, body: form
         });
         const stream = fs.createWriteStream(file);
-        url = await getUrl('Kollegiumsliste mit Angabe', 41);
         got.stream(url, {
             auth: config.username + ':' + config.password,
             cookieJar
@@ -65,21 +63,24 @@ const parseData = async (file: string): Promise<any> => {
  * @param alwaysUpdate do not check if the list was updated
  */
 const download = async (alwaysUpdate = false): Promise<Teacher[] | undefined> => {
-    // Get the path for the pdf file
-    const folder = path.resolve(process.cwd(), 'history', 'teachers');
-    if (!fs.existsSync(folder)) {
-        fs.mkdirSync(folder, { recursive: true });
-    }
-    const file = path.join(folder, 'teachers.pdf');
 
-    // Fetch and parse the pdf file
-    await fetchData(file);
-    console.log('Fetched teachers');
-    const data = await parseData(file);
-    console.log('Parsed teachers');
+    url = await getUrl('Kollegiumsliste mit Angabe', 41);
 
     // Extract the pdf file
-    if (isNew(url) || isDev || alwaysUpdate) {
+    if (await isNew(url) || isDev || alwaysUpdate) {
+        // Get the path for the pdf file
+        const folder = path.resolve(process.cwd(), 'tmp');
+        if (!fs.existsSync(folder)) {
+            fs.mkdirSync(folder);
+        }
+        const file = path.join(folder, 'teachers.pdf');
+
+        // Fetch and parse the pdf file
+        await fetchData(file);
+        console.log('Fetched teachers');
+
+        const data = await parseData(file);
+        console.log('Parsed teachers');
         console.log('Extract teachers');
         return extractData(data);
     }

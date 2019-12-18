@@ -1,11 +1,12 @@
 import crypto from 'crypto';
-import { getUsers, setUsers } from '../tags/users';
 import { updateApp } from '../utils/update_app';
 import { sendNotification } from '../utils/notification';
 import { User, Device, SubstitutionPlan } from '../utils/interfaces';
 import { isDeveloper } from '../utils/auth';
 import { getSubstitutionsForUser } from './sp_filter';
 import { getSubject } from '../utils/subjects';
+import { getUsers, getDevices, getPreference, getNotification, setNotification } from '../tags/tags_db';
+import localizations from '../utils/localizations';
 
 /**
  * Sends substitution plan notifications to all devices
@@ -13,7 +14,7 @@ import { getSubject } from '../utils/subjects';
  * @param day The substitution plan day index
  * @param substitutionplanDay The substitution plan day
  */
-export const sendNotifications = async (isDev: Boolean, day: number, substitutionplanDay: SubstitutionPlan) => {
+export const sendNotifications = async (isDev: boolean, day: number, substitutionplanDay: SubstitutionPlan) => {
     try {
         if (substitutionplanDay === undefined) throw 'Substitution plan is undefined';
         const date = new Date(substitutionplanDay.date);
@@ -27,42 +28,44 @@ export const sendNotifications = async (isDev: Boolean, day: number, substitutio
         }
         const weekday = new Date(substitutionplanDay.date).getDay() - 1;
 
-        let users = getUsers().filter((user: User) => (!isDev || isDeveloper(user.username)) && user.grade !== undefined);
+        let users = await getUsers(isDev);
         console.log('Sending notifications to ' + users.length + ' users');
         const notifications = new Map<string, Device[]>();
         for (let user of users) {
             try {
-                const substitutions = getSubstitutionsForUser(user, substitutionplanDay);
-                for (let device of user.devices) {
+                const substitutions = await getSubstitutionsForUser(user, substitutionplanDay);
+                const devices = await getDevices(user.username);
+                for (let device of devices) {
                     try {
-                        if (!device.notifications) continue;
+                        const getNotifications = await getPreference(device.firebaseId, 'spNotifications');
+                        if (!getNotifications) continue;
                         var text = substitutions.map((s) => {
                             const unsure = s.courseID === undefined && s.id === undefined;
                             let text = ''
                             if (unsure) text += '(';
-                            text += `${s.unit + 1}. Stunde ${getSubject(s.original.subjectID)} ${s.original.teacherID.toLocaleUpperCase()}`.trim();
+                            text += `${s.unit + 1}. ${localizations.hour} ${getSubject(s.original.subjectID)} ${s.original.teacherID.toLocaleUpperCase()}`.trim();
                             text += ': ';
-                            if (s.type === 0) text += 'Änderung';
-                            else if (s.type === 1) text += 'Freistunde';
-                            else if (s.type === 2) text += 'Klausur';
+                            if (s.type === 0) text += localizations.change;
+                            else if (s.type === 1) text += localizations.freeLesson;
+                            else if (s.type === 2) text += localizations.exam;
                             if (unsure) text += ')';
                             
                             return text;
                         }).join('\n');
-                        if (text.length === 0) text = 'Es gibt keine Änderungen für dich';
+                        if (text.length === 0) text = localizations.noChanges;
 
                         /// Check if notification changed to last time
                         const newNotification = crypto.createHash('md5').update(text).digest('hex');
                         const notificationKey = `${new Date().getDate()}-${Math.floor(date.getTime() / 86400000)}-${newNotification}`;
-                        const lastNotification = device.lastNotifications[day];
+                        const lastNotification = await getNotification(user.username, day);
                         if (!lastNotification || lastNotification !== notificationKey) {
-                            device.lastNotifications[day] = notificationKey;
+                            setNotification(user.username, day, notificationKey);
                         } else {
                             console.log(`Notification not changed for user ${user.username}`);
                             continue;
                         }
 
-                        const title = getWeekday(weekday, device.language);
+                        const title = getWeekday(weekday);
                         const notification = `${title}||${text}`;
                         if (!notifications.get(notification)) {
                             notifications.set(notification, []);
@@ -80,8 +83,6 @@ export const sendNotifications = async (isDev: Boolean, day: number, substitutio
                 console.error('Cannot send notification to user: ', user.username, e);
             }
         }
-
-        setUsers(users);
 
         // Send all notifications
         console.log(`Send ${notifications.size} different notifications`)
@@ -117,10 +118,7 @@ export const sendNotifications = async (isDev: Boolean, day: number, substitutio
 /**
  * Returns the weekday string of the given index ind the given language
  * @param day index
- * @param locals the language
  */
-const getWeekday = (day: number, locals: string): string => {
-    const de = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
-    const en = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-    return locals === 'de' ? de[day] : en[day];
+const getWeekday = (day: number): string => {
+    return localizations.weekdays[day];
 }

@@ -1,4 +1,4 @@
-import { setLatestSubstitutionPlan, getLatestSubstitutionPlan } from '../history/history';
+import { setLatestSubstitutionPlan, compareLatestSubstitutionPlan } from '../history/history';
 import {parse} from 'node-html-parser';
 import {fetchData} from '../utils/network';
 import parseSubstitutionPlan from './sp_parser';
@@ -8,6 +8,14 @@ import { initFirebase } from '../utils/firebase';
 import filterSubstitutionPlan from './sp_filter';
 
 const isDev = process.argv.length >= 3 && process.argv[2].trim() === '--dev';
+
+const isNew = async (day: number, data: string): Promise<boolean> => {
+    const _isNew = await compareLatestSubstitutionPlan(day, data.replace(/\"|\\n|\\r/g, '').trim());
+    if (_isNew) {
+        setLatestSubstitutionPlan(day, data);
+    }
+    return _isNew;
+};
 
 /**
  * Downloads the html of the website and saves the parsed json
@@ -20,11 +28,9 @@ const downloadDay = async (day: number, checkIfUpdated?: boolean): Promise<Subst
     const raw = await fetchData(url, true);
     console.log('Fetched substitution plan for day ' + day);
 
-    // Get the old html
-    const old = getLatestSubstitutionPlan(day);
-
     // Check if it is a new html or for development
-    if (raw != old || isDev || !checkIfUpdated) {
+    const _isNew = await isNew(day, raw);
+    if (_isNew || isDev || !checkIfUpdated) {
         // Parse the html to an object
         const data = parse(raw);
         console.log('Parsed substitution plan for day ' + day);
@@ -33,10 +39,8 @@ const downloadDay = async (day: number, checkIfUpdated?: boolean): Promise<Subst
         let substitutionPlan = await parseSubstitutionPlan(data, isDev);
         substitutionPlan = await filterSubstitutionPlan(substitutionPlan);
         console.log('Extracted substitution plan for day ' + day);
-        
-        setLatestSubstitutionPlan(day, raw);
 
-        if (raw != old || isDev) {
+        if (_isNew || isDev) {
             sendNotifications(isDev, day, substitutionPlan);
         }
         

@@ -2,10 +2,11 @@ import express from 'express';
 import download from './tt_download';
 import { sendNotification } from '../utils/notification';
 import { updateApp } from '../utils/update_app';
-import {getUsers} from '../tags/users';
-import { Timetables, User, Device } from '../utils/interfaces';
-import getAuth, { isDeveloper } from '../utils/auth';
+import { Timetables, Device } from '../utils/interfaces';
+import getAuth from '../utils/auth';
 import { getGrade } from '../authentication/ldap';
+import { getUsers, getDevices, getAllDevices } from '../tags/tags_db';
+import localizations from '../utils/localizations';
 
 export const timetableRouter = express.Router();
 var timetables: Timetables;
@@ -63,31 +64,28 @@ export const getSubjectIDsFromCourseID = (grade: string, courseID: string): stri
  * Sends the new timetable notifications to all users
  * @param isDev send only to developers (for debugging)
  */
-export const sendNotifications = async (isDev: Boolean): Promise<void> => {
+export const sendNotifications = async (isDev: boolean): Promise<void> => {
     try {
-        let users = getUsers().filter((user: User) => (!isDev || isDeveloper(user.username)) && user.grade !== undefined);
-        console.log('Sending notifications to ' + users.length + ' users');
-
-        // Sort the devices by language
-        const languages = new Map<String, Device[]>();
-        users.forEach((user) => user.devices.forEach((device) => {
-            if (!languages.get(device.language)) languages.set(device.language, []);
-            const language = languages.get(device.language)
-            if (language) language.push(device);
-        }));
-
-        // Send notifications to each language
-        for (var language of Array.from(languages.keys())) {
-            await sendNotification({
-                devices: languages.get(language),
-                group: 'timetableChanged',
-                text: language === 'de' ? 'Es gibt einen neuen Stundenplan!' : 'There is a new timetable!',
-                title: language === 'de' ? 'Stundenplan' : 'Timetable',
-                data: {
-                    type: 'timetable'
-                }
-            });
+        let devices: Device[] = [];
+        if (isDev) {
+            let users = await getUsers(isDev);
+            for (let user of users) {
+                devices = devices.concat(await getDevices(user.username));
+            }
+        } else {
+            devices = await getAllDevices();
         }
+        console.log('Sending notifications to ' + devices.length + ' devices');
+
+        await sendNotification({
+            devices: devices,
+            group: 'timetableChanged',
+            text: localizations.newTimetable,
+            title: localizations.timetable,
+            data: {
+                type: 'timetable'
+            }
+        });
 
         // Inform the app about a new timetable
         await updateApp('All', {

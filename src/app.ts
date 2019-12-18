@@ -14,16 +14,16 @@ import { teachersRouter, updateTeachers } from './teachers/teachers_butler';
 import tagsRouter, { requestHandler } from './tags/tags_butler';
 import { authRouter } from './authentication/auth_butler';
 import bugsRouter from './bugs/bugs_router';
-import versionsRouter from './versions/versions_butler';
 import { updateWorkgroups, workgroupsRouter } from './workgroups/workgroups_butler';
 import { initFirebase, removeOldDevices } from './utils/firebase';
+import { initDatabase } from './utils/database';
 
 const app = express();
 app.use(cors());
 app.use(basicAuth({ authorizer: authorizer, challenge: true }));
 app.use((req, res, next) => {
-    requestHandler(req);
     next();
+    requestHandler(req);
 });
 
 app.get('/', (req, res) => {
@@ -42,10 +42,10 @@ app.use('/teachers', teachersRouter);
 app.use('/rooms', roomsRouter);
 app.use('/subjects', subjectsRouter);
 app.use('/bugs', bugsRouter);
-app.use('/versions', versionsRouter);
 app.use('/workgroups', workgroupsRouter);
 
 // Init firebase for sending notifications
+initDatabase();
 initFirebase();
 
 /**
