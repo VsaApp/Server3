@@ -29,7 +29,7 @@ const downloadDay = async (day: number, checkIfUpdated?: boolean): Promise<Subst
     // Download the raw html
     const url = `https://www.viktoriaschule-aachen.de/sundvplan/vps/f${day + 1}/subst_001.htm`;
     const raw = await fetchData(url, true);
-    console.log('Fetched substitution plan for day ' + day);
+    //console.log('Fetched substitution plan for day ' + day);
 
     // Check if it is a new html or for development
     const _isNew = await isNew(day, raw);

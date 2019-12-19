@@ -99,7 +99,6 @@ export const extractData = (data: string[]): Timetables => {
                             })[0];
                             if (subjectToUpdate) {
                                 if (subjectToUpdate.teacherID !== teacherID) {
-                                    console.log('Update existing subject', grade, unit, courseID);
                                     subjectToUpdate.teacherID += `+${teacherID}`;
                                 }
                             } else {
