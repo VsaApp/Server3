@@ -42,7 +42,10 @@ export interface Subject {
     courseID: string;  
     /** subject shorthand for example "e"; "s" */
     subjectID: string; 
-    /** teacher shorthand (lowercase) */
+    /** teacher shorthand (lowercase). Multiple teachers for one subject are separated with '+'.
+     * 
+     * Example: 'him+kan' or only 'him'
+     */
     teacherID: string;
     /** lowercase */
     roomID: string;

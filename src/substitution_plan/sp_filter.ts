@@ -15,7 +15,11 @@ const filterSubstitutionPlan = async (substitutionPlan: SubstitutionPlan): Promi
                             const ttUnit = ttDay.units[substitution.unit];
                             // Filter with teacher
                             let subjects = ttUnit.subjects.filter((subject) => {
-                                return subject.teacherID === substitution.original.teacherID;
+                                // A subject can have multiple teachers (separated with '+'), so check for each teacher
+                                return subject.teacherID
+                                    .split('+')
+                                    .map((teacher) => teacher === substitution.original.teacherID)
+                                    .reduce((b1, b2) => b1 || b2);
                             });
                             // Filter with subject
                             if (subjects.length !== 1) {
@@ -26,15 +30,19 @@ const filterSubstitutionPlan = async (substitutionPlan: SubstitutionPlan): Promi
                             // Filter with both
                             if (subjects.length !== 1) {
                                 subjects = ttUnit.subjects.filter((subject) => {
+                                    // A subject can have multiple teachers (separated with '+'), so check for each teacher
                                     return subject.subjectID === substitution.original.subjectID &&
-                                        subject.teacherID === substitution.original.teacherID;
+                                        subject.teacherID
+                                            .split('+')
+                                            .map((teacher) => teacher === substitution.original.teacherID)
+                                            .reduce((b1, b2) => b1 || b2);
                                 });
                             }
                             if (subjects.length === 1) {
                                 substitution.id = subjects[0].id;
                                 substitution.courseID = subjects[0].courseID;
 
-                                // Auto fill a substitution the fix for example empty subjects or rooms
+                                // Auto fill a substitution (For empty rooms or teachers)
                                 autoFillSubstitution(substitution, subjects[0]);
                             } else {
                                 console.error(`Cannot filter grade: ${grade} unit: ${substitution.unit}`);
@@ -93,7 +101,7 @@ export const getSubstitutionsForUser = async (user: User, substitutionPlan: Subs
                 return true;
             }
         }
-        
+
         // Retry with the id
         if (substitution.id) {
             const course = getCourseIDsFromID(user.grade, substitution.id || '');
