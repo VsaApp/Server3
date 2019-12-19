@@ -1,81 +1,125 @@
-import config from '../utils/config';
-import {getRoomID} from '../utils/rooms';
-import {getSubject} from '../utils/subjects';
-import { Timetables, Timetable, Day, Unit, Subject } from '../utils/interfaces';
+import { Timetables, Timetable, Day } from '../utils/interfaces';
 
-export const extractData = (data: string[][]): Timetables => {
+export const extractData = (data: string[]): Timetables => {
     const date: Date = new Date();
     const timetables: Timetables = {
         date: date.toISOString(),
         grades: {}
     };
 
-    data.forEach((line: string[]) => {
-        if (line.length === 0 || line[0].length === 0) return;
-        try {
-            let unit = parseInt(line[6]) - 1;
-            if (unit >= 5) unit++;
-            const grade = line[1].toLowerCase();
-            if (grade.length === 0 || grade === 'ag') return;
-            const teacherID = line[2].toLowerCase();
-            const block = line[0];
-            line[3] = line[3].replace(/  +/g, ' ');
-            const subjectID = line[3].split(' ')[0].replace(/\d/g, '').toLowerCase();
-            const courseID = `${grade}-${line[3].split(' ').length > 1 ? line[3].split(' ')[1].toLowerCase() : `${block}+${teacherID}`}-${subjectID}`;
-            const roomID = getRoomID(line[4]);
-            const day = parseInt(line[5]) - 1;
+    const lines = data
+        .filter((line: string) => line.length > 0 && line.startsWith("U"));
 
-            if (!timetables.grades[grade]) {
-                const _grade: Timetable = {
-                    grade: grade,
-                    date: timetables.date,
-                    data: {
-                        grade: grade,
-                        days: []
-                    }
-                };
-                for (var i = 0; i < 5; i++) {
-                    _grade.data.days.push({
-                        day: i,
-                        units: []
-                    });
-                }
-                timetables.grades[grade] = _grade;
+    for (let i = 0; i < lines.length; i++) {
+        let definingLines: any[] = [lines[i]];
+        for (let j = i + 1; j < lines.length; j++) {
+            if (lines[j].startsWith("U1")) {
+                i += j - i - 1;
+                break;
             }
-
-            const _grade = timetables.grades[grade];
-            if (_grade) {
-                if (!_grade.data.days[day].units[unit]) {
-                    _grade.data.days[day].units[unit] = {
-                        unit: unit,
-                        subjects: [{
-                            id: `${grade}-2-${day}-${unit}-0`,
-                            unit: unit,
-                            block: block,
-                            courseID: `${grade}-${block}-`,
-                            teacherID: '',
-                            subjectID: 'Freistunde',
-                            roomID: '',
-                            week: 2
-                        }]
-                    }
-                }
-                const _unit = _grade.data.days[day].units[unit];
-                _unit.subjects.push({
-                    unit: unit,
-                    id: `${grade}-2-${day}-${unit}-${_unit.subjects.length}`,
-                    courseID: courseID,
-                    subjectID: subjectID,
-                    block: block,
-                    teacherID: teacherID,
-                    roomID: roomID,
-                    week: 2
-                });
-            }
-        } catch (_) {
-            console.log(line);
+            definingLines.push(lines[j]);
         }
-    });
+        definingLines = definingLines.map((line: string) => line.split(";")).sort((a, b) => parseInt(a[0].split("")[1]) - parseInt(b[0].split("")[1]));
+        if (definingLines.length > 1) {
+            let subject = definingLines[0][6].replace(/ {2,}/g, ' ');
+            let grades: string[] = [definingLines[0][2].toLowerCase()];
+            // Skip unused information
+            if (subject === 'BER' || subject === 'KOOR') {
+                continue;
+            }
+            if (definingLines.length > 2 && definingLines[2][0] === 'U6') {
+                grades = definingLines[2].slice(3, -1).map((grade: string) => grade.toLowerCase());
+            }
+            const course: string = subject.split(" ").length > 1 ? subject.split(" ")[1] : null;
+            subject = subject.split(" ")[0];
+            const block: string = definingLines[0][1];
+            const numberOfLessons: number = parseInt(definingLines[1][2]);
+            for (var l = 0; l < grades.length; l++) {
+                const grade = grades[l];
+
+                // Skip all grades
+                if (grade == 'ag') {
+                    continue;
+                }
+
+                if (!timetables.grades[grade]) {
+                    const _grade: Timetable = {
+                        grade: grade,
+                        date: timetables.date,
+                        data: {
+                            grade: grade,
+                            days: []
+                        }
+                    };
+                    for (let i = 0; i < 5; i++) {
+                        _grade.data.days.push({
+                            day: i,
+                            units: []
+                        });
+                    }
+                    timetables.grades[grade] = _grade;
+                }
+                const dataLine = definingLines[1].slice(3);
+                for (let k = 0; k < numberOfLessons; k++) {
+                    const dataElement = dataLine.slice(k * 6, (k + 1) * 6);
+                    const day: number = parseInt(dataElement[0]) - 1;
+                    const unitCount: number = parseInt(dataElement[2]);
+                    let startUnit: number = parseInt(dataElement[1]);
+                    const room: string = dataElement[3];
+                    const teacher: string = dataElement[4];
+
+                    const _grade = timetables.grades[grade];
+                    if (_grade) {
+                        for (var j = 0; j < unitCount; j++) {
+                            let unit = startUnit + j;
+                            if (unit <= 5) {
+                                unit--;
+                            }
+                            if (!_grade.data.days[day].units[unit]) {
+                                _grade.data.days[day].units[unit] = {
+                                    unit: unit,
+                                    subjects: [{
+                                        id: `${grade}-2-${day}-${unit}-0`,
+                                        unit: unit,
+                                        block: block,
+                                        courseID: `${grade}-${block}-`,
+                                        teacherID: '',
+                                        subjectID: 'Freistunde',
+                                        roomID: '',
+                                        week: 2
+                                    }]
+                                }
+                            }
+                            const subjectID = subject.replace(/[0-9]/g, '').replace('Schw', 'Sp').toLowerCase();
+                            const courseID = `${grade}-${course != null ? course : `${block}+${teacher}`}-${subjectID}`.toLowerCase();
+                            const teacherID = teacher.toLowerCase();
+                            const _unit = _grade.data.days[day].units[unit];
+                            const subjectToUpdate = _unit.subjects.filter((subject) => {
+                                return subject.courseID === courseID;
+                            })[0];
+                            if (subjectToUpdate) {
+                                if (subjectToUpdate.teacherID !== teacherID) {
+                                    console.log('Update existing subject', grade, unit, courseID);
+                                    subjectToUpdate.teacherID += `+${teacherID}`;
+                                }
+                            } else {
+                                _unit.subjects.push({
+                                    unit: unit,
+                                    id: `${grade}-2-${day}-${unit}-${_unit.subjects.length}`,
+                                    courseID: courseID,
+                                    subjectID: subjectID,
+                                    block: block,
+                                    teacherID: teacherID,
+                                    roomID: room.toLowerCase(),
+                                    week: 2
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     // Add lunch breaks
     Object.keys(timetables.grades).forEach((grade: string) => {
@@ -100,7 +144,9 @@ export const extractData = (data: string[][]): Timetables => {
             for (var i = 0; i < day.units.length; i++) {
                 const unit = day.units[i];
                 if (!unit) {
-                    console.log(grade, day.day, i);
+                    if (grade != 'ag') {
+                        console.log('Error: Lesson is missing: ', grade, day.day, i);
+                    }
                     day.units[i] = {
                         unit: i,
                         subjects: [{

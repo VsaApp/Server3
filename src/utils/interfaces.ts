@@ -1,14 +1,17 @@
 export interface Timetables {
     date: string;
+    /** Grades in lowercase */
     grades: TimetableGrades
 }
 
 export interface TimetableGrades {
+    /** Grades in lowercase */
     [grade: string]: Timetable
 }
 
 // Timetable
 export interface Timetable {
+    /** Grade in lowercase */
     grade: string;
     /** ISO 8601 */
     date: string;
@@ -29,17 +32,22 @@ export interface Unit {
     subjects: Subject[];
 }
 
+//TODO: Delete week in id
 export interface Subject {
     /** starts with 0; 6. unit is the lunch break */
     unit: number;  
     /** Format: GRADE-WEEK-DAY-UNIT-SUBJECT_INDEX (lowercase) */
     id: string;  
-    /** Format: GRADE-COURSE(BLOCK|TEACHER)-SUBJECT (lowercase) */
+    /** Format: GRADE-COURSE(BLOCK+TEACHER)-SUBJECT (lowercase) */
     courseID: string;  
     /** subject shorthand for example "e"; "s" */
     subjectID: string; 
-    /** teacher shorthand (lowercase) */
-    teacherID: string; 
+    /** teacher shorthand (lowercase). Multiple teachers for one subject are separated with '+'.
+     * 
+     * Example: 'him+kan' or only 'him'
+     */
+    teacherID: string;
+    /** lowercase */
     roomID: string;
     /** 0 => A; 1 => B; 2 => AB */
     week: number; 
@@ -59,6 +67,7 @@ export interface SubstitutionPlan {
 }
 
 export interface SubstitutionPlanGrades {
+    /** Grades in lowercase */
     [grade: string]: Substitution[]
 }
 
@@ -96,24 +105,22 @@ export interface UpdateData {
     /** ISO 8601 */
     calendar: string;
     /** ISO 8601 */
-    teachers: string;
-    /** ISO 8601 */
     workgroups: string;
     /** ISO 8601 */
     subjects: string;
-    /** ISO 8601 */
-    rooms: string;
     minAppLevel: number;
+    /** Grade in lowercase */
     grade: string;
 }
 
 export interface Tags {
+    /** Grade in lowercase */
     grade: string;
-    group: number; // 1 (pupil); 2 (teacher); 4 (developer); 8 (other)
-    selected: string[]; // course list
-    exams: string[]; // course list
+    /** 1 (pupil); 2 (teacher); 4 (developer); 8 (other) */
+    group: number; 
+    selected: Selection[]; // course list
+    exams: Exam[]; // course list
     cafetoria: CafetoriaLogin;
-    timestamp: string; // iso date
 }
 
 export interface CafetoriaLogin {
@@ -124,33 +131,52 @@ export interface CafetoriaLogin {
 
 export interface User {
     username: string;
+    /** Grade in lowercase */ 
     grade: string;
-    group: number; // 1 (pupil); 2 (teacher); 4 (developer); 8 (other)
-    devices: Device[];
-    selected: Course[]; // course list
-    exams: string[]; // course list
-    cafetoria: CafetoriaLogin;
-    timestamp: string; // iso date
-    lastActive: string; // iso date
+    /** 1 (pupil); 2 (teacher); 4 (developer); 8 (other) */
+    group: number; 
 }
 
+export interface Selection {
+    block: string;
+    courseID: string | undefined;
+    timestamp: string;
+}
+
+export interface Exam {
+    subject: string;
+    writing: boolean | undefined;
+    timestamp: string;
+}
 
 export interface Course {
     courseID: string;
-    subjectIDs: string[]
+    subjectIDs: string[];
+    /** ISO Date */
+    timestamp: string;
 }
 
 export interface Device {
     os: string;
     name: string;
     appVersion: string;
-    notifications: boolean;
     firebaseId: string;
-    language: string;
-    /** day index list with notification UPDATED_DAY-DATE_SINCE_EPOCHE-TEXT_HASH
-     * example: 28-18229-d8345b3416426541733f126ade0de8b7
-     */
-    lastNotifications: string[]
+    /** ISO-Date */
+    lastActive: string;
+}
+
+/** day index list with notification UPDATED_DAY-DATE_SINCE_EPOCHE-TEXT_HASH
+ * 
+ *   example: 28-18229-d8345b3416426541733f126ade0de8b7
+ */
+export interface LastNotifications {
+    username: string;
+    day1: string;
+    day2: string;
+}
+
+export interface Settings {
+    spNotifications: boolean;
 }
 
 export interface Cafetoria {
@@ -197,4 +223,8 @@ export interface Workgroup {
     participants: string;
     time: string;
     place: string;
+}
+
+export interface Subjects {
+    [id: string]: string;
 }

@@ -1,5 +1,6 @@
 import { SubstitutionPlan, Substitution, Timetable, Subject, User } from "../utils/interfaces";
-import { getTimetable } from "../timetable/tt_butler";
+import { getTimetable, getCourseIDsFromID } from "../timetable/tt_butler";
+import { getSelections, getExams } from "../tags/tags_db";
 
 const filterSubstitutionPlan = async (substitutionPlan: SubstitutionPlan): Promise<SubstitutionPlan> => {
     const timetable = await getTimetable();
@@ -14,7 +15,11 @@ const filterSubstitutionPlan = async (substitutionPlan: SubstitutionPlan): Promi
                             const ttUnit = ttDay.units[substitution.unit];
                             // Filter with teacher
                             let subjects = ttUnit.subjects.filter((subject) => {
-                                return subject.teacherID === substitution.original.teacherID;
+                                // A subject can have multiple teachers (separated with '+'), so check for each teacher
+                                return subject.teacherID
+                                    .split('+')
+                                    .map((teacher) => teacher === substitution.original.teacherID)
+                                    .reduce((b1, b2) => b1 || b2);
                             });
                             // Filter with subject
                             if (subjects.length !== 1) {
@@ -25,15 +30,19 @@ const filterSubstitutionPlan = async (substitutionPlan: SubstitutionPlan): Promi
                             // Filter with both
                             if (subjects.length !== 1) {
                                 subjects = ttUnit.subjects.filter((subject) => {
+                                    // A subject can have multiple teachers (separated with '+'), so check for each teacher
                                     return subject.subjectID === substitution.original.subjectID &&
-                                        subject.teacherID === substitution.original.teacherID;
+                                        subject.teacherID
+                                            .split('+')
+                                            .map((teacher) => teacher === substitution.original.teacherID)
+                                            .reduce((b1, b2) => b1 || b2);
                                 });
                             }
                             if (subjects.length === 1) {
                                 substitution.id = subjects[0].id;
                                 substitution.courseID = subjects[0].courseID;
 
-                                // Auto fill a substitution the fix for example empty subjects or rooms
+                                // Auto fill a substitution (For empty rooms or teachers)
                                 autoFillSubstitution(substitution, subjects[0]);
                             } else {
                                 console.error(`Cannot filter grade: ${grade} unit: ${substitution.unit}`);
@@ -71,24 +80,39 @@ const autoFillSubstitution = (substitution: Substitution, subject: Subject): voi
  * @param user The user to filter for
  * @param day to search for
  */
-export const getSubstitutionsForUser = (user: User, substitutionPlan: SubstitutionPlan): Substitution[] => {
+export const getSubstitutionsForUser = async (user: User, substitutionPlan: SubstitutionPlan): Promise<Substitution[]> => {
 
     // Reduces the ids to string arrays
-    const selectedCourses = user.selected.map((course) => course.courseID);
-    const selectedSubjectsIDs = user.selected.map((course) => course.subjectIDs).reduce((i1, i2) => Array.from(i1).concat(i2));
+    const selections = await getSelections(user.username) || [];
+    const selectedCourses = selections.map((course) => course.courseID);
+    const exams = (await getExams(user.username) || []).map((exam) => exam.subject);
 
     return substitutionPlan.data[user.grade].filter((substitution) => {
         // If the server was not able to filter the substitution, select it and it will be marked as unknown
         if (substitution.courseID === undefined && substitution.id === undefined) {
             return true;
         }
-        // Check if the substitution is selected
-        const selected = selectedCourses.includes(substitution.courseID || '-') || selectedSubjectsIDs.includes(substitution.id || '-');
-        // If it is an exam, check if writing is enabled
-        if (selected && substitution.type === 2) {
-            return user.exams.includes(substitution.courseID || '-');
+        // If the course is selected, mark as user change
+        if (substitution.courseID) {
+            if (selectedCourses.includes(substitution.courseID || '-')) {
+                if (substitution.type === 2) {
+                    return exams.includes(substitution.original.subjectID || '-');
+                }
+                return true;
+            }
         }
-        return selected;
+
+        // Retry with the id
+        if (substitution.id) {
+            const course = getCourseIDsFromID(user.grade, substitution.id || '');
+            if (selectedCourses.includes(course)) {
+                if (substitution.type === 2) {
+                    return exams.includes(substitution.original.subjectID || '-');
+                }
+                return true;
+            }
+        }
+        return false;
     });
 }
 

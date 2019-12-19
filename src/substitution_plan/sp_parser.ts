@@ -230,32 +230,4 @@ const removeUnusedCharacters = (text: string): string => {
     return text.replace( /\s\s+/g, ' ' ).replace('→', '').replace('&nbsp;', '').replace('---', '');
 }
 
-
-/**
- * Generates the id to identify the subject in the timetable
- * @param grade the grade of the substitution
- * @param day the day of week (0-4)
- * @param unit the unit of the substitution
- * @param course the course of the substitution
- * @param subject the shorthand of the subject
- * @param teacher the teacher of the substitution
- * @returns an id to identify the subject
- *//*
-const getID = (grade: string, day: number, unit: number, course: string, subject: string, teacher: string,): string => {
-    //TODO: If course or teacher is undefined (free lesson), use the unit to get the info from the timetable
-    const subjectIndex = -1;
-    return `${grade}-${day}-${unit}-${subjectIndex}`;
-}
-*/
-
-/**
- * Generates the course id for the given id
- * @param id the subject id
- *//*
-const getCourseID = (id: string): string => {
-    //TODO: Get the course id of the subject with the given id
-    //for Example: return timetable.getSubject(id).courseID;
-    return `GRADE-COURSE-TEACHER`;
-}
-*/
 export default parseSubstitutionPlan;

@@ -1,14 +1,23 @@
-import {getUsers} from "../tags/users";
 import {sendMessage} from './notification';
-import { User } from "./interfaces";
+import { User, Device } from "./interfaces";
 import { isDeveloper } from "./auth";
+import { getAllDevices, getUsers, getDevices } from '../tags/tags_db';
 
-export const updateApp = async (segment: string, data: any, dev?: Boolean): Promise<void> => {
+export const updateApp = async (segment: string, data: any, dev?: boolean): Promise<void> => {
     if (!dev) dev = false;
-    const users = getUsers().filter((user: User) => !dev || isDeveloper(user.username));
+    
+    let devices: Device[] = [];
+    if (dev) {
+        let users = await getUsers(dev);
+        for (let user of users) {
+            devices = devices.concat(await getDevices(user.username));
+        }
+    } else {
+        devices = await getAllDevices();
+    }
 
     await sendMessage({
-        users: users,
+        devices: devices,
         data: data
     });
 };

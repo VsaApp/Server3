@@ -2,8 +2,6 @@
     "port": "PORT",
     "username": "USERNAME",
     "password": "PASSWORD",
-    "appAuthKey": "ONESIGNAL_AUTH_KEY",
-    "appId": "ONESIGNAL_APP_ID",
     "cafetoriaId": "YOUR_SERVICE_ID",
     "cafetoriaPin": "YOUR_SERVICE_PIN",
     "emailUser": "TEST@EXAMPLE.de",
@@ -12,5 +10,10 @@
     "isFirstQ": true,
     "viktoriaAppUsername": "USERNAME",
     "viktoriaAppPassword": "PASSWORD",
-    "developers": ["USERNAME", "USERNAME"]
+    "developers": ["USERNAME", "USERNAME"],
+    "dbHost": "HOST_URL",
+    "dbName": "DATABASE",
+    "dbUser": "USERNAME",
+    "dbPassword": "PASSWORD",
+    "dbPort": 3306
 }

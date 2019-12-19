@@ -1,8 +1,9 @@
 import admin from 'firebase-admin';
 import path from 'path';
-import { getUsers, setUsers } from '../tags/users';
-import { User, Device } from './interfaces';
-import { checkUsername } from '../authentication/ldap';
+import { Device, User } from './interfaces';
+import { getAllDevices, rmvDevice, getUsers, getDevices, rmvUser, rmvPreferences, rmvSelections, rmvExams, rmvNotifications, rmvDevices } from '../tags/tags_db';
+import { getGrade, checkUsername } from '../authentication/ldap';
+import { rmvCafetoriaLogin } from '../cafetoria/cafetoria_db';
 
 export const initFirebase = () => {
     console.log("Init firebase");
@@ -15,6 +16,7 @@ export const initFirebase = () => {
 };
 
 export const send = async (tokens: string[], data: any, options?: any): Promise<boolean> => {
+    if (tokens.length === 0) return false;
     return new Promise((resolve, reject) => {
         admin.messaging().sendToDevice(tokens, data, options)
             .then((response) => {
@@ -28,33 +30,41 @@ export const send = async (tokens: string[], data: any, options?: any): Promise<
 };
 
 export const removeOldDevices = async () => {
+    const fourMonthsAgo = new Date();
+    fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
+
+    // Clean up old devices
     let count = 0;
-    let users: User[] = getUsers();
-    for (var user of users) {
-        for (var i = user.devices.length - 1; i >= 0; i--) {
-            const device = user.devices[i];
-            const success = await send([device.firebaseId], { data: { 'type': 'device check' } });
-            if (!success) {
-                user.devices.splice(i, 1);
-                count++;
-            }
+    let devices: Device[] = await getAllDevices();
+    for (var device of devices) {
+        const success = await send([device.firebaseId], { data: { 'type': 'device check' } });
+
+        // Delete the device if the token does not exist or it was since four month inactive
+        if (!success || Date.parse(device.lastActive) < fourMonthsAgo.getTime()) {
+            rmvDevice(device);
+            rmvPreferences(device.firebaseId);
+            count++;
         }
     }
     console.log(`Removed ${count} devices`);
-    const usersCount = users.length;
-    users = users.filter((user) => {
-        const threeMonthsAgo = new Date();
-        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-        // Delete the user if he do not has any device and it was since three month not active
-        if (user.devices.length === 0 && Date.parse(user.lastActive) < threeMonthsAgo.getTime()) {
-            return false;
+
+    // Clean up old users
+    count = 0;
+    const users: User[] = await getUsers();
+    for (var user of users) {
+        const devices = await getDevices(user.username);
+        if (!checkUsername(user.username) || devices.length === 0) {
+            // Delete complete user data
+            rmvUser(user);
+            rmvDevices(user.username);
+            rmvSelections(user.username);
+            rmvExams(user.username);
+            rmvNotifications(user.username);
+            rmvCafetoriaLogin(user.username);
+            devices.forEach((device) => rmvPreferences(device.firebaseId));
+            count++;
         }
-        // Delete a user if he do not exists in the ldap system
-        else if (!checkUsername(user.username)) {
-            return false;
-        }
-        return true;
-    });
-    console.log(`Removed ${usersCount - users.length} users`);
-    setUsers(users);
+    }
+    console.log(`Removed ${count} users`);
+    
 }

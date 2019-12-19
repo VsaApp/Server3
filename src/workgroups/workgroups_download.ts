@@ -4,7 +4,7 @@ import fs from 'fs';
 import {getUrl} from '../utils/downloads';
 import extractData from './workgroups_parser';
 import { WorkgroupsDay } from '../utils/interfaces';
-import {getLatestWorkgroups, setLatestWorkgroups} from '../history/history';
+import {compareLatestWorkgroups, setLatestWorkgroups} from '../history/history';
 
 const isDev = process.argv.length === 3;
 const pdf_table_extractor = require('pdf-table-extractor');
@@ -15,9 +15,8 @@ let url: string;
  * Check if the url was updated
  * @param url 
  */
-const isNew = (url: string): boolean => {
-    const oldUrl = getLatestWorkgroups();
-    if (url !== oldUrl) {
+const isNew = async (url: string): Promise<boolean> => {
+    if (await compareLatestWorkgroups(url)) {
         setLatestWorkgroups(url);
         return true;
     }
@@ -52,23 +51,24 @@ const parseData = async (file: string): Promise<any> => {
  */
 const download = async (alwaysDownload = false): Promise<WorkgroupsDay[] | undefined> => {
     // Get the path for the pdf file
-    const folder = path.resolve(process.cwd(), 'history', 'workgroups');
+    const folder = path.resolve(process.cwd(), 'tmp');
     if (!fs.existsSync(folder)) {
-        fs.mkdirSync(folder, {recursive: true});
+        fs.mkdirSync(folder);
     }
     const file = path.join(folder, 'workgroups.pdf');
 
     // Get url
     url = await getUrl('AG-Gesamtübersicht', 152)
 
-    // Fetch and parse pdf
-    await fetchData(file);
-    console.log('Fetched work groups');
-    const data = await parseData(file);
-    console.log('Parsed work groups');
-
     // Extract pdf
-    if (isNew(url) || isDev || alwaysDownload) {
+    if (await isNew(url) || isDev || alwaysDownload) {
+        // Fetch and parse pdf
+        await fetchData(file);
+        console.log('Fetched work groups');
+
+        const data = await parseData(file);
+        console.log('Parsed work groups');
+
         return extractData(data);
     }
     return undefined

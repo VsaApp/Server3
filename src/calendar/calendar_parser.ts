@@ -1,5 +1,6 @@
 import got from 'got';
 import { Calendar, Event } from '../utils/interfaces';
+import localizations from '../utils/localizations';
 
 /**
  * Extracts the calendar from raw html object
@@ -111,7 +112,6 @@ export const extractData = async (data: any): Promise<Calendar> => {
                             start: stringToDate(date1, time1).toISOString(),
                             end: stringToDate(date1, time2).toISOString(),
                         });
-                        /// TODO: check if date parsing is correct
                         out.data.push({
                             name: description,
                             info: '',
@@ -191,13 +191,13 @@ export const extractData = async (data: any): Promise<Calendar> => {
                 return line.includes('Dafür ist unterrichtsfrei am');
             }).replace('Dafür ist unterrichtsfrei am ', '').replace(', dem', '').slice(0, -1);
             out.data.push({
-                name: 'Tag der Offenen Tür',
+                name: localizations.openDoorDay,
                 info: '',
                 start: stringToDate(openDoorDay).toISOString(),
                 end: stringToDate(openDoorDay).toISOString(),
             });
             out.data.push({
-                name: 'Ersatz für Tag der Offenen Tür',
+                name: localizations.openDoorDayReplacement,
                 info: '',
                 start: stringToDate(openDoorDayReplacement).toISOString(),
                 end: stringToDate(openDoorDayReplacement).toISOString(),
@@ -218,7 +218,7 @@ export const extractData = async (data: any): Promise<Calendar> => {
                 }
                 out.data.push({
                     name,
-                    info: 'Ferien',
+                    info: localizations.holidays,
                     start: stringToDate(start).toISOString(),
                     end: end
                 });
@@ -259,7 +259,7 @@ export const extractExternalData = (years: number[]): Promise<Event[]> => {
  * @param month month string
  */
 const monthToInt = (month: string): number => {
-    const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+    const months = localizations.months;
     return months.indexOf(month) + 1;
 };
 
