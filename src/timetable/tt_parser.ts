@@ -95,7 +95,7 @@ export const extractData = (data: string[]): Timetables => {
                                 unit: unit,
                                 id: `${grade}-2-${day}-${unit}-${_unit.subjects.length}`,
                                 courseID: `${grade}-${course != null ? course : `${block}+${teacher}`}-${subject}`.toLowerCase(),
-                                subjectID: subject.replace(/[0-9]/g, ''),
+                                subjectID: subject.replace(/[0-9]/g, '').replace('Schw', 'Sp').toLowerCase(),
                                 block: block,
                                 teacherID: teacher.toLowerCase(),
                                 roomID: room.toLowerCase(),

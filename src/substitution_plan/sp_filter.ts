@@ -1,6 +1,6 @@
 import { SubstitutionPlan, Substitution, Timetable, Subject, User } from "../utils/interfaces";
-import { getTimetable } from "../timetable/tt_butler";
-import { getSelections } from "../tags/tags_db";
+import { getTimetable, getCourseIDsFromID } from "../timetable/tt_butler";
+import { getSelections, getExams } from "../tags/tags_db";
 
 const filterSubstitutionPlan = async (substitutionPlan: SubstitutionPlan): Promise<SubstitutionPlan> => {
     const timetable = await getTimetable();
@@ -77,25 +77,35 @@ export const getSubstitutionsForUser = async (user: User, substitutionPlan: Subs
     // Reduces the ids to string arrays
     const selections = await getSelections(user.username) || [];
     const selectedCourses = selections.map((course) => course.courseID);
-    //TODO: Write filter with database
-    /*
-    const selectedSubjectsIDs = user.selected.map((course) => course.subjectIDs).reduce((i1, i2) => Array.from(i1).concat(i2));
+    const exams = (await getExams(user.username) || []).map((exam) => exam.subject);
 
     return substitutionPlan.data[user.grade].filter((substitution) => {
         // If the server was not able to filter the substitution, select it and it will be marked as unknown
         if (substitution.courseID === undefined && substitution.id === undefined) {
             return true;
         }
-        // Check if the substitution is selected
-        const selected = selectedCourses.includes(substitution.courseID || '-') || selectedSubjectsIDs.includes(substitution.id || '-');
-        // If it is an exam, check if writing is enabled
-        if (selected && substitution.type === 2) {
-            return user.exams.includes(substitution.courseID || '-');
+        // If the course is selected, mark as user change
+        if (substitution.courseID) {
+            if (selectedCourses.includes(substitution.courseID || '-')) {
+                if (substitution.type === 2) {
+                    return exams.includes(substitution.original.subjectID || '-');
+                }
+                return true;
+            }
         }
-        return selected;
+        
+        // Retry with the id
+        if (substitution.id) {
+            const course = getCourseIDsFromID(user.grade, substitution.id || '');
+            if (selectedCourses.includes(course)) {
+                if (substitution.type === 2) {
+                    return exams.includes(substitution.original.subjectID || '-');
+                }
+                return true;
+            }
+        }
+        return false;
     });
-    */
-    return [];
 }
 
 export default filterSubstitutionPlan;

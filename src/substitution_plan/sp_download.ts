@@ -6,6 +6,8 @@ import { SubstitutionPlan } from '../utils/interfaces';
 import { sendNotifications } from './sp_notifications';
 import { initFirebase } from '../utils/firebase';
 import filterSubstitutionPlan from './sp_filter';
+import { updateTimetable } from '../timetable/tt_butler';
+import { initDatabase } from '../utils/database';
 
 const isDev = process.argv.length >= 3 && process.argv[2].trim() === '--dev';
 
@@ -62,7 +64,11 @@ const download = async (checkIfUpdated?: boolean): Promise<Array<SubstitutionPla
 // If this file is started direct from the command line and was not imported
 if (module.parent === null) {
     initFirebase();
-    download();
+    initDatabase().then(() => {
+        updateTimetable().then(() => {
+            download();
+        })
+    });
 }
 
 export default download;

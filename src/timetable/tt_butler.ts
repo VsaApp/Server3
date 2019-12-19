@@ -42,22 +42,23 @@ export const getTimetable = async (): Promise<Timetables | undefined> => {
     return undefined;
 }
 
+
 /**
  * Returns all subjects ids of one course id
  * @param grade for timetable
  * @param courseID searched [courseID]
  */
-export const getSubjectIDsFromCourseID = (grade: string, courseID: string): string[] => {
+export const getCourseIDsFromID = (grade: string, id: string): string | undefined => {
     const timetable = timetables.grades[grade];
-    if (!timetable) throw `Timetable for ${grade} is undefined!`;
-    const subjectIDs = timetable.data.days
-        .map((day) => day.units
-            .map((unit) => unit.subjects
-                .filter((subject) => subject.courseID === courseID)))
-        .reduce((i1, i2) => i1.concat(i2))
-        .reduce((i1, i2) => i1.concat(i2))
-        .map((subject) => subject.id);
-    return subjectIDs;
+    try {
+        return timetable.data
+            .days[parseInt(id.split('-')[2])]
+            .units[parseInt(id.split('-')[3])]
+            .subjects[parseInt(id.split('-')[4])]
+            .courseID;
+    } catch (_) {
+        return undefined;
+    }
 }
 
 /**
