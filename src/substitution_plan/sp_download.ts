@@ -8,6 +8,7 @@ import { initFirebase } from '../utils/firebase';
 import filterSubstitutionPlan from './sp_filter';
 import { updateTimetable } from '../timetable/tt_butler';
 import { initDatabase } from '../utils/database';
+import { updatedSubstitutionPlan } from '../status/status_butler';
 
 const isDev = process.argv.length >= 3 && process.argv[2].trim() === '--dev';
 
@@ -58,6 +59,7 @@ const downloadDay = async (day: number, checkIfUpdated?: boolean): Promise<Subst
 const download = async (checkIfUpdated?: boolean): Promise<Array<SubstitutionPlan | undefined>> => {
     const day1 = await downloadDay(0, checkIfUpdated);
     const day2 = await downloadDay(1, checkIfUpdated);
+    updatedSubstitutionPlan();
     return [day1, day2];
 }
 

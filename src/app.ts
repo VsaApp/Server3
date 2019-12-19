@@ -16,6 +16,7 @@ import bugsRouter from './bugs/bugs_router';
 import { updateWorkgroups, workgroupsRouter } from './workgroups/workgroups_butler';
 import { initFirebase, removeOldDevices } from './utils/firebase';
 import { initDatabase } from './utils/database';
+import { updatedMinutely, updatedDaily, statusRouter } from './status/status_butler';
 
 const app = express();
 app.use(cors());
@@ -37,6 +38,7 @@ app.use('/teachers', teachersRouter);
 app.use('/subjects', subjectsRouter);
 app.use('/bugs', bugsRouter);
 app.use('/workgroups', workgroupsRouter);
+app.use('/status', statusRouter);
 
 
 /**
@@ -45,6 +47,7 @@ app.use('/workgroups', workgroupsRouter);
 const minutely = async (): Promise<void> => {
     await updateSubstitutionPlan();
     setTimeout(minutely, 60000);
+    updatedMinutely();
 };
 /**
  * Downloads every 24 hours the substitutionPlan
@@ -65,6 +68,7 @@ const daily = async (): Promise<void> => {
     }
     const difInMillis = tomorrow.getTime() - now;
     setTimeout(daily, difInMillis);
+    updatedDaily();
 };
 
 // Start download process
