@@ -12,7 +12,7 @@
     "viktoriaAppPassword": "PASSWORD",
     "developers": ["USERNAME", "USERNAME"],
     "dbHost": "HOST_URL",
-    "dnName": "DATABASE",
+    "dbName": "DATABASE",
     "dbUser": "USERNAME",
     "dbPassword": "PASSWORD",
     "dbPort": 3306

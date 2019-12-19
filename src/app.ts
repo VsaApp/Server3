@@ -42,9 +42,6 @@ app.use('/subjects', subjectsRouter);
 app.use('/bugs', bugsRouter);
 app.use('/workgroups', workgroupsRouter);
 
-// Init firebase for sending notifications
-initDatabase();
-initFirebase();
 
 /**
  * Downloads every minute the substitutionPlan
@@ -76,6 +73,9 @@ const daily = async (): Promise<void> => {
 
 // Start download process
 (async () => {
+    // Init firebase for sending notifications
+    await initDatabase();
+    initFirebase();
     await daily();
     await minutely();
 })();

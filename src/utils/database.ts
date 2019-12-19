@@ -1,7 +1,6 @@
 import mysql from 'mysql';
 import config from './config';
 import sqlString from 'sqlstring';
-import { User } from './interfaces';
 
 let dbConnection: mysql.Connection;
 
@@ -73,6 +72,7 @@ export const initDatabase = (): Promise<boolean> => {
         dbConnection.connect((err) => {
             if (err) {
                 console.log('Failed to connect to the database!');
+                //dbConnection = undefined;
                 resolve(false);
                 return;
             };
@@ -85,15 +85,16 @@ export const initDatabase = (): Promise<boolean> => {
 
 /** Executes a sql command */
 export const runDbCmd = (options: string): void => {
-    checkDatabaseStatus();
+    if (!checkDatabaseStatus()) return;
     dbConnection.query(options);
 }  
 
 /** Returns all results for the given options */
 export const getDbResults = async (options: string): Promise<any[]> => {
-    checkDatabaseStatus();    
+    if (!checkDatabaseStatus()) return [];   
     return new Promise<any[]>((resolve, reject) => {
         dbConnection.query(options, (err, results) => {
+            console.log(err, results);
             if (err) {
                 console.log('Failed to get values: ' + err);
                 resolve(undefined);
@@ -106,7 +107,7 @@ export const getDbResults = async (options: string): Promise<any[]> => {
 
 /** Creates all default database tables */
 const createDefaultTables = (): void => {
-    checkDatabaseStatus();
+    if (!checkDatabaseStatus()) return;
     dbConnection.query(
         'CREATE TABLE IF NOT EXISTS users (username VARCHAR(8) NOT NULL, grade TEXT NOT NULL, user_group INT NOT NULL, last_active VARCHAR(24) NOT NULL, UNIQUE KEY unique_username (username)) ENGINE = InnoDB DEFAULT CHARSET=utf8;');
     dbConnection.query(
@@ -128,10 +129,12 @@ const createDefaultTables = (): void => {
 }
 
 /** Checks if the database connection is already initialized */
-const checkDatabaseStatus = () => {
-    if (!dbConnection) {
-        throw 'The database must be initialized to create the default tables';
+const checkDatabaseStatus = (): boolean => {
+    if (!dbConnection || dbConnection.state != 'connected') {
+        console.error('The database must be initialized');
+        return false;
     }
+    return true;
 }
 
 if (module.parent === null) {
