@@ -72,7 +72,7 @@ export const initDatabase = (): Promise<boolean> => {
         dbConnection.connect((err) => {
             if (err) {
                 console.log('Failed to connect to the database!');
-                //dbConnection = undefined;
+
                 resolve(false);
                 return;
             };
@@ -94,7 +94,6 @@ export const getDbResults = async (options: string): Promise<any[]> => {
     if (!checkDatabaseStatus()) return [];   
     return new Promise<any[]>((resolve, reject) => {
         dbConnection.query(options, (err, results) => {
-            console.log(err, results);
             if (err) {
                 console.log('Failed to get values: ' + err);
                 resolve(undefined);
@@ -130,8 +129,8 @@ const createDefaultTables = (): void => {
 
 /** Checks if the database connection is already initialized */
 const checkDatabaseStatus = (): boolean => {
-    if (!dbConnection || dbConnection.state != 'connected') {
-        console.error('The database must be initialized');
+    if (!dbConnection || dbConnection.state != 'authenticated') {
+        console.error('The database must be initialized:', dbConnection.state);
         return false;
     }
     return true;
