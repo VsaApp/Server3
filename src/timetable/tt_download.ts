@@ -64,8 +64,7 @@ const download = async (checkIfUpdated = true): Promise<Timetables | undefined> 
 // If this file is started direct from the command line and was not imported
 if (module.parent === null) {
     initFirebase();
-    initDatabase();
-    download(false);
+    initDatabase().then(() => download(false));
 }
 
 export default download;

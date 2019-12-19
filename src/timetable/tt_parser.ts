@@ -90,17 +90,30 @@ export const extractData = (data: string[]): Timetables => {
                                     }]
                                 }
                             }
+                            const subjectID = subject.replace(/[0-9]/g, '').replace('Schw', 'Sp').toLowerCase();
+                            const courseID = `${grade}-${course != null ? course : `${block}+${teacher}`}-${subjectID}`.toLowerCase();
+                            const teacherID = teacher.toLowerCase();
                             const _unit = _grade.data.days[day].units[unit];
-                            _unit.subjects.push({
-                                unit: unit,
-                                id: `${grade}-2-${day}-${unit}-${_unit.subjects.length}`,
-                                courseID: `${grade}-${course != null ? course : `${block}+${teacher}`}-${subject}`.toLowerCase(),
-                                subjectID: subject.replace(/[0-9]/g, '').replace('Schw', 'Sp').toLowerCase(),
-                                block: block,
-                                teacherID: teacher.toLowerCase(),
-                                roomID: room.toLowerCase(),
-                                week: 2
-                            });
+                            const subjectToUpdate = _unit.subjects.filter((subject) => {
+                                return subject.courseID === courseID;
+                            })[0];
+                            if (subjectToUpdate) {
+                                if (subjectToUpdate.teacherID !== teacherID) {
+                                    console.log('Update existing subject', grade, unit, courseID);
+                                    subjectToUpdate.teacherID += `+${teacherID}`;
+                                }
+                            } else {
+                                _unit.subjects.push({
+                                    unit: unit,
+                                    id: `${grade}-2-${day}-${unit}-${_unit.subjects.length}`,
+                                    courseID: courseID,
+                                    subjectID: subjectID,
+                                    block: block,
+                                    teacherID: teacherID,
+                                    roomID: room.toLowerCase(),
+                                    week: 2
+                                });
+                            }
                         }
                     }
                 }
