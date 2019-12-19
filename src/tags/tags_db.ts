@@ -1,20 +1,14 @@
 import { runDbCmd, getDbResults, updateOnlyNonNullAttributes, toSqlValue, updateAllAttributes, fromSqlBoolean, fromSqlValue } from "../utils/database"
 import { User, Device, Exam, Selection } from "../utils/interfaces";
 
-/** Sets the last active value of a user */
-export const setLastActive = (username: string) => {
-    runDbCmd(`UPDATE users SET last_active='${new Date().toISOString()}' WHERE username='${username}';`);
-}
-
 /** Sets a new user or updates old parameters */
 export const setUser = (user: User): void => {
     const updateAttr = {
         grade: user.grade,
         user_group: user.group,
-        last_active: user.lastActive
     };
     const updateStr = updateOnlyNonNullAttributes(updateAttr);
-    runDbCmd(`INSERT INTO users VALUES ('${user.username}', '${user.grade}', '${user.group}', '${user.lastActive}') ${updateStr};`);
+    runDbCmd(`INSERT INTO users VALUES ('${user.username}', '${user.grade}', '${user.group}') ${updateStr};`);
 }
 
 /** Removes a user with the given username */
@@ -29,8 +23,7 @@ export const getUser = async (username: string): Promise<User | undefined> => {
     return {
         username: username,
         grade: dbUser.grade,
-        group: dbUser.user_group,
-        lastActive: dbUser.last_active
+        group: dbUser.user_group
     };
 }
 
@@ -46,7 +39,6 @@ export const getUsers = async (dev = false): Promise<User[]> => {
             username: user.username,
             grade: user.grade,
             group: user.user_group,
-            lastActive: user.last_active
         };
     });
 }
@@ -73,12 +65,12 @@ export const getSelection = async (username: string, block: string): Promise<Sel
 }
 
 /** Removes all selections */
-export const clearAllSelections = (): void => {
+export const rmvAllSelections = (): void => {
     runDbCmd(`DELETE FROM users_selections;`);
 }
 
 /** Removes all selections for one username */
-export const clearSelections = (username: string): void => {
+export const rmvSelections = (username: string): void => {
     runDbCmd(`DELETE FROM users_selections WHERE username='${username}';`);
 }
 
@@ -117,7 +109,7 @@ export const getExam = async (username: string, subject: string): Promise<Exam |
 }
 
 /** Removes all exam for a given [username] */
-export const clearExams = (username: string): void => {
+export const rmvExams = (username: string): void => {
     runDbCmd(`DELETE FROM users_exams WHERE username='${username}';`);
 }
 
@@ -139,15 +131,21 @@ export const setDevice = (username: string, device: Device): void => {
     const updateAttr = {
         os: device.os,
         version: device.appVersion,
-        name: device.name
+        name: device.name,
+        last_active: device.lastActive
     };
     const updateStr = updateOnlyNonNullAttributes(updateAttr);
-    runDbCmd(`INSERT INTO users_devices VALUES ('${username}', '${device.firebaseId}', '${device.os}', '${device.appVersion}', '${device.name}') ${updateStr};`);
+    runDbCmd(`INSERT INTO users_devices VALUES ('${username}', '${device.firebaseId}', '${device.os}', '${device.appVersion}', '${device.name}', '${device.lastActive}') ${updateStr};`);
 }
 
 /** Removes a device */
 export const rmvDevice = (device: Device): void => {
     runDbCmd(`DELETE FROM users_devices WHERE token='${device.firebaseId}';`);
+}
+
+/** Removes all devices of a user */
+export const rmvDevices = (username: string): void => {
+    runDbCmd(`DELETE FROM users_devices WHERE username='${username}';`);
 }
 
 /** Returns the device with the username and token */
@@ -158,7 +156,8 @@ export const getDevice = async (username: string, token: string): Promise<Device
         firebaseId: dbDevice.token,
         os: dbDevice.os,
         appVersion: dbDevice.version,
-        name: dbDevice.name
+        name: dbDevice.name,
+        lastActive: dbDevice.last_active
     };
 }
 
@@ -170,7 +169,8 @@ export const getDevices = async (username: string): Promise<Device[]> => {
             firebaseId: device.token,
             os: device.os,
             appVersion: device.version,
-            name: device.name
+            name: device.name,
+            lastActive: device.last_active
         };
     });
 }
@@ -183,7 +183,8 @@ export const getAllDevices = async (): Promise<Device[]> => {
             firebaseId: device.token,
             os: device.os,
             appVersion: device.version,
-            name: device.name
+            name: device.name,
+            lastActive: device.last_active
         };
     });
 }
@@ -198,7 +199,7 @@ export const setPreference = (token: string, key: string, value: boolean): void 
 }
 
 /** Deletes all preferences for a device */
-export const clearPreferences = (token: string): void => {
+export const rmvPreferences = (token: string): void => {
     runDbCmd(`DELETE FROM users_settings WHERE token='${token}';`);
 }
 
@@ -219,7 +220,7 @@ export const setNotification = (username: string, dayIndex: number, notification
 }
 
 /** Removes all notifications for a given username */
-export const clearNotifications = (username: string): void => {
+export const rmvNotifications = (username: string): void => {
     runDbCmd(`DELETE FROM users_notifications WHERE username='${username}';`);
 }
 

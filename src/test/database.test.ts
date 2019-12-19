@@ -1,5 +1,5 @@
 import { initDatabase } from "../utils/database";
-import { setUser, getUser, rmvUser, setDevice, getUsers, getDevice, rmvDevice, getDevices, getAllDevices, setExam, getExam, clearExams, getExams, setNotification, getNotification, clearNotifications, setSelection, getSelection, clearSelections, getSelections, setPreference, getPreference, clearPreferences } from "../tags/tags_db";
+import { setUser, getUser, rmvUser, setDevice, getUsers, getDevice, rmvDevice, getDevices, getAllDevices, setExam, getExam, rmvExams, getExams, setNotification, getNotification, rmvNotifications, setSelection, getSelection, rmvSelections, getSelections, setPreference, getPreference, rmvPreferences } from "../tags/tags_db";
 import { User, Device, CafetoriaLogin, Exam, Selection } from "../utils/interfaces";
 import { setCafetoriaLogin, getCafetoriaLogin, rmvCafetoriaLogin } from "../cafetoria/cafetoria_db";
 
@@ -7,19 +7,18 @@ const testUser: User = {
     username: 'maxmust',
     grade: '5a',
     group: 1,
-    lastActive: new Date().toISOString()
 };
 const testDevUser: User = {
     username: 'maxadmi',
     grade: 'q1',
     group: 5,
-    lastActive: new Date().toISOString()
 };
 const testDevice: Device = {
     os: 'TestOS',
     name: 'TestPhone',
     appVersion: '1.0.0',
-    firebaseId: 'my-firebase-id-123'
+    firebaseId: 'my-firebase-id-123',
+    lastActive: new Date().toISOString()
 };
 const testCafetoriaLogin: CafetoriaLogin = {
     id: 'encrypted_id',
@@ -55,7 +54,6 @@ describe('database', () => {
                 expect(user.username).toBe(testUser.username);
                 expect(user.grade).toBe(testUser.grade);
                 expect(user.group).toBe(testUser.group);
-                expect(user.lastActive).toBe(testUser.lastActive);
             }
             done();
         });
@@ -99,6 +97,7 @@ describe('database', () => {
                 expect(device.firebaseId).toBe(device.firebaseId);
                 expect(device.name).toBe(device.name);
                 expect(device.os).toBe(device.os);
+                expect(device.lastActive).toBe(device.lastActive);
             }
             done();
         });
@@ -176,7 +175,7 @@ describe('database', () => {
         });
     });
     test('remove selections for user', done => {
-        expect(() => clearSelections(testUser.username)).not.toThrow();
+        expect(() => rmvSelections(testUser.username)).not.toThrow();
         getSelections(testUser.username).then(selections => {
             expect(selections).toBeDefined();
             if (selections) {
@@ -214,7 +213,7 @@ describe('database', () => {
         getExams(testUser.username).then(exams => {
             expect(exams).toBeDefined();
             expect((exams || []).length).toBe(1);
-            expect(() => clearExams(testUser.username)).not.toThrow();
+            expect(() => rmvExams(testUser.username)).not.toThrow();
             getExams(testUser.username).then(exams => {
                 expect(exams).toBeDefined();
                 if (exams) {
@@ -236,7 +235,7 @@ describe('database', () => {
         });
     });
     test('clear notifications for user', done => {
-        expect(() => clearNotifications(testUser.username)).not.toThrow();
+        expect(() => rmvNotifications(testUser.username)).not.toThrow();
         getNotification(testUser.username, dayIndex).then(notification => {
             expect(notification).toBeUndefined();
             done();
@@ -255,7 +254,7 @@ describe('database', () => {
         });
     });
     test('remove preference', done => {
-        expect(() => clearPreferences(testUser.username)).not.toThrow();
+        expect(() => rmvPreferences(testUser.username)).not.toThrow();
         getPreference(testUser.username, testPreference).then(dbValue => {
             expect(dbValue).toBeUndefined();
             done();

@@ -76,8 +76,8 @@ export const initDatabase = (): Promise<boolean> => {
                 resolve(false);
                 return;
             };
-            createDefaultTables();
             console.log('Connected to database');
+            createDefaultTables();
             resolve(true);
         });
     });
@@ -108,7 +108,7 @@ export const getDbResults = async (options: string): Promise<any[]> => {
 const createDefaultTables = (): void => {
     if (!checkDatabaseStatus()) return;
     dbConnection.query(
-        'CREATE TABLE IF NOT EXISTS users (username VARCHAR(8) NOT NULL, grade TEXT NOT NULL, user_group INT NOT NULL, last_active VARCHAR(24) NOT NULL, UNIQUE KEY unique_username (username)) ENGINE = InnoDB DEFAULT CHARSET=utf8;');
+        'CREATE TABLE IF NOT EXISTS users (username VARCHAR(8) NOT NULL, grade TEXT NOT NULL, user_group INT NOT NULL, UNIQUE KEY unique_username (username)) ENGINE = InnoDB DEFAULT CHARSET=utf8;');
     dbConnection.query(
         'CREATE TABLE IF NOT EXISTS users_selections (username VARCHAR(8) NOT NULL, block VARCHAR(3) NOT NULL, course_id VARCHAR(12), timestamp VARCHAR(24) NOT NULL, UNIQUE KEY unique_username_block (username, block)) ENGINE = InnoDB DEFAULT CHARSET=utf8;');
     dbConnection.query(
@@ -118,7 +118,7 @@ const createDefaultTables = (): void => {
     dbConnection.query(
         'CREATE TABLE IF NOT EXISTS users_settings (token VARCHAR(8) NOT NULL, key_name VARCHAR(20) NOT NULL, value BOOLEAN NOT NULL, UNIQUE KEY unique_preference (token, key_name)) ENGINE = InnoDB DEFAULT CHARSET=utf8;');
     dbConnection.query(
-        'CREATE TABLE IF NOT EXISTS users_devices (username VARCHAR(8) NOT NULL, token VARCHAR(255) NOT NULL, os TEXT NOT NULL, version TEXT NOT NULL, name TEXT NOT NULL, UNIQUE KEY unique_username (username, token)) ENGINE = InnoDB DEFAULT CHARSET=utf8;');
+        'CREATE TABLE IF NOT EXISTS users_devices (username VARCHAR(8) NOT NULL, token VARCHAR(255) NOT NULL, os TEXT NOT NULL, version TEXT NOT NULL, name TEXT NOT NULL, last_active VARCHAR(24) NOT NULL, UNIQUE KEY unique_username (username, token)) ENGINE = InnoDB DEFAULT CHARSET=utf8;');
     dbConnection.query(
         'CREATE TABLE IF NOT EXISTS users_notifications (username VARCHAR(8) NOT NULL, day_index INT NOT NULL, hash TEXT, UNIQUE KEY unique_notification (username, day_index)) ENGINE = InnoDB DEFAULT CHARSET=utf8;');
     dbConnection.query(
@@ -129,7 +129,7 @@ const createDefaultTables = (): void => {
 
 /** Checks if the database connection is already initialized */
 const checkDatabaseStatus = (): boolean => {
-    if (!dbConnection || dbConnection.state != 'authenticated') {
+    if (!dbConnection || (dbConnection.state != 'authenticated' && dbConnection.state != 'connected')) {
         console.error('The database must be initialized:', dbConnection.state);
         return false;
     }

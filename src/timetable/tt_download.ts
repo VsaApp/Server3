@@ -5,7 +5,7 @@ import { initFirebase } from '../utils/firebase';
 import { extractData } from './tt_parser';
 import { sendNotifications } from './tt_butler';
 import { Timetables } from '../utils/interfaces';
-import { clearAllSelections } from '../tags/tags_db';
+import { rmvAllSelections } from '../tags/tags_db';
 import { initDatabase } from '../utils/database';
 
 const isDev = process.argv.length === 3;
@@ -53,7 +53,7 @@ const download = async (checkIfUpdated = true): Promise<Timetables | undefined> 
 
         // Send notifications
         if (_isNew) {
-            clearAllSelections();
+            rmvAllSelections();
         };
         if (_isNew || isDev) await sendNotifications(isDev);
         return timetable;

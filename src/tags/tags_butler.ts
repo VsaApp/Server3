@@ -3,17 +3,11 @@ import bodyParser from 'body-parser';
 import { Tags, Exam, Device, CafetoriaLogin, Selection } from '../utils/interfaces';
 import getAuth, { isDeveloper } from '../utils/auth';
 import { getGrade } from '../authentication/ldap';
-import { setLastActive, getUser, getSelections, getExams, setUser, setDevice, getExam, setExam, setPreference, setSelection, getSelection } from './tags_db';
+import { getUser, getSelections, getExams, setUser, setDevice, getExam, setExam, setPreference, setSelection, getSelection } from './tags_db';
 import { getCafetoriaLogin, setCafetoriaLogin } from '../cafetoria/cafetoria_db';
 
 const tagsRouter = express.Router();
 tagsRouter.use(bodyParser.json());
-
-/** Sets the last active tag for each request */
-export const requestHandler = (req: any) => {
-    const auth = getAuth(req);
-    setLastActive(auth.username);
-}
 
 tagsRouter.get('/', async (req, res) => {
     if (req.headers.authorization) {
@@ -43,7 +37,6 @@ tagsRouter.post('/', async (req, res) => {
         username: auth.username,
         grade: getGrade(auth.username, auth.password),
         group: isDeveloper(auth.username) ? 5 : 1,
-        lastActive: new Date().toISOString()
     });
 
     const errors = [];
@@ -52,6 +45,7 @@ tagsRouter.post('/', async (req, res) => {
     if (req.body.device) {
         const device: Device = req.body.device;
         if (device.appVersion && device.firebaseId && device.name && device.os) {
+            device.lastActive = new Date().toISOString();
             setDevice(auth.username, device);
 
             // Update settings if they are set

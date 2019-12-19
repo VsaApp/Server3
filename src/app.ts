@@ -10,7 +10,7 @@ import { timetableRouter, updateTimetable } from './timetable/tt_butler';
 import { cafetoriaRouter, updateCafetoriaMenus } from './cafetoria/cafetoria_butler';
 import { calendarRouter, updateCalendar } from './calendar/calendar_butler';
 import { teachersRouter, updateTeachers } from './teachers/teachers_butler';
-import tagsRouter, { requestHandler } from './tags/tags_butler';
+import tagsRouter from './tags/tags_butler';
 import { authRouter } from './authentication/auth_butler';
 import bugsRouter from './bugs/bugs_router';
 import { updateWorkgroups, workgroupsRouter } from './workgroups/workgroups_butler';
@@ -20,10 +20,6 @@ import { initDatabase } from './utils/database';
 const app = express();
 app.use(cors());
 app.use(basicAuth({ authorizer: authorizer, challenge: true }));
-app.use((req, res, next) => {
-    next();
-    requestHandler(req);
-});
 
 app.get('/', (req, res) => {
     res.send('Hello world!');

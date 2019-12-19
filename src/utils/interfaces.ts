@@ -32,6 +32,7 @@ export interface Unit {
     subjects: Subject[];
 }
 
+//TODO: Delete week in id
 export interface Subject {
     /** starts with 0; 6. unit is the lunch break */
     unit: number;  
@@ -131,8 +132,6 @@ export interface User {
     grade: string;
     /** 1 (pupil); 2 (teacher); 4 (developer); 8 (other) */
     group: number; 
-    /** ISO date */
-    lastActive: string;
 }
 
 export interface Selection {
@@ -159,6 +158,8 @@ export interface Device {
     name: string;
     appVersion: string;
     firebaseId: string;
+    /** ISO-Date */
+    lastActive: string;
 }
 
 /** day index list with notification UPDATED_DAY-DATE_SINCE_EPOCHE-TEXT_HASH
