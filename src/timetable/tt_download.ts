@@ -19,7 +19,7 @@ const isNew = async (data: string): Promise<boolean> => {
  * @param weekA fetches either week a or week b
  */
 const fetchData = async (): Promise<string> => {
-    return fs.readFileSync(path.resolve(process.cwd(), 'unstf.txt'), 'utf-8').toString();
+    return fs.readFileSync(path.resolve(process.cwd(), 'unstf.txt'), 'latin1').toString();
 };
 
 const parse = (raw: string): string[] => {
