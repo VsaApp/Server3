@@ -110,7 +110,7 @@ const createDefaultTables = (): void => {
     dbConnection.query(
         'CREATE TABLE IF NOT EXISTS users (username VARCHAR(8) NOT NULL, grade TEXT NOT NULL, user_group INT NOT NULL, UNIQUE KEY unique_username (username)) ENGINE = InnoDB DEFAULT CHARSET=utf8;');
     dbConnection.query(
-        'CREATE TABLE IF NOT EXISTS users_selections (username VARCHAR(8) NOT NULL, block VARCHAR(6) NOT NULL, course_id VARCHAR(12), timestamp VARCHAR(24) NOT NULL, UNIQUE KEY unique_username_block (username, block)) ENGINE = InnoDB DEFAULT CHARSET=utf8;');
+        'CREATE TABLE IF NOT EXISTS users_selections (username VARCHAR(8) NOT NULL, block VARCHAR(5) NOT NULL, course_id VARCHAR(12), timestamp VARCHAR(24) NOT NULL, UNIQUE KEY unique_username_block (username, block)) ENGINE = InnoDB DEFAULT CHARSET=utf8;');
     dbConnection.query(
         'CREATE TABLE IF NOT EXISTS users_exams (username VARCHAR(8) NOT NULL, subject VARCHAR(3) NOT NULL, writing BOOLEAN, timestamp VARCHAR(24) NOT NULL, UNIQUE KEY unique_exam (username, subject)) ENGINE = InnoDB DEFAULT CHARSET=utf8;');
     dbConnection.query(

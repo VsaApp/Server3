@@ -121,6 +121,7 @@ export const extractData = (data: string[]): Timetables => {
     }
 
     Object.keys(timetables.grades).forEach((grade: string, index: number) => {
+        let blockIndex = 0;
         timetables.grades[grade].data.days.forEach((day: Day) => {
             // Add lunch breaks
             if (day.units.length > 5) {
@@ -141,8 +142,9 @@ export const extractData = (data: string[]): Timetables => {
                 };
             }
 
-            // Add missing lessons (This is only to prevent bugs)
+            
             for (var i = 0; i < day.units.length; i++) {
+                // Add missing lessons (This is only to prevent bugs)
                 const unit = day.units[i];
                 if (!unit) {
                     if (grade != 'ag') {
@@ -162,52 +164,40 @@ export const extractData = (data: string[]): Timetables => {
                         }]
                     };
                 }
+
+                // Generate all block ids
+                // Set only the block for all parallels of this subject if the subject do not has already a block
+                if (!unit.subjects[0].block.includes('-')) {
+                    setBlockOfParallels(timetables.grades[grade].data.days, grade, unit.subjects[0].courseID, blockIndex);
+                }
+                blockIndex++;
             };
         });
-
-        // Generate all block ids
-        const allCourseIDs: CourseIDs = {};
-        timetables.grades[grade].data.days.forEach((day) => {
-            day.units.forEach((unit) => {
-                unit.subjects.forEach((subject) => {
-                    if (!allCourseIDs[subject.courseID]) {
-                        allCourseIDs[subject.courseID] = {
-                            subjects: [],
-                            parallels: []
-                        };
-                    }
-                    allCourseIDs[subject.courseID].subjects.push(subject);
-                    unit.subjects.forEach((pSubject) => {
-                        if (pSubject === subject) return;
-                        if (!allCourseIDs[subject.courseID].parallels.includes(pSubject.courseID)) {
-                            allCourseIDs[subject.courseID].parallels.push(pSubject.courseID);
-                        }
-                    });
-                });
-            });
-        });
-        const finishedCourseIDs: string[] = [];
-        const testing = Object.keys(allCourseIDs);
-        Object.keys(allCourseIDs).forEach((courseID, index: number) => {
-            if (finishedCourseIDs.includes(courseID)) {
-                return;
-            }
-            const subjects = allCourseIDs[courseID];
-            subjects.subjects.forEach((subject) => {
-                subject.block = `${grade}-${index}`;
-            });
-            subjects.parallels.forEach((courseID) => {
-                allCourseIDs[courseID].subjects.forEach((subject) => {
-                    subject.block = `${grade}-${index}`;
-                });
-                finishedCourseIDs.push(courseID);
-            });
-            finishedCourseIDs.push(courseID);
-        })
     });
 
     return timetables;
 };
+
+/** Set the blocks of the subjects in the given unit and of all the parallel subjects */
+const setBlockOfParallels = (ttDays: Day[], grade: string, courseID: string, index: number): void => {
+    const blockID: string = `${grade}-${index}`;
+    ttDays.forEach((day) => {
+        day.units.forEach((unit) => {
+            // Only set the blocks if the searched course id is in this unit
+            if (unit.subjects.map((s) => s.courseID).includes(courseID)) {
+                unit.subjects.forEach((subject) => {
+                    // Only if the block is not set already
+                    if (!subject.block.includes('-')) {
+                        subject.block = blockID;
+                        setBlockOfParallels(ttDays, grade, subject.courseID, index);
+                    } else if (subject.block !== blockID) {
+                        console.error('Failed to create block system!', subject);
+                    }
+                });
+            }
+        });
+    });
+}
 
 interface CourseIDs {
     [courseId: string]: {
