@@ -1,4 +1,4 @@
-import { Timetables, Timetable, Day } from '../utils/interfaces';
+import { Timetables, Timetable, Day, Subject } from '../utils/interfaces';
 
 export const extractData = (data: string[]): Timetables => {
     const date: Date = new Date();
@@ -120,9 +120,9 @@ export const extractData = (data: string[]): Timetables => {
         }
     }
 
-    // Add lunch breaks
-    Object.keys(timetables.grades).forEach((grade: string) => {
+    Object.keys(timetables.grades).forEach((grade: string, index: number) => {
         timetables.grades[grade].data.days.forEach((day: Day) => {
+            // Add lunch breaks
             if (day.units.length > 5) {
                 day.units[5] = {
                     unit: 5,
@@ -140,6 +140,8 @@ export const extractData = (data: string[]): Timetables => {
                     ]
                 };
             }
+
+            // Add missing lessons (This is only to prevent bugs)
             for (var i = 0; i < day.units.length; i++) {
                 const unit = day.units[i];
                 if (!unit) {
@@ -162,7 +164,55 @@ export const extractData = (data: string[]): Timetables => {
                 }
             };
         });
+
+        // Generate all block ids
+        const allCourseIDs: CourseIDs = {};
+        timetables.grades[grade].data.days.forEach((day) => {
+            day.units.forEach((unit) => {
+                unit.subjects.forEach((subject) => {
+                    if (!allCourseIDs[subject.courseID]) {
+                        allCourseIDs[subject.courseID] = {
+                            subjects: [],
+                            parallels: []
+                        };
+                    }
+                    allCourseIDs[subject.courseID].subjects.push(subject);
+                    unit.subjects.forEach((pSubject) => {
+                        if (pSubject === subject) return;
+                        if (!allCourseIDs[subject.courseID].parallels.includes(pSubject.courseID)) {
+                            allCourseIDs[subject.courseID].parallels.push(pSubject.courseID);
+                        }
+                    });
+                });
+            });
+        });
+        const finishedCourseIDs: string[] = [];
+        const testing = Object.keys(allCourseIDs);
+        Object.keys(allCourseIDs).forEach((courseID, index: number) => {
+            if (finishedCourseIDs.includes(courseID)) {
+                return;
+            }
+            const subjects = allCourseIDs[courseID];
+            subjects.subjects.forEach((subject) => {
+                subject.block = `${grade}-${index}`;
+            });
+            subjects.parallels.forEach((courseID) => {
+                allCourseIDs[courseID].subjects.forEach((subject) => {
+                    subject.block = `${grade}-${index}`;
+                });
+                finishedCourseIDs.push(courseID);
+            });
+            finishedCourseIDs.push(courseID);
+        })
     });
 
     return timetables;
 };
+
+interface CourseIDs {
+    [courseId: string]: {
+        subjects: Subject[],
+        /** List of all parallel course ids */
+        parallels: string[]
+    }
+}
