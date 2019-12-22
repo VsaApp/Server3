@@ -25,7 +25,8 @@ const getDir = (dirPath: string, relPath: string): string => {
  * @param res the response object
  */
 const handleHistoryRequest = (url: string, res: any): any => {
-    let dirPath = path.resolve(process.cwd(), 'history');
+    url = url.replace(/\/{2,}/, '/');
+    let dirPath = path.resolve(process.cwd(), 'tmp');
     dirPath = path.join(dirPath, url.substr(1));
     const isDir = fs.lstatSync(dirPath).isDirectory();
     if (!fs.existsSync(dirPath)) return res.status(404).send('Page not found!');

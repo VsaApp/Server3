@@ -2,6 +2,7 @@ import got from 'got';
 import { Calendar, Event } from '../utils/interfaces';
 import localizations from '../utils/localizations';
 
+//TODO: Fix empty event title (exp. 21.02.2020)
 /**
  * Extracts the calendar from raw html object
  * @param data raw html
