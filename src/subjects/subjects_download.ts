@@ -16,7 +16,7 @@ const setUpdate = async (data: string): Promise<boolean> => {
  * Fetches the schuldatentransfer file
  */
 const fetchData = (): string => {
-    return fs.readFileSync(path.resolve(process.cwd(), 'unstf.txt'), 'utf-8').toString();
+    return fs.readFileSync(path.resolve(process.cwd(), 'unstf.txt'), 'latin1').toString();
 };
 
 const parse = (raw: string): string[] => {
