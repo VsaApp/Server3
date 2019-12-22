@@ -205,11 +205,3 @@ const setBlockOfParallels = (ttDays: Day[], grade: string, courseID: string, ind
         });
     });
 }
-
-interface CourseIDs {
-    [courseId: string]: {
-        subjects: Subject[],
-        /** List of all parallel course ids */
-        parallels: string[]
-    }
-}
