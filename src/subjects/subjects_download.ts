@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs, { readFileSync } from 'fs';
+import path, { resolve } from 'path';
 import { extractData } from './subjects_parser';
 import { Subjects } from '../utils/interfaces';
 import { compareLatestSubjects, setLatestSubjects } from '../history/history';
@@ -33,7 +33,7 @@ const download = async (): Promise<Subjects | undefined> => {
 
     // Clean the raw string
     const data = parse(raw);
-    await setUpdate(data.join('\n'));
+    await setUpdate(data.join('\n') + readFileSync(resolve(process.cwd(), 'subjects.json')).toString().replace(' ', '').trim());
     console.log('Parsed subjects');
 
     // Parse the subjects
