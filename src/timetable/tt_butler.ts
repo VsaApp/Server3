@@ -6,7 +6,7 @@ import { Timetables, Device } from '../utils/interfaces';
 import getAuth from '../utils/auth';
 import { getGrade } from '../authentication/ldap';
 import { getUsers, getDevices, getAllDevices } from '../tags/tags_db';
-import localizations from '../utils/localizations';
+import getLocalization from '../utils/localizations';
 
 export const timetableRouter = express.Router();
 var timetables: Timetables;
@@ -81,8 +81,8 @@ export const sendNotifications = async (isDev: boolean): Promise<void> => {
         await sendNotification({
             devices: devices,
             group: 'timetableChanged',
-            text: localizations.newTimetable,
-            title: localizations.timetable,
+            text: getLocalization('newTimetable'),
+            title: getLocalization('timetable'),
             data: {
                 type: 'timetable'
             }

@@ -1,11 +1,10 @@
 import crypto from 'crypto';
 import { updateApp } from '../utils/update_app';
 import { sendNotification } from '../utils/notification';
-import { User, Device, SubstitutionPlan } from '../utils/interfaces';
-import { isDeveloper } from '../utils/auth';
+import { Device, SubstitutionPlan } from '../utils/interfaces';
 import { getSubstitutionsForUser } from './sp_filter';
 import { getUsers, getDevices, getPreference, getNotification, setNotification } from '../tags/tags_db';
-import localizations from '../utils/localizations';
+import getLocalization from '../utils/localizations';
 import { getSubject } from '../subjects/subjects_butler';
 
 /**
@@ -43,16 +42,16 @@ export const sendNotifications = async (isDev: boolean, day: number, substitutio
                             const unsure = s.courseID === undefined && s.id === undefined;
                             let text = ''
                             if (unsure) text += '(';
-                            text += `${s.unit + 1}. ${localizations.hour} ${getSubject(s.original.subjectID)} ${s.original.teacherID.toLocaleUpperCase()}`.trim();
+                            text += `${s.unit + 1}. ${getLocalization('hour')} ${getSubject(s.original.subjectID)} ${s.original.teacherID.toLocaleUpperCase()}`.trim();
                             text += ': ';
-                            if (s.type === 0) text += localizations.change;
-                            else if (s.type === 1) text += localizations.freeLesson;
-                            else if (s.type === 2) text += localizations.exam;
+                            if (s.type === 0) text += getLocalization('change');
+                            else if (s.type === 1) text += getLocalization('freeLesson');
+                            else if (s.type === 2) text += getLocalization('exam');
                             if (unsure) text += ')';
                             
                             return text;
                         }).join('\n');
-                        if (text.length === 0) text = localizations.noChanges;
+                        if (text.length === 0) text = getLocalization('noChanges');
 
                         /// Check if notification changed to last time
                         const newNotification = crypto.createHash('md5').update(text).digest('hex');
@@ -120,5 +119,5 @@ export const sendNotifications = async (isDev: boolean, day: number, substitutio
  * @param day index
  */
 const getWeekday = (day: number): string => {
-    return localizations.weekdays[day];
+    return getLocalization('weekdays')[day];
 }

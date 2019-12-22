@@ -1,8 +1,7 @@
 import got from 'got';
 import { Calendar, Event } from '../utils/interfaces';
-import localizations from '../utils/localizations';
+import getLocalization from '../utils/localizations';
 
-//TODO: Fix empty event title (exp. 21.02.2020)
 /**
  * Extracts the calendar from raw html object
  * @param data raw html
@@ -186,19 +185,19 @@ export const extractData = async (data: any): Promise<Calendar> => {
 
         function getOpenDoorDay(lines: Array<string>) {
             let openDoorDay = (<any>lines).find((line: string) => {
-                return line.includes('Unterricht am Tag der Offenen Tür für künftige Fünftklässler und deren Eltern.');
-            }).replace(': Unterricht am Tag der Offenen Tür für künftige Fünftklässler und deren Eltern.', '');
+                return /.+Tag der Offenen Tür.+Fünftklässler.+Eltern\./.test(line);
+            }).replace(/:.+/, '');
             let openDoorDayReplacement = (<any>lines).find((line: string) => {
                 return line.includes('Dafür ist unterrichtsfrei am');
             }).replace('Dafür ist unterrichtsfrei am ', '').replace(', dem', '').slice(0, -1);
             out.data.push({
-                name: localizations.openDoorDay,
+                name: getLocalization('openDoorDay'),
                 info: '',
                 start: stringToDate(openDoorDay).toISOString(),
                 end: stringToDate(openDoorDay).toISOString(),
             });
             out.data.push({
-                name: localizations.openDoorDayReplacement,
+                name: getLocalization('openDoorDayReplacement'),
                 info: '',
                 start: stringToDate(openDoorDayReplacement).toISOString(),
                 end: stringToDate(openDoorDayReplacement).toISOString(),
@@ -219,7 +218,7 @@ export const extractData = async (data: any): Promise<Calendar> => {
                 }
                 out.data.push({
                     name,
-                    info: localizations.holidays,
+                    info: getLocalization('holidays'),
                     start: stringToDate(start).toISOString(),
                     end: end
                 });
@@ -260,7 +259,7 @@ export const extractExternalData = (years: number[]): Promise<Event[]> => {
  * @param month month string
  */
 const monthToInt = (month: string): number => {
-    const months = localizations.months;
+    const months = getLocalization('months');
     return months.indexOf(month) + 1;
 };
 
@@ -284,7 +283,8 @@ const stringToDate = (raw: string, rawTime?: string, germanFormat = true): Date 
     if (raw.split(',').length > 2) raw = raw.split(',').slice(0, 2).join(',');
     // Replace all unused characters (./-/, and all weekdays)
     let fragments = raw
-        .replace(/\.|-|.+,|.+m?M?ontag|.+d?D?ienstag|.+m?M?ittwoch|.+d?D?onnerstag|.+f?F?reitag|.+s?S?amstag|.+s?S?onntag/g, ' ')
+        .replace(/\(.+/, '')
+        .replace(/\.|-|.+,|.+\w+tag/g, ' ')
         .replace(/  +/g, ' ')
         .trim()
         .split(' ')

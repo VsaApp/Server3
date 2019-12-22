@@ -1,6 +1,6 @@
 import {getRoomID} from '../utils/rooms';
 import { WorkgroupsDay } from '../utils/interfaces';
-import localizations from '../utils/localizations';
+import getLocalization from '../utils/localizations';
 
 (<any>Array.prototype).insert = function (index: number) {
     this.splice.apply(this, [index, 0].concat(
@@ -83,7 +83,7 @@ const extractData = (data: any): WorkgroupsDay[] => {
 };
 
 const weekdayToNumber = (weekday: string): number => {
-    return localizations.weekdays.map((i: string) => i.toLowerCase()).indexOf(weekday.toLowerCase());
+    return getLocalization('weekdays').map((i: string) => i.toLowerCase()).indexOf(weekday.toLowerCase());
 }
 
 export default extractData;

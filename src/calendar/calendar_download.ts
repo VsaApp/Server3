@@ -5,6 +5,7 @@ import {getUrl} from '../utils/downloads';
 import {extractData, extractExternalData} from './calendar_parser';
 import {setLatestCalendar, compareLatestCalendar} from '../history/history';
 import { Calendar, Event } from '../utils/interfaces';
+import { initDatabase } from '../utils/database';
 
 const isDev = process.argv.length === 3;
 const pdf_table_extractor = require('pdf-table-extractor');
@@ -79,5 +80,7 @@ export const download = async (alwaysUpdate = false): Promise<Calendar | undefin
 };
 
 if (module.parent === null) {
-    download(true);
+    initDatabase().then(() => {
+        download(true);
+    });
 }
