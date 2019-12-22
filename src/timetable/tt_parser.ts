@@ -190,6 +190,13 @@ const setBlockOfParallels = (ttDays: Day[], grade: string, courseID: string, ind
                     if (!subject.block.includes('-')) {
                         subject.block = blockID;
                         setBlockOfParallels(ttDays, grade, subject.courseID, index);
+                        const blockPart = subject.courseID.split('-')[1].split('+');
+                        if (/^\d/.test(blockPart[0])) {
+                            blockPart[0] = blockID.split('-')[1];
+                            const fragments = subject.courseID.split('-');
+                            fragments[1] = blockPart.join('+');
+                            subject.courseID = fragments.join('-');
+                        }
                     } else if (subject.block !== blockID) {
                         console.error('Failed to create block system!', subject);
                     }
