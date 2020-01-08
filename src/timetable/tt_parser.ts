@@ -1,4 +1,5 @@
 import { Timetables, Timetable, Day, Subject } from '../utils/interfaces';
+import { getRoomID } from '../utils/rooms';
 
 export const extractData = (data: string[]): Timetables => {
     const date: Date = new Date();
@@ -109,7 +110,7 @@ export const extractData = (data: string[]): Timetables => {
                                     subjectID: subjectID,
                                     block: block,
                                     teacherID: teacherID,
-                                    roomID: room.toLowerCase(),
+                                    roomID: getRoomID(room.toLowerCase()),
                                     week: 2
                                 });
                             }

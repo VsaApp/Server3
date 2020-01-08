@@ -1,4 +1,5 @@
 import { SubstitutionPlan, Substitution, SubstitutionPlanGrades } from '../utils/interfaces';
+import { getRoomID } from '../utils/rooms';
 
 /**
  * Parses the week (A/B), date and update in ISO-8601 string
@@ -175,13 +176,13 @@ const parseSubstitutionPlan = async (raw: any, isDev: boolean): Promise<Substitu
                                     original: {
                                         subjectID: normalSubject.toLowerCase().replace(/[0-9]/g, ''),
                                         teacherID: normalTeacher.toLowerCase(),
-                                        roomID: normalRoom.toLowerCase().replace(' ', ''),
+                                        roomID: getRoomID(normalRoom.toLowerCase().replace(' ', '')),
                                         course: normalCourse ? normalCourse.toLowerCase() : undefined
                                     },
                                     changed: {
                                         subjectID: newSubject.toLowerCase().replace(/[0-9]/g, ''),
                                         teacherID: newTeacher.toLowerCase(),
-                                        roomID: newRoom.toLowerCase().replace(' ', '')
+                                        roomID: getRoomID(newRoom.toLowerCase().replace(' ', ''))
                                     }
                                 };
 
