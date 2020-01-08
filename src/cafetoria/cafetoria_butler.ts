@@ -1,23 +1,26 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import { download, fetchDataForUser } from './cafetoria_download';
 import { Cafetoria } from '../utils/interfaces';
 
 export const cafetoriaRouter = express.Router();
+cafetoriaRouter.use(bodyParser.json());
+
 let data: Cafetoria | undefined;
 
-cafetoriaRouter.get('/login/:id/:pin', async (req, res) => {
-    if (req.params.id === 'null' || req.params.pin === 'null' || req.params.id === undefined || req.params.pin === undefined) {
-        req.params.id = '';
-        req.params.pin = '';
+cafetoriaRouter.post('/', async (req, res) => {
+    if (req.body.id === 'null' || req.body.pin === 'null' || req.body.id === undefined || req.body.pin === undefined) {
+        req.body.id = '';
+        req.body.pin = '';
     }
     try {
-        res.json(await fetchDataForUser(req.params.id, req.params.pin));
+        res.json(await fetchDataForUser(req.body.id, req.body.pin));
     } catch (e) {
         res.json(e);
     }
 });
 
-cafetoriaRouter.get('/list', (req, res) => {
+cafetoriaRouter.get('/', (req, res) => {
     return res.json(data);
 });
 
