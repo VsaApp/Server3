@@ -22,12 +22,13 @@
     ],
     "openDoorDay": "Tag der Offenen Tür",
     "openDoorDayReplacement": "Ersatz für Tag der Offenen Tür",
-    "holidays": "Ferien", 
+    "holidays": "Ferien",
     "newTimetable": "Es gibt einen neuen Stundenplan",
     "timetable": "Stundenplan",
-    "noChanges": "Es gibt keine Änderungen für dich",
+    "noChanges": "Keine Änderungen",
     "exam": "Klausur",
     "change": "Änderung",
+    "changes": "Änderungen",
     "freeLesson": "Freistunde",
     "hour": "Stunde"
 }

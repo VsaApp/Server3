@@ -48,7 +48,7 @@ export const sendNotifications = async (isDev: boolean, day: number, substitutio
                             else if (s.type === 1) text += getLocalization('freeLesson');
                             else if (s.type === 2) text += getLocalization('exam');
                             if (unsure) text += ')';
-                            
+
                             return text;
                         }).join('\n');
                         if (text.length === 0) text = getLocalization('noChanges');
@@ -61,7 +61,7 @@ export const sendNotifications = async (isDev: boolean, day: number, substitutio
                             setNotification(user.username, day, notificationKey);
                         } else {
                             console.log(`Notification not changed for user ${user.username}`);
-                            continue;
+                            if (!isDev) continue;
                         }
 
                         const title = getWeekday(weekday);
@@ -87,13 +87,15 @@ export const sendNotifications = async (isDev: boolean, day: number, substitutio
         console.log(`Send ${notifications.size} different notifications`)
         for (var notification of Array.from(notifications.keys())) {
             try {
+                const changesCount = notification.split('|')[1].split('\n').length;
                 await sendNotification({
                     devices: notifications.get(notification) || [],
-                    group: weekday.toString(),
-                    text: notification.split('||')[1],
+                    body: changesCount == 0 ? notification.split('||')[1] : `${changesCount} ${getLocalization('changes')}`,
+                    bigBody: notification.split('||')[1],
                     title: notification.split('||')[0],
                     data: {
-                        type: 'substitution plan'
+                        type: 'substitution plan',
+                        weekday: weekday.toString()
                     }
                 });
             }

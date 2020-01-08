@@ -80,8 +80,8 @@ export const sendNotifications = async (isDev: boolean): Promise<void> => {
 
         await sendNotification({
             devices: devices,
-            group: 'timetableChanged',
-            text: getLocalization('newTimetable'),
+            body: getLocalization('newTimetable'),
+            bigBody: getLocalization('newTimetable'),
             title: getLocalization('timetable'),
             data: {
                 type: 'timetable'
