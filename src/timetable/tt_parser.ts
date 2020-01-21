@@ -91,7 +91,7 @@ export const extractData = (data: string[]): Timetables => {
                                     }]
                                 }
                             }
-                            const subjectID = subject.replace(/[0-9]/g, '').replace('Schw', 'Sp').toLowerCase();
+                            const subjectID = subject.replace('Schw', 'Sp').toLowerCase();
                             const courseID = `${grade}-${course != null ? course : `${block}+${teacher}`}-${subjectID}`.toLowerCase();
                             const teacherID = teacher.toLowerCase();
                             const _unit = _grade.data.days[day].units[unit];
@@ -107,7 +107,7 @@ export const extractData = (data: string[]): Timetables => {
                                     unit: unit,
                                     id: `${grade}-2-${day}-${unit}-${_unit.subjects.length}`,
                                     courseID: courseID,
-                                    subjectID: subjectID,
+                                    subjectID: subjectID.replace(/[0-9]/g, ''),
                                     block: block,
                                     teacherID: teacherID,
                                     roomID: getRoomID(room.toLowerCase()),
