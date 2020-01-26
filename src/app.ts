@@ -20,7 +20,7 @@ import { updatedMinutely, updatedDaily, statusRouter } from './status/status_but
 
 const app = express();
 app.use(cors());
-app.use(basicAuth({ authorizer: authorizer, challenge: true }));
+app.use(basicAuth({ authorizer: authorizer, challenge: true, authorizeAsync: true }));
 
 app.get('/', (req, res) => {
     res.send('Hello world!');

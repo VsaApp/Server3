@@ -19,7 +19,7 @@ updatesRouter.get('/', async (req, res) => {
         substitutionPlan: allUpdates.get('substitution_plan_0') || '',
         subjects: allUpdates.get('subjects') || '',
         minAppLevel: 27,
-        grade: getGrade(auth.username, auth.password)
+        grade: await getGrade(auth.username, auth.password)
     };
     return res.json(updates);
 });

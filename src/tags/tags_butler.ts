@@ -35,7 +35,7 @@ tagsRouter.post('/', async (req, res) => {
     const auth = getAuth(req);
     setUser({
         username: auth.username,
-        grade: getGrade(auth.username, auth.password),
+        grade: await getGrade(auth.username, auth.password),
         group: isDeveloper(auth.username) ? 5 : 1,
     });
 

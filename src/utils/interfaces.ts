@@ -129,6 +129,12 @@ export interface CafetoriaLogin {
     timestamp: string;
 }
 
+export interface LdapUser {
+    status: boolean,
+    grade: string,
+    isTeacher: boolean
+}
+
 export interface User {
     username: string;
     /** Grade in lowercase */ 

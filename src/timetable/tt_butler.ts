@@ -12,9 +12,9 @@ export const timetableRouter = express.Router();
 var timetables: Timetables;
 var timetablePromise: Promise<Timetables | undefined> | undefined;
 
-timetableRouter.get('/', (req, res) => {
+timetableRouter.get('/', async (req, res) => {
     const auth = getAuth(req);
-    const grade = getGrade(auth.username, auth.password);
+    const grade = await getGrade(auth.username, auth.password);
     return res.json(timetables.grades[grade]);
 });
 

@@ -2,7 +2,7 @@ import admin from 'firebase-admin';
 import path from 'path';
 import { Device, User } from './interfaces';
 import { getAllDevices, rmvDevice, getUsers, getDevices, rmvUser, rmvPreferences, rmvSelections, rmvExams, rmvNotifications, rmvDevices } from '../tags/tags_db';
-import { getGrade, checkUsername } from '../authentication/ldap';
+import { checkUsername } from '../authentication/ldap';
 import { rmvCafetoriaLogin } from '../cafetoria/cafetoria_db';
 
 export const initFirebase = () => {
@@ -53,7 +53,7 @@ export const removeOldDevices = async () => {
     const users: User[] = await getUsers();
     for (var user of users) {
         const devices = await getDevices(user.username);
-        if (!checkUsername(user.username) || devices.length === 0) {
+        if (!await checkUsername(user.username) || devices.length === 0) {
             // Delete complete user data
             rmvUser(user);
             rmvDevices(user.username);
