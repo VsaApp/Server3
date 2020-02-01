@@ -53,7 +53,8 @@ export const removeOldDevices = async () => {
     const users: User[] = await getUsers();
     for (var user of users) {
         const devices = await getDevices(user.username);
-        if (!await checkUsername(user.username) || devices.length === 0) {
+        const userExists = await checkUsername(user.username)
+        if (!userExists || devices.length === 0) {
             // Delete complete user data
             rmvUser(user);
             rmvDevices(user.username);
@@ -66,5 +67,5 @@ export const removeOldDevices = async () => {
         }
     }
     console.log(`Removed ${count} users`);
-    
+
 }

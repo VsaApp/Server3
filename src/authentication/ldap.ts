@@ -8,7 +8,7 @@ import { LdapUser } from '../utils/interfaces';
 const ldapRequest = (username: string, password: string): Promise<LdapUser> => {
     return new Promise<LdapUser>((resolve, reject) => {
         const options: request.CoreOptions = { auth: { username: username, password: password } };
-        request.get(config.ldapUrl, options, (err, res, body) => {
+        request.get(`${config.ldapUrl}/login`, options, (err, res, body) => {
             if (err) {
                 console.log('Failed to check login:', err);
                 resolve({ status: false, grade: '', isTeacher: false });
@@ -25,8 +25,18 @@ const checkLogin = async (username: string, password: string): Promise<boolean> 
 }
 
 export const checkUsername = async (username: string): Promise<boolean> => {
-    //TODO: Add function to LDAP api
-    return true;
+    return new Promise<boolean>((resolve, reject) => {
+        const options: request.CoreOptions = { auth: { username: config.ldapUsername, password: config.ldapPassword } };
+        request.get(`${config.ldapUrl}/user/${username}`, options, (err, res, body) => {
+            if (err) {
+                console.log('Failed to check username:', err);
+                resolve(false);
+            } else {
+                const status = body === 'true';
+                resolve(status);
+            }
+        });
+    });
 }
 
 export const getGrade = async (username: string, password: string): Promise<string> => {
