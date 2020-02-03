@@ -39,7 +39,7 @@ export const extractData = (data: string[]): Timetables => {
                 const grade = grades[l];
 
                 // Skip all grades
-                if (grade == 'ag') {
+                if (grade == 'ag' || grade.length === 0) {
                     continue;
                 }
 
