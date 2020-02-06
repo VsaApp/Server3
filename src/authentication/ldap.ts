@@ -30,7 +30,7 @@ export const checkUsername = async (username: string): Promise<boolean> => {
         request.get(`${config.ldapUrl}/user/${username}`, options, (err, res, body) => {
             if (err) {
                 console.log('Failed to check username:', err);
-                resolve(false);
+                resolve(true);
             } else {
                 const status = body === 'true';
                 resolve(status);
