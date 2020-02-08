@@ -9,7 +9,7 @@ const ldapRequest = (username: string, password: string): Promise<LdapUser> => {
     return new Promise<LdapUser>((resolve, reject) => {
         const options: request.CoreOptions = { auth: { username: username, password: password }, timeout: 1500 };
         try {
-            request.get(`${config.ldapUrl}/logfin`, options, (err, res, body) => {
+            request.get(`${config.ldapUrl}/login`, options, (err, res, body) => {
                 if (err) {
                     console.log('Failed to check login:', err);
                     reject();
