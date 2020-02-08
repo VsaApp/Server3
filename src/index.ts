@@ -1,5 +1,6 @@
 import app from './app';
+import config from './utils/config';
 
-app.listen(process.env.PORT || 8000, () => {
-    console.log('Listening on port ' + (process.env.PORT || 8000));
+app.listen(config.port, () => {
+    console.log('Listening on port ' + (config.port));
 });

@@ -1,15 +1,20 @@
 {
+    "port": "PORT",
     "username": "USERNAME",
     "password": "PASSWORD",
-    "rpPassword": "REPLACEMENTPLAN_PASSWORD",
-    "appAuthKey": "ONESIGNAL_AUTH_KEY",
-    "appId": "ONESIGNAL_APP_ID",
     "cafetoriaId": "YOUR_SERVICE_ID",
     "cafetoriaPin": "YOUR_SERVICE_PIN",
     "emailUser": "TEST@EXAMPLE.de",
     "emailKey": "EMAIL_KEY",
     "apiEndpoint": "https://api.vsa.2bad2c0.de/",
     "isFirstQ": true,
-    "viktoriaAppUsername": "USERNAME",
-    "viktoriaAppPassword": "PASSWORD"
+    "developers": ["USERNAME", "USERNAME"],
+    "ldapUrl": "URL_TO_LDAP_API",
+    "ldapUsername": "LDAP_DEVELOPER_USERNAME",
+    "ldapPassword": "LDAP_DEVELOPER_PASSWORD",
+    "dbHost": "HOST_URL",
+    "dbName": "DATABASE",
+    "dbUser": "USERNAME",
+    "dbPassword": "PASSWORD",
+    "dbPort": 3306
 }
