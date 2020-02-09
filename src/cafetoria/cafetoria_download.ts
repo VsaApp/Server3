@@ -67,9 +67,7 @@ const fetchData = async (id: string, pin: string): Promise<string> => {
  * @param pin of keyfop
  */
 export const fetchDataForUser = async (id: string, pin: string): Promise<Cafetoria> => {
-    if (id === '' && pin === '') {
-        return await JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'out', 'cafetoria', 'list.json'), 'utf-8'));
-    } else {
+    if (id !== '' && pin !== '') {
         return new Promise((resolve, reject) => {
             fetchData(id, pin).then((raw: any) => {
                 const data = parse(raw);
@@ -78,6 +76,7 @@ export const fetchDataForUser = async (id: string, pin: string): Promise<Cafetor
             }).catch(reject);
         });
     }
+    return { error: 'Credentials must not be null', saldo: undefined, days: [] };
 };
 
 /**

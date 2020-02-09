@@ -10,13 +10,14 @@ let data: Cafetoria | undefined;
 
 cafetoriaRouter.post('/', async (req, res) => {
     if (req.body.id === 'null' || req.body.pin === 'null' || req.body.id === undefined || req.body.pin === undefined) {
-        req.body.id = '';
-        req.body.pin = '';
+        res.json(data);
+        return;
     }
     try {
-        res.json(await fetchDataForUser(req.body.id, req.body.pin));
+        const result = await fetchDataForUser(req.body.id, req.body.pin);
+        res.json({ error: result.error, days: data?.days, saldo: result.saldo});
     } catch (e) {
-        res.json(e);
+        res.json({ error: e, days: data?.days, saldo: undefined});
     }
 });
 
