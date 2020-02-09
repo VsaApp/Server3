@@ -96,19 +96,14 @@ export interface SubstitutionDetails {
 
 // Updates
 export interface UpdateData {
-    /** ISO 8601 */
     timetable: string; // 
-    /** ISO 8601 */
     substitutionPlan: string;
-    /** ISO 8601 */
     cafetoria: string;
-    /** ISO 8601 */
     calendar: string;
-    /** ISO 8601 */
     workgroups: string;
-    /** ISO 8601 */
     subjects: string;
     minAppLevel: number;
+    aixformation: string;
     /** Grade in lowercase */
     grade: string;
 }

@@ -36,5 +36,8 @@ export const compareLatestSubjects = async (data: string): Promise<boolean> => a
 export const setLatestTimetable = (data: string): void => setUpdated('timetable', data);
 export const compareLatestTimetable = async (data: string): Promise<boolean> => await compareUpdate('timetable', data);
 
+export const setLatestAiXformation = (data: string): void => setUpdated('aixformation', data);
+export const compareLatestAiXformation = async (data: string): Promise<boolean> => await compareUpdate('aixformation', data);
+
 const _setLatestSubstitutionPlan = (day: number, data: string): void => setUpdated(`substitution_plan_${day}`, data);
 export const compareLatestSubstitutionPlan = async (day: number, data: string): Promise<boolean> => await compareUpdate(`substitution_plan_${day}`, data);

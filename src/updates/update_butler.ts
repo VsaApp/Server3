@@ -18,6 +18,7 @@ updatesRouter.get('/', async (req, res) => {
         workgroups: allUpdates.get('workgroups') || '',
         substitutionPlan: allUpdates.get('substitution_plan_0') || '',
         subjects: allUpdates.get('subjects') || '',
+        aixformation: allUpdates.get('aixformation') || '',
         minAppLevel: 27,
         grade: await getGrade(auth.username, auth.password)
     };
