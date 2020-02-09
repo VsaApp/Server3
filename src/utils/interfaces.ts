@@ -130,8 +130,8 @@ export interface CafetoriaLogin {
 }
 
 export interface LdapUser {
-    status: boolean,
-    grade: string,
+    status: boolean;
+    grade: string;
     isTeacher: boolean
 }
 
@@ -204,7 +204,7 @@ export interface Menu {
 }
 
 export interface Calendar {
-    years: number[],
+    years: number[];
     data: Event[]
 }
 
@@ -221,7 +221,7 @@ export interface Teacher {
 
 export interface WorkgroupsDay {
     weekday: number;
-    data: Workgroup[]
+    data: Workgroup[];
 }
 
 export interface Workgroup {
@@ -233,4 +233,23 @@ export interface Workgroup {
 
 export interface Subjects {
     [id: string]: string;
+}
+
+export interface AiXformation {
+    posts: Post[];
+    /** ISO-Date */
+    date: string;
+}
+
+export interface Post {
+    id: number;
+    date: string;
+    title: string;
+    content: string;
+    url: string;
+    thumbnailUrl: string;
+    mediumUrl: string;
+    fullUrl: string;
+    author: string;
+    tags: string[];
 }

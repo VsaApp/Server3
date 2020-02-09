@@ -8,7 +8,7 @@ import config from './config';
  * @returns {string} the raw html code as string 
  */
 export const fetchData = async (url: string, auth: boolean): Promise<string> => {
-    if (config) {
+    if (config && auth) {
         return (await got(url, {auth: config.username + ':' + config.password})).body;
     }
     return (await got(url)).body;

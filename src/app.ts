@@ -17,6 +17,7 @@ import { updateWorkgroups, workgroupsRouter } from './workgroups/workgroups_butl
 import { initFirebase, removeOldDevices } from './utils/firebase';
 import { initDatabase } from './utils/database';
 import { updatedMinutely, updatedDaily, statusRouter } from './status/status_butler';
+import { aixformationRouter, updateAiXformation } from './aixformation/axf_butler';
 
 const app = express();
 app.use(cors());
@@ -38,6 +39,7 @@ app.use('/teachers', teachersRouter);
 app.use('/subjects', subjectsRouter);
 app.use('/bugs', bugsRouter);
 app.use('/workgroups', workgroupsRouter);
+app.use('/aixformation', aixformationRouter);
 app.use('/status', statusRouter);
 
 
@@ -59,6 +61,7 @@ const daily = async (): Promise<void> => {
     await updateCalendar();
     await updateCafetoriaMenus();
     await updateWorkgroups();
+    await updateAiXformation();
     await removeOldDevices();
     const now = Date.now();
     const tomorrow = new Date();
