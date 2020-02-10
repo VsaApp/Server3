@@ -11,6 +11,9 @@ const ldapRequest = (username: string, password: string): Promise<LdapUser> => {
         try {
             request.get(`${config.ldapUrl}/login`, options, (err, res, body) => {
                 if (err) {
+                    if (err.message === 'ESOCKETTIMEDOUT') {
+                        err = 'timeout';
+                    }
                     console.log('Failed to check login:', err);
                     reject();
                 } else {
@@ -30,21 +33,28 @@ const ldapRequest = (username: string, password: string): Promise<LdapUser> => {
 }
 
 const checkLogin = async (username: string, password: string): Promise<boolean> => {
-    return new Promise<boolean>((resolve, reject) => {
+    return new Promise<boolean>(async (resolve, reject) => {
         const hashed = crypto.createHash('sha256').update(password).digest('hex');
-        ldapRequest(username, password)
-            .then((user) => {
-                if (user.status) {
-                    runDbCmd(`INSERT INTO users_login VALUES (\'${username}\', '${hashed}') ON DUPLICATE KEY UPDATE password = '${hashed}';`);
-                } else {
-                    runDbCmd(`DELETE FROM users_login WHERE username='${username}';`);
-                }
-                resolve(user.status);
-            })
-            .catch(async (_) => {
-                const userLogin = (await getDbResults(`SELECT * FROM users_login where username="${username}";`))[0];
-                resolve(userLogin ? (userLogin.password === hashed) : false);
-            });
+        const userLogin = (await getDbResults(`SELECT * FROM users_login where username="${username}";`))[0];
+        const status = userLogin ? (userLogin.password === hashed) : false;
+
+        if (status) {
+            resolve(status);
+        }
+        else {
+            ldapRequest(username, password)
+                .then((user) => {
+                    if (user.status) {
+                        runDbCmd(`INSERT INTO users_login VALUES (\'${username}\', '${hashed}') ON DUPLICATE KEY UPDATE password = '${hashed}';`);
+                    } else {
+                        runDbCmd(`DELETE FROM users_login WHERE username='${username}';`);
+                    }
+                    resolve(user.status);
+                })
+                .catch(async (_) => {
+                    resolve(false);
+                });
+        }
     });
 }
 
@@ -67,20 +77,20 @@ export const checkUsername = async (username: string): Promise<boolean> => {
     });
 }
 
-export const getGrade = async (username: string, password: string): Promise<string> => {
-    return new Promise<string>((resolve, reject) => {
-        ldapRequest(username, password)
-            .then((user) => {
-                resolve(user.grade);
-            })
-            .catch(async (_) => {
-                const user = await getUser(username)
-                if (user) {
-                    resolve(user.username);
-                } else {
+export const getGrade = async (username: string, password: string, cache = true): Promise<string> => {
+    return new Promise<string>(async (resolve, reject) => {
+        const user = await getUser(username)
+        if (user && cache) {
+            resolve(user.grade);
+        } else {
+            ldapRequest(username, password)
+                .then((user) => {
+                    resolve(user.grade);
+                })
+                .catch((_) => {
                     resolve('');
-                }
-            });
+                });
+        }
     });
 }
 
