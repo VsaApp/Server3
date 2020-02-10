@@ -1,11 +1,12 @@
 import config from '../utils/config';
 import request from 'request';
-import {parse} from 'node-html-parser';
+import { parse } from 'node-html-parser';
 import extractData from './cafetoria_parser';
 import path from 'path';
 import fs from 'fs';
 import { Cafetoria } from '../utils/interfaces';
 import { compareLatestCafetoria, setLatestCafetoria } from '../history/history';
+import { rejects } from 'assert';
 
 const isDev = process.argv.length === 3;
 
@@ -31,33 +32,48 @@ const isNew = async (data: any): Promise<boolean> => {
 const fetchData = async (id: string, pin: string): Promise<string> => {
     return new Promise((resolve, reject) => {
         const cookieJar = request.jar();
-        request.get({
-            url: 'https://www.opc-asp.de/vs-aachen/',
-            jar: cookieJar
-        }, () => {
-            request.post({
-                url: 'https://www.opc-asp.de/vs-aachen/?LogIn=true',
-                jar: cookieJar,
-                form: {
-                    sessiontest: (<any>cookieJar)._jar.store.idx['www.opc-asp.de']['/'].PHPSESSID.toString().split(';')[0].split('=')[1],
-                    f_kartennr: id,
-                    f_pw: pin
-                }
+        try {
+            request.get({
+                timeout: 4000,
+                url: 'https://www.opc-asp.de/vs-aachen/',
+                jar: cookieJar
             }, () => {
-                request.get({
-                    url: 'https://www.opc-asp.de/vs-aachen/menuplan.php?KID=' + id,
-                    jar: cookieJar
-                }, (error, response, body) => {
-                    if (response.statusCode !== 200) {
-                        reject({
-                            error: 'Invalid cafetoria credentials'
-                        });
-                        return;
-                    }
-                    resolve(body);
-                });
+                try {
+                    request.post({
+                        timeout: 4000,
+                        url: 'https://www.opc-asp.de/vs-aachen/?LogIn=true',
+                        jar: cookieJar,
+                        form: {
+                            sessiontest: (<any>cookieJar)._jar.store.idx['www.opc-asp.de']['/'].PHPSESSID.toString().split(';')[0].split('=')[1],
+                            f_kartennr: id,
+                            f_pw: pin
+                        }
+                    }, () => {
+                        try {
+                            request.get({
+                                timeout: 4000,
+                                url: 'https://www.opc-asp.de/vs-aachen/menuplan.php?KID=' + id,
+                                jar: cookieJar
+                            }, (error, response, body) => {
+                                if (response.statusCode !== 200) {
+                                    reject({
+                                        error: 'Invalid cafetoria credentials'
+                                    });
+                                    return;
+                                }
+                                resolve(body);
+                            });
+                        } catch (e) {
+                            reject(e);
+                        }
+                    });
+                } catch (e) {
+                    reject(e);
+                }
             });
-        });
+        } catch (e) {
+            reject(e);
+        }
     });
 };
 
@@ -95,9 +111,7 @@ export const download = (checkIfNew = true): Promise<Cafetoria | undefined> => {
             }
             resolve(undefined);
         }).catch(() => {
-            reject({
-                error: 'Wrong Cafetoria credentials'
-            });
+            reject('Wrong Cafetoria credentials');
         });
     });
 }

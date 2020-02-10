@@ -30,6 +30,6 @@ export const updateCafetoriaMenus = async (): Promise<void> => {
         download(data != undefined).then((_data) => {
             data = _data || data;
             resolve()
-        }).catch((reason) => console.error(reason));
+        }).catch((reason) => reject(reason));
     });
 };

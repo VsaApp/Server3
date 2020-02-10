@@ -47,7 +47,11 @@ app.use('/status', statusRouter);
  * Downloads every minute the substitutionPlan
  */
 const minutely = async (): Promise<void> => {
-    await updateSubstitutionPlan();
+    try {
+        await updateSubstitutionPlan();
+    } catch (e) {
+        console.error('Failed to run minutely update:', e);
+    }
     setTimeout(minutely, 60000);
     updatedMinutely();
 };
@@ -55,14 +59,27 @@ const minutely = async (): Promise<void> => {
  * Downloads every 24 hours the substitutionPlan
  */
 const daily = async (): Promise<void> => {
-    await updateSubjects();
-    await updateTeachers();
-    await updateTimetable();
-    await updateCalendar();
-    await updateCafetoriaMenus();
-    await updateWorkgroups();
-    await updateAiXformation();
-    await removeOldDevices();
+    const updates: any = {
+        'subjects': async () => await updateSubjects(),
+        'teachers': async () => await updateTeachers(),
+        'timetable': async () => await updateTimetable(),
+        'calendar': async () => await updateCalendar(),
+        'cafetoria': async () => await updateCafetoriaMenus(),
+        'workgroups': async () => await updateWorkgroups(),
+        'aixformation': async () => await updateAiXformation(),
+        'devices': async () => await removeOldDevices(),
+    };
+    for (var update of Object.keys(updates)) {
+        try {
+            console.log('Update', update);
+            await updates[update]().catch((e: any) => {
+                console.error(`Failed to run daily update ${updates[update]}:`, e);
+            });
+        } catch (e) {
+            console.error(`Failed to run daily update ${updates[update]}:`, e);
+        }
+    }
+
     const now = Date.now();
     const tomorrow = new Date();
     tomorrow.setHours(18, 0, 0);
