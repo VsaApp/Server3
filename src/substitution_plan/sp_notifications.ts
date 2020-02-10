@@ -36,7 +36,8 @@ export const sendNotifications = async (isDev: boolean, day: number, substitutio
                 const devices = await getDevices(user.username);
                 for (let device of devices) {
                     try {
-                        const getNotifications = await getPreference(device.firebaseId, 'spNotifications');
+                        var getNotifications = await getPreference(device.firebaseId, 'spNotifications');
+                        if (getNotifications === undefined) getNotifications = true;
                         if (!getNotifications) continue;
                         var text = substitutions.map((s) => {
                             const unsure = s.courseID === undefined && s.id === undefined;
