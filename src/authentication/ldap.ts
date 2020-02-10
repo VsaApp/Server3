@@ -64,6 +64,9 @@ export const checkUsername = async (username: string): Promise<boolean> => {
         try {
             request.get(`${config.ldapUrl}/user/${username}`, options, (err, res, body) => {
                 if (err) {
+                    if (err.message === 'ESOCKETTIMEDOUT') {
+                        err = 'timeout';
+                    }
                     console.log('Failed to check username:', err);
                     resolve(true);
                 } else {
