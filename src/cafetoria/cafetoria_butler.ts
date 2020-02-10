@@ -28,8 +28,11 @@ cafetoriaRouter.get('/', (req, res) => {
 export const updateCafetoriaMenus = async (): Promise<void> => {
     return new Promise((resolve, reject) => {
         download(data != undefined).then((_data) => {
-            data = _data || data;
+            data = _data || data || {saldo: undefined, error: '?', days: []};
             resolve()
-        }).catch((reason) => reject(reason));
+        }).catch((reason) => {
+            data = data || { saldo: undefined, error: '?', days: [] };
+            reject(reason)
+        });
     });
 };
