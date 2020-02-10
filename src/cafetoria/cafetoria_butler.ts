@@ -15,9 +15,9 @@ cafetoriaRouter.post('/', async (req, res) => {
     }
     try {
         const result = await fetchDataForUser(req.body.id, req.body.pin);
-        res.json({ error: result.error, days: data?.days, saldo: result.saldo});
+        res.json({ error: result.error?.toString(), days: data?.days, saldo: result.saldo});
     } catch (e) {
-        res.json({ error: e, days: data?.days, saldo: undefined});
+        res.json({ error: e.toString(), days: data?.days, saldo: undefined});
     }
 });
 
