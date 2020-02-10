@@ -53,7 +53,7 @@ const download = async (checkIfUpdated = true): Promise<Timetables | undefined> 
 
         // Send notifications
         if (_isNew) {
-            rmvAllSelections();
+            // rmvAllSelections();
         };
         if (_isNew || isDev) await sendNotifications(isDev);
         return timetable;

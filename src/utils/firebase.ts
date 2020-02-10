@@ -53,7 +53,7 @@ export const removeOldDevices = async () => {
     const users: User[] = await getUsers();
     for (var user of users) {
         const _devices = await getDevices(user.username);
-        const userExists = await checkUsername(user.username)
+        const userExists = await checkUsername(user.username);
         if (!userExists || _devices.length === 0) {
             // Delete complete user data
             rmvUser(user);

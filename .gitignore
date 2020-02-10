@@ -68,3 +68,5 @@ config.json
 firebase.json
 tags.json
 unstf.txt
+restore.ts
+data.json
