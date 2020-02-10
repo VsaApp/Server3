@@ -67,7 +67,7 @@ const daily = async (): Promise<void> => {
         'cafetoria': async () => await updateCafetoriaMenus(),
         'workgroups': async () => await updateWorkgroups(),
         'aixformation': async () => await updateAiXformation(),
-        //'devices': async () => await removeOldDevices(),
+        'devices': async () => await removeOldDevices(),
     };
     for (var update of Object.keys(updates)) {
         try {

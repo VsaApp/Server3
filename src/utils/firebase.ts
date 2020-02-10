@@ -52,9 +52,9 @@ export const removeOldDevices = async () => {
     count = 0;
     const users: User[] = await getUsers();
     for (var user of users) {
-        const devices = await getDevices(user.username);
+        const _devices = await getDevices(user.username);
         const userExists = await checkUsername(user.username)
-        if (!userExists || devices.length === 0) {
+        if (!userExists || _devices.length === 0) {
             // Delete complete user data
             rmvUser(user);
             rmvDevices(user.username);
@@ -62,7 +62,7 @@ export const removeOldDevices = async () => {
             rmvExams(user.username);
             rmvNotifications(user.username);
             rmvCafetoriaLogin(user.username);
-            devices.forEach((device) => rmvPreferences(device.firebaseId));
+            _devices.forEach((device) => rmvPreferences(device.firebaseId));
             count++;
         }
     }

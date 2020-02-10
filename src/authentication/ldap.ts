@@ -67,7 +67,7 @@ export const checkUsername = async (username: string): Promise<boolean> => {
                     console.log('Failed to check username:', err);
                     resolve(true);
                 } else {
-                    const status = body === 'true';
+                    const status = body !== 'false';
                     resolve(status);
                 }
             });
