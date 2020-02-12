@@ -11,5 +11,20 @@ aixformationRouter.get('/', (req, res) => {
 });
 
 export const updateAiXformation = async (): Promise<void> => {
-    aixformation = await download();
+    return new Promise<void>((resolve, reject) => {
+        download()
+            .then((data) => {
+                aixformation = data || aixformation ||  defaultValue;
+                resolve();
+            })
+            .catch(() => {
+                aixformation = aixformation || defaultValue;
+                reject();
+            });
+    });
+};
+
+const defaultValue: AiXformation = {
+    date: new Date().toISOString(),
+    posts: [],
 };
